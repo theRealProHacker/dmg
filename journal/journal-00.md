@@ -2,7 +2,7 @@
 
 Nun habe ich die nächsten Monate Zeit, um ein Produkt zu schaffen, dass Anderen nutzt und auf das ich stolz sein kann. Gleichzeitig muss ich darauf achten, einen wissenschaftlichen Standard aufrechtzuerhalten und am Ende möchte ich auch eine Bachelorarbeit haben, die einer Publikation wert ist. 
 
-Diese Reihe von "Gedanken" stellt ein Tagebuch für meine Gedanken dar. Dies ist hilfreich, da ich mir oft viele Gedanken mache, diese jedoch nicht aufschreibe, was wodurch es so scheint als hätte ich mir gar keine Gedanken gemacht und meine Entscheidungen arbiträr getroffen. Meine Absicht ist außerdem die Bachelorarbeit am Ende auf Grundlage dieser Notizen zu schreiben. 
+Diese Reihe von "Gedanken" stellt ein Tagebuch für meine Gedanken dar. Dies ist hilfreich, da ich mir oft viele Gedanken mache, diese jedoch nicht aufschreibe, wodurch es so scheint als hätte ich mir gar keine Gedanken gemacht und meine Entscheidungen arbiträr getroffen. Meine Absicht ist außerdem die Bachelorarbeit am Ende auf Grundlage dieser Notizen zu schreiben. 
 
 ## Ein erster Prototyp
 
