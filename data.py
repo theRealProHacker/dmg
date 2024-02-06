@@ -3,6 +3,8 @@ The data module encapsulates all static data to represent a single source of tru
 for all other modules
 """
 
+# TODO: use pyarabic.araby constants
+
 alif = "\u0627"
 waw = "\u0648"
 alif_maksurah = "\u0649"
@@ -100,17 +102,9 @@ sun_letters = set("tṯdḏrzsšṣḍṭẓn")
 #     "|".join(hex(ord(x)) for x in arab) for arab in char_map|diacritic_map
 # ])
 
-prefixes = {
+
+latin_prefixes = {
     "al"
 }
 
-prefix_lengths = {len(p) for p in prefixes}
-
-prefix_blacklist = {
-    "allah",
-}
-
-proper_names = {
-    "allah",
-    "muhammad",
-}
+latin_prefix_lengths = {len(p) for p in prefixes}
