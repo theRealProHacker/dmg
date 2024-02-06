@@ -15,7 +15,7 @@ Pos = Literal["stopword", "noun", "verb"]
 @dataclass
 class Profile:
     pausa: bool = False
-    skip_ta_marbatuh: bool = False
+    ta_marbatuh: bool = False
     # skip_i3rab: bool = False
     # """Whether i3rab (flexion endings) should be skipped"""
     # full_vocalisation: bool = False
@@ -26,6 +26,11 @@ class Profile:
     # TODO: alif maqsura to ya
     # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
     # TODO: alif maqsura mit Unterpunkt
+
+    descriptions = {
+        "pausa": ("Pausa", "Ob der Text in Pausa gelesen werden soll"),
+        "ta_marbatuh": ("Ta marbuta", "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll"),
+    }
 
 
 @dataclass
@@ -123,6 +128,8 @@ def tokenize(text: str, profile: Profile)->list[Token]:
     return tokens
 
 def transliterate(text: str, profile: Profile)->str:
+    if not text:
+        return ""
     tokens = tokenize(text, profile)
     for token in tokens:
         token.map_chars()

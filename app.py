@@ -4,21 +4,19 @@ from trans import Profile, transliterate
 
 app = Flask(__name__)
 
-profile_descriptions = {
-    "pausa": ("Pausa", "Ob der Text in Pausa gelesen werden soll"),
-    "skip_ta_marbatuh": ("Ta marbuta nicht wiedergeben", "Ob die Ta marbuta am Ende eines Wortes nicht wiedergegeben werden soll"),
-}
-
 @app.route('/')
 def index():
     # name, value, type, title, description
-    profile_data = [
+    profile = [
         (
             name, field.default, field.type.__name__, 
-            profile_descriptions.get(name, " ".join(name.split("_")).capitalize())
+            *Profile.descriptions.get(
+                name, 
+                (" ".join(name.split("_")).capitalize(), "")
+            )
         ) for (name,field) in Profile.__dataclass_fields__.items()
     ]
-    return render_template('index.html')
+    return render_template('index.html', profile=profile)
 
 @app.route('/transliterate', methods=['POST'])
 def trans():

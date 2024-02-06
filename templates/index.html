@@ -84,7 +84,21 @@
                 </div>
             </div>
             <aside id="side-bar" class="collapse-horizontal">
-                <div class="container-fluid"></div>
+                <div class="container-fluid">
+                    <h2>Profile</h2>
+                    <p>Profile settings will be here.</p>
+
+                    {% for (name, value, type, title, description) in profile %}
+                        {% if type == 'bool' %}
+                            <div class="form-check form-switch mb-3">
+                                <input id="{{name}}-profile-input" class="form-check-input" type="checkbox" role="switch" name="{{name}}" {% if value %} checked {% endif %}>
+                                <label class="form-check-label" for="{{name}}-profile-input" title="{{description}}">
+                                    {{title}}
+                                </label>
+                            </div>
+                        {% endif %}
+                    {%endfor%}
+                </div>
             </aside>
         </main>
     </div>
@@ -94,21 +108,35 @@
         let timeoutId;
         const input = document.getElementById('input-text');
         const output = document.getElementById('output-text');
+        const profile_inputs = document.querySelectorAll('#side-bar input[name]');
 
-        input.addEventListener('input', function () {
+        const send_request = () => {
+            const text = input.value;
+            const profile = {};
+            // TODO: This only works for booleans
+            profile_inputs.forEach(input => {
+                if (input.type === 'checkbox') {
+                    profile[input.name] = input.checked
+                }
+            });
+
+            fetch('/transliterate', { method: 'POST', body: JSON.stringify({ text, profile }) })
+            .then(response => response.ok 
+                ? response.text() 
+                : (()=>{throw new Error(response.status + ' ' + response.statusText)})()
+            )
+            .then(data => output.value = data)
+            .catch(error => console.error('Error:', error));
+            // TODO: real error handling
+            console.log(text, profile);
+        }
+
+        input.addEventListener('input', () => {
             clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                const text = input.value;
-                const profile = {};
-
-                fetch('/transliterate', { method: 'POST', body: JSON.stringify({ text, profile }) })
-                .then(response => response.text())
-                .then(data => output.value = data)
-                .catch(error => console.error('Error:', error));
-                // TODO: real error handling
-                console.log(text, profile);
-            }, 1000); 
+            timeoutId = setTimeout(send_request, 1000); 
         });
+
+        profile_inputs.forEach(input => input.addEventListener('change', send_request));
     </script>
 </body>
 </html>
