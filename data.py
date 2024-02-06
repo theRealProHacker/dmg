@@ -107,4 +107,4 @@ latin_prefixes = {
     "al"
 }
 
-latin_prefix_lengths = {len(p) for p in prefixes}
+# latin_prefix_lengths = {len(p) for p in prefixes}
