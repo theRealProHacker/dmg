@@ -8,12 +8,10 @@ from pyarabic import araby
 import naftawayh.wordtag
 import naftawayh.wordtag_const as wordtag_const
 import qalsadi.stemmedword as stemmedword
-import qalsadi.disambig as disambig
 # import tashaphyne.stemming
 # stemmer = tashaphyne.stemming.ArabicLightStemmer()
 
 remove_i3rab = araby.strip_lastharaka
-
 
 def normalize(text: str) -> str:
     """
@@ -28,18 +26,21 @@ def normalize(text: str) -> str:
     # text = araby.autocorrect(text)
     return text
 
-
 _tokenize = araby.tokenize_with_location
 
-
-def tokenize_with_location(text: str) -> list[str]:
+def tokenize_with_location(text: str) -> tuple[list[str], list[int], list[int]]:
     """
     Tokenizes Arabic text with the tokens location and without any empty tokens
 
     From:
     qalsadi.analex.Analex.text_tokenize
+
+    Usage
+    ```py
+    tokens, starts, ends = tokenize_with_location(text)
+    ```
     """
-    return [x for x in _tokenize(text) if x["token"]]
+    return zip(*([*x.values()] for x in _tokenize(text) if x["token"]))
 
 
 Tag = Literal["t", "v", "n", "nv"]
@@ -58,7 +59,8 @@ class WordTagger(naftawayh.wordtag.WordTagger):
 
     tag_world_alone is cached using functools.cache
 
-    tag_word works similarly to the original one_word_tagging but doesn't append digits to the tag
+    tag_word works similarly to the original one_word_tagging 
+    but doesn't append digits to the tag
     """
 
     @cache
@@ -84,20 +86,13 @@ class WordTagger(naftawayh.wordtag.WordTagger):
         if tag == "nv" and previous:
             if previous in wordtag_const.tab_verb_context:
                 return "v"
-            elif previous in wordtag_const.tab_noun_context:
+            if previous in wordtag_const.tab_noun_context:
                 return "n"
-            if second_previous and (
-                second_previous in wordtag_const.tab_noun_context
-                or second_previous in wordtag_const.tab_noun_context
-            ):
+            if second_previous and second_previous in wordtag_const.tab_noun_context:
                 return "t"
         return tag
 
-
 tagger = WordTagger()
-
-disambiguator = disambig.Disambiguator()
-
 
 def check_word(word: str, tag: str) -> list[str]:
     """
@@ -106,7 +101,6 @@ def check_word(word: str, tag: str) -> list[str]:
     From:
     qalsadi.analex.Analex.check_word
     """
-
 
 def check_words(tokens: list[str]) -> list[dict]:
     """
@@ -117,20 +111,11 @@ def check_words(tokens: list[str]) -> list[dict]:
     """
     guessed_tags = tagger.word_tagging(tokens)
 
-    if len(guessed_tags) != len(tokens):
-        guessed_tags = ["nv"] * len(tokens)
-
-    if False:
-        newwordlist = disambiguator.disambiguate_words(tokens, guessed_tags)
-
-        # avoid the incomplete list
-        if len(newwordlist) == len(tokens):
-            list_word = newwordlist
-
     resulted_data = []
 
-    for word, tag in zip(list_word, guessed_tags):
+    for word, tag in zip(tokens, guessed_tags):
         one_data_list = check_word(word, tag)
         stemmed_one_data_list = [stemmedword.StemmedWord(w) for w in one_data_list]
         resulted_data.append(stemmed_one_data_list)
+
     return resulted_data
