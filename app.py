@@ -4,31 +4,34 @@ from trans import Profile, transliterate
 
 app = Flask(__name__)
 
-@app.route('/')
+
+@app.route("/")
 def index():
     # name, value, type, title, description
     profile = [
         (
-            name, field.default, field.type.__name__, 
+            name,
+            field.default,
+            field.type.__name__,
             *Profile.descriptions.get(
-                name, 
-                (" ".join(name.split("_")).capitalize(), "")
-            )
-        ) for (name,field) in Profile.__dataclass_fields__.items()
+                name, (" ".join(name.split("_")).capitalize(), "")
+            ),
+        )
+        for (name, field) in Profile.__dataclass_fields__.items()
     ]
-    return render_template('index.html', profile=profile)
+    return render_template("index.html", profile=profile)
 
-@app.route('/transliterate', methods=['POST'])
+
+@app.route("/transliterate", methods=["POST"])
 def trans():
     """
     Takes a string of Arabic text and settings and returns a transliteration
     """
     data = json.loads(request.data)
-    text = data['text']
-    profile = Profile(**data['profile'])
+    text = data["text"]
+    profile = Profile(**data["profile"])
     return transliterate(text, profile)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

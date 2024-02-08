@@ -4,13 +4,15 @@ import data
 from typing import Literal
 
 from pyarabic import araby
-import qalsadi.lemmatizer, qalsadi.analex
+import qalsadi.lemmatizer
+import qalsadi.analex
 
 analex = qalsadi.analex.Analex()
 lemmatizer = qalsadi.lemmatizer.Lemmatizer()
 lemmatizer.set_vocalized_lemma()
 
 Pos = Literal["stopword", "noun", "verb"]
+
 
 @dataclass
 class Profile:
@@ -29,7 +31,10 @@ class Profile:
 
     descriptions = {
         "pausa": ("Pausa", "Ob der Text in Pausa gelesen werden soll"),
-        "ta_marbatuh": ("Ta marbuta", "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll"),
+        "ta_marbatuh": (
+            "Ta marbuta",
+            "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
+        ),
     }
 
 
@@ -48,7 +53,7 @@ class Token:
 
     def determine_prefix(self):
         """
-        Determines whether the token begins with a prefix 
+        Determines whether the token begins with a prefix
         and sets the prefix attribute accordingly
         """
         # for length in data.prefix_lengths:
@@ -63,12 +68,12 @@ class Token:
         Replaces the arab chars with latin chars
         and sets the latin attribute accordingly
         """
-        char_map = data.subs|data.diacritic_map|data.char_map|data.special_char_map
+        char_map = (
+            data.subs | data.diacritic_map | data.char_map | data.special_char_map
+        )
         # if self.is_pausa:
         #     char_map = data.pausa_map | char_map | data.pausa_map
-        rules = [
-            (re.compile(arab), latin) for arab, latin in char_map.items()
-        ]
+        rules = [(re.compile(arab), latin) for arab, latin in char_map.items()]
         word = self.arab
         if self.is_pausa:
             word = araby.strip_lastharaka(word)
@@ -92,12 +97,12 @@ class Token:
 
     def assimilate(self):
         """
-        Apply internal assimilations to the latin 
+        Apply internal assimilations to the latin
         """
         # sun letter assimilation
         first_letter = self.latin[0]
         if self.prefix.endswith("al") and first_letter in data.sun_letters:
-            self.prefix = self.prefix[:-1]+first_letter
+            self.prefix = self.prefix[:-1] + first_letter
 
     def result(self):
         """
@@ -105,29 +110,31 @@ class Token:
         """
         if self.is_name:
             self.latin = self.latin.capitalize()
-        return (self.prefix+"-" if self.prefix else "") + self.latin
+        return (self.prefix + "-" if self.prefix else "") + self.latin
 
-def tokenize(text: str, profile: Profile)->list[Token]:
+
+def tokenize(text: str, profile: Profile) -> list[Token]:
     """
     Tokenizes the `text` given a `profile` and returns a list of tokens.
     """
     # We simply use the qalsadi lib to tokenize the text and then lemmatize and pos tag each word.
     # optionally use araby.tokenize_with_location
     raw_tokens = analex.text_tokenize(text)
-    # analyzed has a list of possible configurations for each word. 
+    # analyzed has a list of possible configurations for each word.
     analyzed = analex.check_text(text)
     stemnodelist = lemmatizer.analyze(analyzed)
     lemmas = lemmatizer.get_lemmas(stemnodelist, return_pos=True)
     tokens = [
-        Token(arab, lemma, pos, is_pausa=profile.pausa) for (arab, (lemma, pos)) in zip(raw_tokens, lemmas)
+        Token(arab, lemma, pos, is_pausa=profile.pausa)
+        for (arab, (lemma, pos)) in zip(raw_tokens, lemmas)
     ]
     tokens[-1].is_pausa = True
     # TODO: set is_part_of_idafah
 
-
     return tokens
 
-def transliterate(text: str, profile: Profile)->str:
+
+def transliterate(text: str, profile: Profile) -> str:
     if not text:
         return ""
     tokens = tokenize(text, profile)
@@ -138,6 +145,7 @@ def transliterate(text: str, profile: Profile)->str:
         token.assimilate()
     print(tokens)
     return " ".join(t.result() for t in tokens)
+
 
 if __name__ == "__main__":
     text = "يَكْتُبُ الكَلْبُ"
