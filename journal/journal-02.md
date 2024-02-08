@@ -43,7 +43,7 @@ Frage ist, inwieweit die Korrektheit und Genauigkeit dieser Bibliotheken gegeben
 ## TODO
 - Rausfinden (ausprobieren), ob es besser ist Präfix- und Eigennamenbestimmung nach oder vor der Buchstabenersetzung zu tun und Grund aufschreiben
 - Das `qalsadi` SQLite Problem lösen
-- Im Web (aka Internetz) hosten -> MVA und testen
+- Im Web (aka Internetz) hosten -> MVP und testen
 - Einen Transliterationsexperten bekommen -> Meine alte Arabischlehrerin hat sich noch nicht zurückgemeldet
 - Die Paper zu den genannten Quellen zumindest überfliegen und die Genauigkeit herausfinden/abschätzen
 
