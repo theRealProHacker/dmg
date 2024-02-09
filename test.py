@@ -1,4 +1,13 @@
+from arab_tools import tokenize_with_location
 from trans import transliterate, Profile
+
+
+def test_tokenization():
+    text = "يَكْتُبُ الكَلْبُ"
+    tokens, starts, ends = tokenize_with_location(text)
+    assert tokens == ("يَكْتُبُ", "الكَلْبُ")
+    assert starts == (0, 9)
+    assert ends == (8, 17)
 
 
 def test_sun_assimilation():
@@ -9,4 +18,4 @@ def test_sun_assimilation():
         assert transliterate(arab, profile) == latin
 
 
-test_sun_assimilation()
+# test_sun_assimilation()
