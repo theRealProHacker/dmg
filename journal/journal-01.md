@@ -20,7 +20,7 @@ Als Arabischfont bietet sich [Noto Naskh Arabic](https://fonts.google.com/noto/s
 
 ### Hosting
 
-Eine einfache Alternative ist zum Beispiel pythonanywhere. Ich habe mich dafür entschieden, [diesem Tutorial](https://www.youtube.com/watch?v=1FdrJPt77GU) zu folgen und [Zeet](https://zeet.co/r/thecodex) zu verwenden. 
+Eine einfache Alternative ist zum Beispiel pythonanywhere. ~~Ich habe mich dafür entschieden, [diesem Tutorial](https://www.youtube.com/watch?v=1FdrJPt77GU) zu folgen und [Zeet](https://zeet.co/r/thecodex) zu verwenden.~~
 
 ### Weiterführende Gedanken
 

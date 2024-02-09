@@ -1,5 +1,31 @@
 # Neuigkeiten und Fortschritte
 
+## UI
+
+### Webhosting
+
+Eine erste Version ist online verfügbar auf https://transliteration.eu.pythonanywhere.com/
+
+Die Server stehen in Deutschland und der Service ist kostenlos. Ich werde hier der Vollständigkeit halber kurz erläutern, wie das Aufsetzen funktioniert:
+
+1. Kostenloses Konto auf [eu.pythonanywhere.com](https://eu.pythonanywhere.com) mit dem richtigen Benutzernamen machen (in diesem Fall transliteration)
+2. Webapp erstellen und Flask mit app bei `app.py` aus den Optionen auswählen
+3. `git clone [repo-github-url]`
+4. `cd [repo]`, `python3 -m venv venv`, `. venv/bin/activate`, `pip install -r requirements.txt`
+5. Den Pfad zum Sourcecode und zum `venv` bei der Webapp configuration angeben: 
+    - `/home/transliteration/[repo]`
+    - `/home/transliteration/[repo]/venv`
+7. Die Webapp neustarten
+
+
+Es gibt nun außerdem eine Fehlermeldungen, wenn die Serveranfrage fehlschlägt
+
+### TODOs (perspektivisch)
+
+- besseres Design
+
+## Anderes
+
 Anscheinend hatte keiner von den Islamwissenschaftlern aktiv Interesse daran, mir zu helfen. Ich habe es jetzt noch einmal bei den Arabisten probiert.
 
 Trotz der Probleme mit qalsadi, konnte ich ein großes Stück weiterkommen. Ich konnte mittels Methode 3 des letzten Journals (Ich Ctrl+C/Ctrl+V den gesamten Code, den ich brauche und entferne alle Aufrufe zur SQLite-Datenbank) die SQLite-Problematik vorerst lösen. Die SQLite-Datenbank wird zum Speichern der Wortfrequenzdaten verwendet. Ich habe bis auf Weiteres die Frequenz aller Wörter auf 0 gesetzt. 
