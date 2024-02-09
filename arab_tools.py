@@ -9,10 +9,10 @@ import naftawayh.wordtag
 import naftawayh.wordtag_const as wordtag_const
 import qalsadi.analex
 import qalsadi.analex_const as analex_const
+import qalsadi.stem_noun
 import qalsadi.stem_verb
 import qalsadi.stopwords
 from pyarabic import araby
-from qalsadi.stem_noun import NounStemmer
 from qalsadi.stem_pounct_const import POUNCTUATION as PUNCTUATION
 from qalsadi.stem_stop import StopWordStemmer
 from qalsadi.stem_unknown import UnknownStemmer
@@ -110,13 +110,27 @@ class WordTagger(naftawayh.wordtag.WordTagger):
                 return "t"
         return tag
 
+
 class VerbStemmer(qalsadi.stem_verb.VerbStemmer):
+    def lookup_by_stamp(self, word):
+        """
+        lookup for word in dict
+        """
+        if word in self.verb_cache:
+            return self.verb_cache[word]
+        else:
+            result = self.verb_dictionary.lookup_by_stamp(word)
+            # remove this line to avoid SQLite call
+            # result += self.custom_verb_dictionary.lookup_by_stamp(word)
+            self.verb_cache[word] = result
+        return result
+
     def exists_as_stamp(self, word):
         """
         lookup for word in dict
         """
         stamp = self.verb_dictionary.word_stamp(word)
-        stamp = stamp.replace(araby.TEH,"")
+        stamp = stamp.replace(araby.TEH, "")
         # a verb stamp can't more than 4 letters
         # لا يمكن للفعل أن يكون فيه أكثر من أربعة حروف أصلية
         if len(stamp) > 4:
@@ -126,7 +140,22 @@ class VerbStemmer(qalsadi.stem_verb.VerbStemmer):
             # remove this line to avoid SQLite call
             # result +=  self.custom_verb_dictionary.exists_as_stamp(word)
             self.stamp_cache[stamp] = result
-        return self.stamp_cache.get(stamp, False)           
+        return self.stamp_cache.get(stamp, False)
+
+
+class NounStemmer(qalsadi.stem_noun.NounStemmer):
+    def lookup_dict(self, word):
+        """
+        lookup for word in dict
+        """
+        if word in self.noun_cache:
+            return self.noun_cache[word]
+        else:
+            result = self.noun_dictionary.lookup(word)
+            # Avoid SQLite call
+            # result +=  self.custom_noun_dictionary.lookup(word)
+            self.noun_cache[word] = result
+        return result
 
 tagger = WordTagger()
 nounstemmer = NounStemmer()
@@ -300,7 +329,7 @@ class Analex:
                     "freq": self.get_freq(word, "unknown"),
                     "syntax": "",
                     # addition
-                    "number": ()
+                    "number": (),
                 }
             )
 
@@ -316,6 +345,7 @@ class Analex:
         guessed_tags = [tagger.tag_word(token) for token in tokens]
 
         return [self.check_word(word, tag) for word, tag in zip(tokens, guessed_tags)]
+
 
 if __name__ == "__main__":
     text = "يَكْتُبُ الكَلْبُ"
