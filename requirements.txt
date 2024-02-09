@@ -1,2 +1,5 @@
 flask
 qalsadi
+
+# deployment
+gunicorn
