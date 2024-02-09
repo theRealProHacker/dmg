@@ -1,12 +1,13 @@
-from dataclasses import dataclass
 import re
-import data
+from dataclasses import dataclass
 from typing import Literal
 
-from pyarabic import araby
-import qalsadi.lemmatizer
 import qalsadi.analex
-from arab_tools import tokenize_with_location, Analex
+import qalsadi.lemmatizer
+from pyarabic import araby
+
+import data
+from arab_tools import Analex, tokenize_with_location
 
 analex = Analex()
 lemmatizer = qalsadi.lemmatizer.Lemmatizer()

@@ -1,5 +1,5 @@
 from arab_tools import tokenize_with_location
-from trans import transliterate, Profile
+from trans import Profile, transliterate
 
 
 def test_tokenization():

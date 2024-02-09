@@ -1,5 +1,7 @@
 import json
+
 from flask import Flask, render_template, request
+
 from trans import Profile, transliterate
 
 app = Flask(__name__)

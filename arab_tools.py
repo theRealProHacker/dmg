@@ -4,20 +4,22 @@ Extracting the essentials from linuxscouts arabic libraries
 
 from functools import cache
 from typing import Literal
-from pyarabic import araby
+
 import naftawayh.wordtag
 import naftawayh.wordtag_const as wordtag_const
+import qalsadi.analex
+import qalsadi.analex_const as analex_const
+import qalsadi.stem_verb
+import qalsadi.stopwords
+from pyarabic import araby
+from qalsadi.stem_noun import NounStemmer
+from qalsadi.stem_pounct_const import POUNCTUATION as PUNCTUATION
+from qalsadi.stem_stop import StopWordStemmer
+from qalsadi.stem_unknown import UnknownStemmer
 from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
-import qalsadi.analex
-from qalsadi.stem_noun import NounStemmer
-from qalsadi.stem_verb import VerbStemmer
-from qalsadi.stem_unknown import UnknownStemmer
-from qalsadi.stem_stop import StopWordStemmer
-from qalsadi.stem_pounct_const import POUNCTUATION as PUNCTUATION
-import qalsadi.stopwords
-import qalsadi.analex_const as analex_const
-from arramooz import wordfreqdictionaryclass
+
+# from arramooz import wordfreqdictionaryclass
 # import tashaphyne.stemming
 # stemmer = tashaphyne.stemming.ArabicLightStemmer()
 
@@ -108,6 +110,23 @@ class WordTagger(naftawayh.wordtag.WordTagger):
                 return "t"
         return tag
 
+class VerbStemmer(qalsadi.stem_verb.VerbStemmer):
+    def exists_as_stamp(self, word):
+        """
+        lookup for word in dict
+        """
+        stamp = self.verb_dictionary.word_stamp(word)
+        stamp = stamp.replace(araby.TEH,"")
+        # a verb stamp can't more than 4 letters
+        # لا يمكن للفعل أن يكون فيه أكثر من أربعة حروف أصلية
+        if len(stamp) > 4:
+            return False
+        if stamp not in self.stamp_cache:
+            result = self.verb_dictionary.exists_as_stamp(word)
+            # remove this line to avoid SQLite call
+            # result +=  self.custom_verb_dictionary.exists_as_stamp(word)
+            self.stamp_cache[stamp] = result
+        return self.stamp_cache.get(stamp, False)           
 
 tagger = WordTagger()
 nounstemmer = NounStemmer()
@@ -141,7 +160,7 @@ class Analex:
         Words frequency
         """
         return 0  # we don't want to access the file system
-        return freq_dict.get_freq(word, wordtype)
+        # return freq_dict.get_freq(word, wordtype)
 
     @staticmethod
     def check_word_as_numeric(word: str) -> StemmedWord | None:
