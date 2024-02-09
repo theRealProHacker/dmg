@@ -6,8 +6,9 @@ from typing import Literal
 from pyarabic import araby
 import qalsadi.lemmatizer
 import qalsadi.analex
+from arab_tools import tokenize_with_location, Analex
 
-analex = qalsadi.analex.Analex()
+analex = Analex()
 lemmatizer = qalsadi.lemmatizer.Lemmatizer()
 lemmatizer.set_vocalized_lemma()
 
@@ -117,16 +118,13 @@ def tokenize(text: str, profile: Profile) -> list[Token]:
     """
     Tokenizes the `text` given a `profile` and returns a list of tokens.
     """
-    # We simply use the qalsadi lib to tokenize the text and then lemmatize and pos tag each word.
-    # optionally use araby.tokenize_with_location
-    raw_tokens = analex.text_tokenize(text)
-    # analyzed has a list of possible configurations for each word.
-    analyzed = analex.check_text(text)
+    raw_tokens, starts, ends = tokenize_with_location(text)
+    analyzed = analex.check_words(raw_tokens)
     stemnodelist = lemmatizer.analyze(analyzed)
     lemmas = lemmatizer.get_lemmas(stemnodelist, return_pos=True)
     tokens = [
         Token(arab, lemma, pos, is_pausa=profile.pausa)
-        for (arab, (lemma, pos)) in zip(raw_tokens, lemmas)
+        for (arab, _, _, (lemma, pos)) in zip(raw_tokens, starts, ends, lemmas)
     ]
     tokens[-1].is_pausa = True
     # TODO: set is_part_of_idafah
