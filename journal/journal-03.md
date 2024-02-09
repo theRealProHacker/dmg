@@ -2,6 +2,8 @@
 
 ## UI
 
+Es gibt nun eine Fehlermeldung, wenn die Serveranfrage fehlschlägt
+
 ### Webhosting
 
 Eine erste Version ist online verfügbar auf https://transliteration.eu.pythonanywhere.com/
@@ -17,18 +19,16 @@ Die Server stehen in Deutschland und der Service ist kostenlos. Ich werde hier d
     - `/home/transliteration/[repo]/venv`
 7. Die Webapp neustarten
 
-
-Es gibt nun außerdem eine Fehlermeldungen, wenn die Serveranfrage fehlschlägt
-
 ### TODOs (perspektivisch)
 
 - besseres Design
+- Profile-Erweiterung für andere Arten von Attributen (nicht nur booleans)
 
 ## Anderes
 
 Anscheinend hatte keiner von den Islamwissenschaftlern aktiv Interesse daran, mir zu helfen. Ich habe es jetzt noch einmal bei den Arabisten probiert.
 
-Trotz der Probleme mit qalsadi, konnte ich ein großes Stück weiterkommen. Ich konnte mittels Methode 3 des letzten Journals (Ich Ctrl+C/Ctrl+V den gesamten Code, den ich brauche und entferne alle Aufrufe zur SQLite-Datenbank) die SQLite-Problematik vorerst lösen. Die SQLite-Datenbank wird zum Speichern der Wortfrequenzdaten verwendet. Ich habe bis auf Weiteres die Frequenz aller Wörter auf 0 gesetzt. 
+Trotz der Probleme mit qalsadi, konnte ich ein großes Stück weiterkommen. Ich konnte mittels Methode 3 des letzten Journals (Ich Ctrl+C/Ctrl+V den gesamten Code, den ich brauche und entferne alle Aufrufe zur SQLite-Datenbank) die SQLite-Problematik vorerst lösen. Die SQLite-Datenbank wird zum Speichern der Wortfrequenzdaten und als Wörterbuch verwendet. Ich habe bis auf Weiteres die Frequenz aller Wörter auf 0 gesetzt. 
 
 Auch sonst konnte ich etwas tieferen Einblick in den Code gewinnen und kann jetzt etwas Pseudocode mit Ergebnissen demonstrieren:
 
@@ -115,16 +115,115 @@ def get_lemmas(self, stemnode_list, pos="", return_pos = False):
     return lemmas
 ```
 
+```py
+# Ausgaben für einfaches Beispiel
+
+# wort
+"يَكْتُبُ الكَلْبُ" # Der Hund schreibt
+
+# tags
+'يَكْتُبُ', 'الكَلْبُ'
+
+# analyzed
+[[{
+    u'word' = u'يكتب', # yaktub (er schreibt)
+    u'vocalized' = u'يَكْتُبُ', 
+    u'unvocalized' = u'',
+    u'semivocalized' = u'يَكْتُب',
+    # Ich verstehe hiervon nur so viel: 3.P Sg M Präsens/Imperfekt Indikativ
+    # Die tags werden, aber unten noch einmal einzeln aufgezählt
+    u'tags' = u'المضارع المعلوم:هو:y:مدخل مشكول:',
+    # scheint das zu sein 
+    # 'affix': (word_seg['pro'], word_seg['prefix'], word_seg['suffix'], word_seg['enc']),
+    u'affix_key' = u'-ي--|المضارع المعلوم:هو:y:مدخل مشكول',
+    # Aus dem Stamm können viele andere Arten von Wörtern gebildert werden, z.B. kaatib (das Buch)
+    u'stem' = u'كتب',
+    u'original_tags' = u'('',)',
+    u'freq' = u'0', # von mir so gesetzt
+    u'type' = u'Verb',
+    u'original' = u'كَتَبَ',
+    u'tag_regular' = u'True',
+    u'root' = u'كتب',
+    u'affix' = u'Taha', # ?
+    u'action' = u'',
+    u'object_type' = u'',
+    u'need' = u'',
+    u'tag_type' = u'2',
+    u'tag_added' = u'False',
+    u'tag_initial' = u'False',
+    u'tag_transparent' = u'False',
+    u'tag_mamnou3' = u'False',
+    u'tag_break' = u'False',
+    u'tag_voice' = u'معلوم',
+    u'tag_mood' = u'مرفوع',
+    u'tag_confirmed' = u'',
+    u'tag_pronoun' = u'هو',
+    u'tag_transitive' = u'True',
+    u'tag_person' = u'4',
+    u'tag_original_number' = u'مفرد',
+    u'tag_original_gender' = u'مذكر',
+    u'tag_number' = u'1',
+    u'tag_gender' = u'1',
+    u'tag_tense' = u'المضارع المعلوم',
+}], [{
+    u'word' = u'الكلب', # al-kalb (der Hund)
+    u'vocalized' = u'الْكَلْبُ',
+    u'unvocalized' = u'',
+    u'semivocalized' = u'الْكَلْب',
+    u'tags' = u'تعريف:مرفوع:متحرك:ينون::مدخل مشكول:',
+    # Hier sehen wir, dass die Affixbestimmung hier schon geschieht. 
+    # Die Frage ist, wie können wir das gezielt herausgreifen?
+    u'affix_key' = u'ال--ُ-|الكلب',
+    u'stem' = u'كلب',
+    u'original_tags' = u'('',)',
+    u'freq' = u'0',
+    u'type' = u'Noun::جامد',
+    u'original' = u'كَلْبٌ',
+    u'tag_regular' = u'True',
+    u'root' = u'كلب',
+    u'affix' = u'Taha',
+    u'action' = u'',
+    u'object_type' = u'',
+    u'need' = u'',
+    u'tag_type' = u'4',
+    u'tag_added' = u'False',
+    u'tag_initial' = u'False',
+    u'tag_transparent' = u'False',
+    u'tag_mamnou3' = u'False',
+    u'tag_break' = u'False',
+    u'tag_voice' = u'False',
+    u'tag_mood' = u'False',
+    u'tag_confirmed' = u'False',
+    u'tag_pronoun' = u'False',
+    u'tag_transitive' = u'False',
+    u'tag_person' = u'4',
+    u'tag_original_number' = u'مفرد',
+    u'tag_original_gender' = u'مذكر',
+    u'tag_number' = u'1',
+    u'tag_gender' = u'1',
+}]]
+
+# stemnodelist
+# Man kann hier sehen, dass im Endeffekt aufsummiert wurde,
+# auch wenn der Print ein bisschen broken scheint
+[
+'يكتب':كَتَبَ, [verb-non_break]{V:1, N:0, S:0} {'mansoub': [], 'marfou3': [0], 'majrour': [], 'majzoum': [], 'tanwin_mansou  ub': [], 'tanwin_marfou3': [], 'tanwin_majrour': []}{'verb': [0], 'noun': [], 'pounct': [], 'stopword': []}{'كَتَبَ': [0]}In  ndexes : [0],
+'الكلب':كَلْبٌ, [noun-non_break]{V:0, N:1, S:0} {'mansoub': [], 'marfou3': [0], 'majrour': [], 'majzoum': [], 'tanwin_mansoub': [], 'tanwin_marfou3': [], 'tanwin_majrour': []}{'verb': [], 'noun': [0], 'pounct': [], 'stopword': []}{'كَلْبٌ': [0]}I  Indexes : [0]]
+
+# lemma mit POS
+[('كَتَبَ', 'verb'), ('كَلْبٌ', 'noun')]
+```
+
 ## Neue To-Dos
 
 Herausfinden, was genau die Wortarten eigentlich bedeuten. Was ist zum Beispiel mit Pronomen und Partizipien (der Rest scheint relativ klar)? Ist es möglich eine noch feinere Unterscheidung zu tätigen?
 
-Die Tokenisierung und Satzerkennung gefällt mir noch nicht so. Insbesondere, was mit Satzzeichen und nicht-arabischen Buchstaben passiert ist noch nicht klar festgelegt (also vom Code natürlich schon). Sollte ein Wort einfach übersprungen werden, wenn es kein vollständig arabisches Wort ist? Auch `\n` wird als Satzzeichen behandelt -> macht das Sinn?
+Die Tokenisierung und Satzerkennung gefällt mir noch nicht so. Insbesondere, was mit Satzzeichen, Leerzeichen, Zahlen und nicht-arabischen Buchstaben passiert ist noch nicht klar festgelegt (also vom Code natürlich schon). Sollte ein Wort einfach übersprungen werden, wenn es kein vollständig arabisches Wort ist? Auch `\n` wird als Satzzeichen behandelt -> macht das Sinn?
 
 Ich denke, es sollte ungefähr so funktionieren, dass jeder Text erstmal über ein Pattern in Sätze gesplittet wird und jeder Satz über ein anderes Pattern in Tokens. Dabei merken sich die Sätze und Tokens, was hinter ihnen kommt. Leere Sätze und Tokens werden einfach weggeschmissen. Dann wird für jeden Satz der oben genannte Algorithmus ausgeführt, um die Lemmas und die Wortart zu erhalten. Diese Information helfen dann dabei folgendes zu bestimmen:
 - `is_part_of_idafah` (nur Nomen)
 - `is_name` (nur Nomen)
-- `prefix` (Artikel nur Nomen)
+- `prefix` (Wort = Präfix + Lemma + Postfix; vielleicht reicht ja sogar ein einfaches find)
 - `starts_with_hamzatul_wasl` (nur einige Nomen und Stopwörter und einige Arten von Verben)
 
 
@@ -138,7 +237,7 @@ Kommentare und Variablennamen sind außerdem von Rechtschreibfehlern durchzogen.
 
 Es gibt viele Inkonsistenzen. Mal wird zum Cachen ein dict genommen, mal eine pickle DB und mal eine SQLite DB. 
 
-Am meisten Angst machen mir jedoch die TODO-Kommentare -> es ist noch nicht richtig -> Ich muss rausfinden, was nicht richtig ist und es reparieren
+Am meisten Angst machen mir jedoch die TODO-Kommentare -> Irgendetwas ist noch nicht richtig -> Ich muss rausfinden, was nicht richtig ist und es reparieren
 
 ## Beispiele 
 
