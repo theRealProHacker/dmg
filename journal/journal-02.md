@@ -18,11 +18,11 @@ Soll die Präfixbestimmung vor oder nach dem Ersetzen der Buchstaben kommen? Bzw
 
 Ich bin bis jetzt zu dem Schluss gekommen, dass es mehr Sinn macht diese beiden Dinge im Arabischen zu klären. Ich vergesse aber jedes Mal, wie ich zu diesem Schluss gekommen bin. Ich weiß nur, dass ich einen guten Grund hatte. 
 
-Die andere, rein technische, Problematik ist, dass `qalsadi` eine SQLite Datenbank zum Cachen nimmt (warum nicht einfach eine LRU Cache im RAM speichern, das sollte für die meisten Anwendungsfälle reichen?). Diese Datenbank wird jedoch aufgrund des Flask-Multithreading in einem anderen Thread verwendet, als sie erstellt wird, was wiederum das Programm zum Absturz bringt 🤦. Es gibt einige Lösungswege:
+Die andere, rein technische, Problematik ist, dass `qalsadi` eine SQLite-Datenbank zum Cachen nimmt (warum nicht einfach eine LRU Cache im RAM speichern, das sollte für die meisten Anwendungsfälle reichen?). Diese Datenbank wird jedoch aufgrund des Flask-Multithreading in einem anderen Thread verwendet, als sie erstellt wird, was wiederum das Programm zum Absturz bringt 🤦. Es gibt einige Lösungswege:
 
 1. Ich forke `qalsadi` und ändere alles, was mich stört
 2. Ich leite den SQL-Cursor auf ein Mock-Cursor um, der immer ein Cache-Miss produziert
-3. (ähnlich wie) Ich Ctrl+C/Ctrl+V den gesamten Code, den ich brauche und entferne alle Aufrufe zur SQLite Datenbank
+3. (ähnlich wie 1.) Ich Ctrl+C/Ctrl+V den gesamten Code, den ich brauche und entferne alle Aufrufe zur SQLite-Datenbank
 4. Ich sorge dafür, dass die Datenbank im gleichen Thread erstellt wird, wie der Serverthread -> Wird schwer
 5. Ich benutze `qalsadi` und alle entlehnten Bibliotheken nicht -> wäre wahrscheinlich ein großer Verlust
 
