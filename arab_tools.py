@@ -157,6 +157,7 @@ class NounStemmer(qalsadi.stem_noun.NounStemmer):
             self.noun_cache[word] = result
         return result
 
+
 tagger = WordTagger()
 nounstemmer = NounStemmer()
 verbstemmer = VerbStemmer()
