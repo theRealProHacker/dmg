@@ -13,7 +13,6 @@ import qalsadi.stem_noun
 import qalsadi.stem_verb
 import qalsadi.stopwords
 from pyarabic import araby
-from qalsadi.stem_pounct_const import POUNCTUATION as PUNCTUATION
 from qalsadi.stem_stop import StopWordStemmer
 from qalsadi.stem_unknown import UnknownStemmer
 from qalsadi.stemmedword import StemmedWord
@@ -213,28 +212,6 @@ class Analex:
         return None
 
     @staticmethod
-    def check_word_as_punct(word: str) -> StemmedWord | None:
-        """
-        Check if the word is  punctuation
-        """
-        if all(char in PUNCTUATION for char in word):
-            # if all chars are punctuation, the word takes tags of the first char
-            return StemmedWord(
-                {
-                    "word": word,
-                    "affix": ("", "", "", ""),
-                    "stem": "",
-                    "original": word,
-                    "vocalized": word,
-                    "tags": PUNCTUATION[word[0]]["tags"],
-                    "type": "POUNCT",
-                    "freq": 0,
-                    "syntax": "",
-                    "root": "",
-                }
-            )
-
-    @staticmethod
     def check_partially_vocalized(word: str, data: list[WordCase]) -> list[WordCase]:
         if not araby.is_vocalized(word):
             return data
@@ -272,9 +249,6 @@ class Analex:
         word_nm_shadda = araby.strip_harakat(word)
 
         if stemmed := self.check_word_as_numeric(word_nm):
-            return [stemmed]
-
-        if stemmed := self.check_word_as_punct(word_nm):
             return [stemmed]
 
         result = []
