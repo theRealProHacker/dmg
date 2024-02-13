@@ -3,6 +3,18 @@ The data module encapsulates all static data to represent a single source of tru
 for all other modules
 """
 
+import re
+
+
+def compile_map_pattern(d: dict[str, str]) -> re.Pattern:
+    keys = (re.escape(k) for k in d.keys())
+    return re.compile(r"\b(" + "|".join(keys) + r")\b")
+
+
+def sub_map_pattern(pattern, d: dict[str, str], s: str) -> str:
+    return pattern.sub(lambda x: d[x.group()], s)
+
+
 # TODO: use pyarabic.araby constants
 
 alif = "\u0627"
@@ -20,14 +32,29 @@ sukun = "\u0652"
 hamza = "\u0621"
 alif_maddah = "\u0622"
 
+short_vowels = fatha + damma + kasra + fathatan + dammatan + kasratan
+harakat_wo_shaddah = short_vowels + sukun
+long_vowels = alif + waw + ya
+half_vowels = waw + ya
+
+half_vowel_map = {
+    "و": "w",
+    "ي": "y",
+}
 
 subs = {
     alif_maksurah: alif,
     # TODO: add more hamza rules
     "أ": hamza,
+    "(.)" + shaddah: lambda match: match.group(1) * 2,
 }
 
 diacritic_map = {
+    **{
+        rf"{half_vowel}(?={harakah})": latin_half_vowel
+        for harakah in harakat_wo_shaddah
+        for half_vowel, latin_half_vowel in half_vowel_map.items()
+    },
     fatha + alif: "ā",
     damma + waw: "ū",
     kasra + ya: "ī",
@@ -37,10 +64,8 @@ diacritic_map = {
     fathatan: "an",
     dammatan: "un",
     kasratan: "in",
-    # This is because an alif might be added
     alif + fathatan + "$": "an",
     fathatan + alif + "$": "an",
-    "(.)" + shaddah: lambda match: match.group(1) * 2,
     sukun: "",
 }
 
@@ -75,12 +100,12 @@ char_map = {
     "ه": "h",
     # TODO: make them long when following a consonant
     # TODO: nisba suffix
-    "و": "w",
-    "ي": "y",
+    **half_vowel_map,
 }
 
 special_char_map = {"ﷲ": "allah"}
 
+# Not currently necessary
 pausa_map = {
     "[" + fatha + damma + kasra + fathatan + dammatan + kasratan + shaddah + "]$": "",
     fathatan + alif + "$": alif,
@@ -97,7 +122,32 @@ sun_letters = set("tṯdḏrzsšṣḍṭẓn")
 #     "|".join(hex(ord(x)) for x in arab) for arab in char_map|diacritic_map
 # ])
 
+# Pattern to match an arabic word
+token_pattern = re.compile("[\u0621-\u0655]+")
 
-latin_prefixes = {"al"}
+conjunction_prefixes = {
+    "ف": "fa",
+    "و": "wa",
+}
+preposition_prefixes = {
+    "ب": "bi",
+    "ك": "ka",
+    "ل": "li",
+    "في": "fi",
+}
+article_prefixes = {
+    "ال": "al",
+    "الْ": "al",
+    "أَلْ": "al",
+}
+prefixes = conjunction_prefixes | preposition_prefixes | article_prefixes
+prefix_lengths = sorted({len(x) for x in prefixes}, reverse=True)
 
-# latin_prefix_lengths = {len(p) for p in prefixes}
+# .venv\Lib\site-packages\qalsadi\stem_pounct_const.py
+sentence_stop_marks = r".!?\n۔؟"
+after_map = {
+    "۔": ".",
+    "؟": "?",
+    "،": ",",
+}
+after_map_pattern = compile_map_pattern(after_map)
