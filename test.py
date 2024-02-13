@@ -12,7 +12,10 @@ def test_tokenization():
 
 def test_sun_assimilation():
     # https://de.wikipedia.org/wiki/Sonnenbuchstabe
-    tests = {"التَعلِيم": "at-taʿlīm", "الثَورَة": "aṯ-ṯawra"}
+    tests = {
+        "التَعلِيم": "at-taʿlīm",
+        "الثَورَة": "aṯ-ṯawra",
+    }
     profile = Profile()
     for arab, latin in tests.items():
         assert transliterate(arab, profile) == latin
