@@ -178,7 +178,9 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             word = araby.strip_lastharaka(word)
         # char mapping
         char_map = (
-            data.subs | data.diacritic_map | data.char_map | data.special_char_map
+            {
+                "ة^": "t" if token.is_idafah else ("h" if profile.ta_marbatuh else "")
+            } | data.subs | data.diacritic_map | data.char_map | data.special_char_map
         )
         # if token.is_pausa:
         #     char_map = data.pausa_map | char_map | data.pausa_map

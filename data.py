@@ -74,6 +74,7 @@ char_map = {
     alif: "a",
     "ب": "b",
     "ت": "t",
+    "ة": "t", # this is the default. Should be overriden
     "ث": "ṯ",
     "ج": "ǧ",
     "ح": "ḥ",
