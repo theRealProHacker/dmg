@@ -343,7 +343,12 @@ class Analex:
         From:
         qalsadi.analex.Analex.check_text
         """
-        guessed_tags = [tagger.tag_word(token) for token in tokens]
+        prev_tokens = [*tokens[1:], ""]
+        prev_prev_tokens = [tokens[2:], "", ""]
+        guessed_tags = [
+            tagger.tag_word(token, prev, prev_prev)
+            for token, prev, prev_prev in zip(tokens, prev_tokens, prev_prev_tokens)
+        ]
 
         return [self.check_word(word, tag) for word, tag in zip(tokens, guessed_tags)]
 
