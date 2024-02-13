@@ -245,6 +245,7 @@ class Analex:
         From:
         qalsadi.analex.Analex.check_word
         """
+        # print("Checking", word, tag)
         word_nm = araby.strip_tashkeel(word)
         word_nm_shadda = araby.strip_harakat(word)
 
@@ -264,7 +265,12 @@ class Analex:
                 result += nounstemmer.stemming_noun(word_nm)
 
         if not result:
-            result = unknownstemmer.stemming_noun(word_nm)
+            result = (
+                unknownstemmer.stemming_noun(word_nm)
+                or nounstemmer.stemming_noun(word_nm)
+                or verbstemmer.stemming_verb(word_nm)
+                or stopwordstemmer.stemming_stopword(word_nm)
+            )
 
         result = [
             x
@@ -288,25 +294,7 @@ class Analex:
             item.freq = self.get_freq(item.original, wordtype)
 
         if not result:
-            error_code = self.get_error_code()
-            return StemmedWord(
-                {
-                    "word": word,
-                    "affix": ("", "", "", ""),
-                    "stem": word,
-                    "original": word,
-                    "vocalized": word,
-                    "semivocalized": word,
-                    "tags": error_code,
-                    "type": "unknown",
-                    "root": "",
-                    "template": "",
-                    "freq": self.get_freq(word, "unknown"),
-                    "syntax": "",
-                    # addition
-                    "number": (),
-                }
-            )
+            print("No result for", word, tag, word_nm, word_nm_shadda)
 
         return [StemmedWord(w) for w in result]
 
@@ -317,8 +305,8 @@ class Analex:
         From:
         qalsadi.analex.Analex.check_text
         """
-        prev_tokens = [*tokens[1:], ""]
-        prev_prev_tokens = [tokens[2:], "", ""]
+        prev_tokens = ["", *tokens]
+        prev_prev_tokens = ["", "", *tokens]
         guessed_tags = [
             tagger.tag_word(token, prev, prev_prev)
             for token, prev, prev_prev in zip(tokens, prev_tokens, prev_prev_tokens)
