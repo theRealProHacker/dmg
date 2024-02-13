@@ -28,7 +28,7 @@ Die Server stehen in Deutschland und der Service ist kostenlos. Ich werde hier d
 
 Anscheinend hatte keiner von den Islamwissenschaftlern aktiv Interesse daran, mir zu helfen. Ich habe es jetzt noch einmal bei den Arabisten probiert.
 
-Trotz der Probleme mit qalsadi, konnte ich ein großes Stück weiterkommen. Ich konnte mittels Methode 3 des letzten Journals (Ich Ctrl+C/Ctrl+V den gesamten Code, den ich brauche und entferne alle Aufrufe zur SQLite-Datenbank) die SQLite-Problematik vorerst lösen. Die SQLite-Datenbank wird zum Speichern der Wortfrequenzdaten und als Wörterbuch verwendet. Ich habe bis auf Weiteres die Frequenz aller Wörter auf 0 gesetzt. 
+Trotz der Probleme mit qalsadi, konnte ich ein großes Stück weiterkommen. Ich konnte mittels Methode 3 des letzten Journals (Ich Ctrl+C/Ctrl+V den gesamten Code, den ich brauche und entferne alle Aufrufe zur SQLite-Datenbank) die SQLite-Problematik vorerst lösen. SQLite-Datenbanken werden zum Speichern der Wortfrequenzdaten und als Wörterbuch verwendet. Ich habe bis auf Weiteres die Frequenz aller Wörter auf 0 gesetzt. 
 
 Auch sonst konnte ich etwas tieferen Einblick in den Code gewinnen und kann jetzt etwas Pseudocode mit Ergebnissen demonstrieren:
 
@@ -172,7 +172,8 @@ def get_lemmas(self, stemnode_list, pos="", return_pos = False):
     u'semivocalized' = u'الْكَلْب',
     u'tags' = u'تعريف:مرفوع:متحرك:ينون::مدخل مشكول:',
     # Hier sehen wir, dass die Affixbestimmung hier schon geschieht. 
-    # Die Frage ist, wie können wir das gezielt herausgreifen?
+    # Die Frage ist, wie können wir das sicher gezielt herausgreifen (was ist das Muster)?
+        # Antwort: .split("-")[0]
     u'affix_key' = u'ال--ُ-|الكلب',
     u'stem' = u'كلب',
     u'original_tags' = u'('',)',
@@ -223,7 +224,7 @@ Die Tokenisierung und Satzerkennung gefällt mir noch nicht so. Insbesondere, wa
 Ich denke, es sollte ungefähr so funktionieren, dass jeder Text erstmal über ein Pattern in Sätze gesplittet wird und jeder Satz über ein anderes Pattern in Tokens. Dabei merken sich die Sätze und Tokens, was hinter ihnen kommt. Leere Sätze und Tokens werden einfach weggeschmissen. Dann wird für jeden Satz der oben genannte Algorithmus ausgeführt, um die Lemmas und die Wortart zu erhalten. Diese Information helfen dann dabei folgendes zu bestimmen:
 - `is_part_of_idafah` (nur Nomen)
 - `is_name` (nur Nomen)
-- `prefix` (Wort = Präfix + Lemma + Postfix; vielleicht reicht ja sogar ein einfaches find)
+- `prefix` (Wort = Präfix + Lemma + Postfix)
 - `starts_with_hamzatul_wasl` (nur einige Nomen und Stopwörter und einige Arten von Verben)
 
 
