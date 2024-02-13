@@ -124,13 +124,13 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     for token in tokens:
         current_sentence.append(token)
         if any(stop_mark in token.after for stop_mark in sentence_stop_marks):
-            token.is_end_of_sentence = True
             sentences.append(current_sentence)
             current_sentence = []
     if current_sentence:
         sentences.append(current_sentence)
 
     for sentence in sentences:
+        sentence[-1].is_end_of_sentence = True
         # word analysis and stemming
         stemmed_words = analex.check_words([token.arab for token in sentence])
         for token, stemming in zip(sentence, stemmed_words):
@@ -174,7 +174,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     # transliteration
     for token in tokens:
         word = token.arab[len(token.prefix) :]
-        if token.is_pausa:
+        if token.is_pausa or token.is_end_of_sentence:
             word = araby.strip_lastharaka(word)
         # char mapping
         char_map = (
