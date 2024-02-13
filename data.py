@@ -44,8 +44,7 @@ half_vowel_map = {
 
 subs = {
     alif_maksurah: alif,
-    # TODO: add more hamza rules
-    "أ": hamza,
+    "[\u0622-\u0626\u0671-\u0676\u0678]": hamza,
     "(.)" + shaddah: lambda match: match.group(1) * 2,
 }
 
