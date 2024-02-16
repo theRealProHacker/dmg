@@ -6,6 +6,8 @@
     <title>DMG Transliteration</title>
     <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
     <!-- Import Bootstrap 5 -->
+    <script src="/static/bs-dark-mode.js"></script>
+    <link rel="stylesheet" href="/static/bs-dark-mode.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
         html, body {
@@ -23,10 +25,34 @@
             min-width: 100%;
         }
 
+        nav {
+            border-bottom: solid darkorchid 2px;
+        }
+
         #side-bar>div {
             width: 250px;
             height: 100%;
-            border-left: solid rgb(var(--bs-dark-rgb)) 2px;
+            border-left: solid darkorchid 2px;
+        }
+
+        @media (max-width: 992px) {
+            #side-bar>div {
+                width: 200px;
+            }
+        }
+
+        #side-bar .form-check-input {
+            border-color: #9932cc;
+            box-shadow: none;
+        }
+
+        #side-bar .form-check-input:focus {
+            --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%239932cc'/%3e%3c/svg%3e");
+        }
+
+        #side-bar .form-check-input:checked {
+            background-color: #9932cc;
+            --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
         }
 
         main {
@@ -52,6 +78,54 @@
             width: 100%;
             padding: 10px;
         }
+
+        #input-text {
+            outline: none;
+            border: 1px solid grey;
+            border-radius: 5px;
+        }
+
+        #input-text {
+            --bg-color: var(--bs-light);
+        }
+
+        [data-bs-theme="dark"] #input-text {
+            --bg-color: #222128;
+        }
+
+        /* @property --direction {
+            syntax: '<angle>';
+            inherits: false;
+            initial-value: 0deg;
+        }
+
+        @keyframes gradient {
+            0% {
+                --direction: 135deg;
+            }
+            25% {
+                --direction: 225deg;
+            }
+            50% {
+                --direction: 315deg;
+            }
+            75% {
+                --direction: 45deg;
+            }
+            100% {
+                --direction: 135deg;
+            }
+        } */
+
+        #input-text:focus{
+            border-width: 2px;
+            border-color: transparent; 
+            --direction: 135deg;
+            background:
+                linear-gradient(var(--bg-color),var(--bg-color)) padding-box,
+                linear-gradient(var(--direction), yellow,rgb(255, 183, 0)) border-box;
+            animation: gradient 10s ease infinite;
+        }
     </style>
 </head>
 <body>
@@ -69,19 +143,43 @@
     </template>
     <div class="toast-container bottom-0 end-0 p-3"></div>
     <div id="grid-wrapper">
-        <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <nav class="navbar navbar-expand">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">
-                    <img src="/static/favicon.ico" width="30" height="30" class="d-inline-block align-text-top mr-1" alt="DMG icon">
+                    <img src="/static/favicon.ico" width="30" height="30" class="d-inline-block align-text-top me-2" alt="DMG icon">
                     DMG Transliteration
                 </a>
                 <ul class="navbar-nav justify-content-end">
                     <!-- <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#">Home</a>
                     </li> -->
+                    <li class="nav-item mx-2">
+                        <button id="theme-toggle" class="theme-toggle btn" type="button" aria-label="auto" aria-live="polite">
+                            <svg class="sun-and-moon" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24">
+                              <mask class="moon" id="moon-mask">
+                                <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                                <circle cx="24" cy="10" r="6" fill="black" />
+                              </mask>
+                              <circle class="sun" cx="12" cy="12" r="6" mask="url(#moon-mask)" fill="currentColor" />
+                              <g class="sun-beams" stroke="currentColor">
+                                <line x1="12" y1="1" x2="12" y2="3" />
+                                <line x1="12" y1="21" x2="12" y2="23" />
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                <line x1="1" y1="12" x2="3" y2="12" />
+                                <line x1="21" y1="12" x2="23" y2="12" />
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                               </g>
+                            </svg>
+                        </button>
+                    </li>
                     <li class="nav-item">
-                        <button class="btn btn-dark" type="button" data-bs-toggle="collapse" data-bs-target="#side-bar" aria-controls="side-bar" aria-expanded="false">
-                            Profile
+                        <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#side-bar" aria-controls="side-bar" aria-expanded="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+                                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+                            </svg>
                         </button>
                     </li>
                 </ul>
@@ -96,10 +194,9 @@
                     <textarea id="output-text" disabled></textarea>
                 </div>
             </div>
-            <aside id="side-bar" class="collapse-horizontal">
+            <aside id="side-bar" class="collapse-horizontal collapse">
                 <div class="container-fluid">
-                    <h2>Profile</h2>
-                    <p>Profile settings will be here.</p>
+                    <h2 class="pt-4 mb-5">Einstellungen</h2>
 
                     {% for (name, value, type, title, description) in profile %}
                         {% if type == 'bool' %}
@@ -161,7 +258,6 @@
                 console.error(error)
                 show_title_toast('Failed to reach server', 'Please try again later.')
             });
-            // TODO: real error handling
             console.debug(text, profile);
         }
 
