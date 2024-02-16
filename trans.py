@@ -179,8 +179,8 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
         # char mapping
         char_map = (
             {
-                "ة^": "t" if token.is_idafah else ("h" if profile.ta_marbatuh else "")
-            } | data.subs | data.diacritic_map | data.char_map | data.special_char_map
+                "ة$": "t" if token.is_idafah else ("h" if profile.ta_marbatuh else "")
+            } | data.subs | data.special_char_map | data.diacritic_map | data.char_map
         )
         # if token.is_pausa:
         #     char_map = data.pausa_map | char_map | data.pausa_map
