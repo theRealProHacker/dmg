@@ -36,7 +36,7 @@ For verbs: indicative,  no application, subjunctive,    jussive,        unknown
 @dataclass
 class Profile:
     pausa: bool = False
-    ta_marbatuh: bool = False
+    ta_marbutah: bool = False
     # skip_i3rab: bool = False
     # """Whether i3rab (flexion endings) should be skipped"""
     # full_vocalisation: bool = False
@@ -53,7 +53,7 @@ class Profile:
             "Pausa",
             "Ob der Text in Pausa gelesen werden soll",
         ),
-        "ta_marbatuh": (
+        "ta_marbutah": (
             "Ta marbuta",
             "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
         ),
@@ -123,7 +123,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     current_sentence: list[Token] = []
     for token in tokens:
         current_sentence.append(token)
-        if any(stop_mark in token.after for stop_mark in sentence_stop_marks):
+        if any(stop_mark in token.latin_after for stop_mark in sentence_stop_marks):
             sentences.append(current_sentence)
             current_sentence = []
     if current_sentence:
@@ -178,10 +178,13 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             word = araby.strip_lastharaka(word)
         # char mapping
         char_map = (
-            {
-                "ة$": "t" if token.is_idafah else ("h" if profile.ta_marbatuh else "")
-            } | data.subs | data.special_char_map | data.diacritic_map | data.char_map
+            data.subs | data.special_char_map | data.diacritic_map | data.char_map
         )
+        if not token.is_idafah:
+            char_map = {
+                f"[{data.long_vowels}]ة": "h",
+                "ة$": ("h" if profile.ta_marbutah else ""),
+            } | char_map
         # if token.is_pausa:
         #     char_map = data.pausa_map | char_map | data.pausa_map
         rules = [(re.compile(arab), latin) for arab, latin in char_map.items()]

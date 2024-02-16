@@ -74,7 +74,7 @@ char_map = {
     alif: "a",
     "ب": "b",
     "ت": "t",
-    "ة": "t", # this is the default. Should be overriden
+    "ة": "t",  # this is the default. Should be overriden
     "ث": "ṯ",
     "ج": "ǧ",
     "ح": "ḥ",
@@ -143,8 +143,7 @@ article_prefixes = {
 prefixes = conjunction_prefixes | preposition_prefixes | article_prefixes
 prefix_lengths = sorted({len(x) for x in prefixes}, reverse=True)
 
-# .venv\Lib\site-packages\qalsadi\stem_pounct_const.py
-sentence_stop_marks = r".!?\n۔؟"
+sentence_stop_marks = ".!?\n"
 after_map = {
     "۔": ".",
     "؟": "?",
