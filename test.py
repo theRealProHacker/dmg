@@ -15,10 +15,19 @@ def test_sun_assimilation():
     tests = {
         "التَعلِيم": "at-taʿlīm",
         "الثَورَة": "aṯ-ṯawra",
+        "الدَولَة": "ad-dawla",  # daula
+        "الذَرَّة": "aḏ-ḏarra",
+        # "الرَإِيس": "ar-raʾīs", # doesn't work, rais is not recognized
+        "الزَيت": "az-zayt",
+        "السُكَّر": "as-sukkar",
+        "الشَمس": "aš-šams",
+        # "الصُندُق": "aṣ-ṣundūq", # doesn't work, sunduq is not recognized
+        "الضَيف": "aḍ-ḍayf",  # daif
+        # "الطَاوِيلَة": "aṭ-ṭāwila", # tawila is not recognized
+        "الظُهر": "aẓ-ẓuhr",
+        "اللُغَة": "al-luġa",
+        "النَوم": "an-nawm",  # naum
     }
     profile = Profile()
     for arab, latin in tests.items():
         assert transliterate(arab, profile) == latin
-
-
-# test_sun_assimilation()
