@@ -6,7 +6,7 @@ from qalsadi import stemnode
 
 import arab_tools
 import data
-import ner
+# import ner
 from data import (
     article_prefixes,
     preposition_prefixes,
@@ -54,12 +54,13 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     if current_sentence:
         sentences.append(current_sentence)
     # sentence-level analysis
-    names = ner.find_names(
-        [
-            [araby.strip_diacritics(token.original) for token in sentence]
-            for sentence in sentences
-        ]
-    )
+    # names = ner.find_names(
+    #     [
+    #         [araby.strip_diacritics(token.original) for token in sentence]
+    #         for sentence in sentences
+    #     ]
+    # )
+    names = [[False] * len(sentence) for sentence in sentences]
     for sentence, is_name_data in zip(sentences, names):
         sentence[-1].is_end_of_sentence = True
         # named entity recognition
