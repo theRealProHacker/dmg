@@ -1,3 +1,14 @@
+# UI
+
+Ich habe folgendes hinzugefügt:
+
+- Dark/Light-Mode
+- Ein cooles Farbscheme
+- Ein Feedback-Formular
+- Zwei coole Fonts: Google Sans und Scheherazade New
+- Falls in das Inputfeld kopiert wird, wird es sofort transliteriert
+- Durch Klicken auf das Outputfeld, wird der Inhalt automatisch kopiert. 
+
 # Zahlen, Satzzeichen und Representation
 
 Ich habe Daten für Satzzeichen, Zahlen und Repräsentationen hinzugefügt. 
@@ -23,3 +34,13 @@ Folgende Quellen gibt es:
 Ein Problem ist, dass die Tokens möglicherweise verschieden sind. Entweder muss man dann die Tokens einfach so nehmen wie sie sind, oder man muss irgendwie die Tokens matchen ohne dabei einen Fehlerzustand ausgeben zu dürfen. 
 
 Ich habe einfach gleich das erste Modell ausprobiert und es scheint gut genug zu funktionieren. Leider erhöht es mit seinen 110 Millionen Parametern jedoch erheblich die Laufzeitkosten sowohl beim Start als auch bei jeder Transliteration. Die Tests, die vorher in weniger als einer Sekunde gelaufen sind, sind jetzt erst nach fast einer halben Minute fertig. Und die langsame NER führt aufgrund von fehlendem Caching auch im Frontend zu Lags. 
+
+Noch beunruhigender ist jedoch, dass mein Hosting ein maximales File-Limit von 512 MB anbietet, was absolut nicht ausreicht, um pytorch, geschweige denn das trainierte Modell herunterzuladen. Wegen diesen Problemen, habe ich das Feature vorerst entfernt. Ich werde jedoch weitere Wege ausprobieren, die vielleicht weniger rechenintensiv sind. 
+
+# Diphthonge
+
+Es gibt nun eine Option, Diphthonge als solche wiederzugeben: also "au" statt "aw" und "ai" statt "ay".
+
+# Doppelte Vokale
+
+Es gibt nun eine Option "Doppelte Vokale", die by default angeschaltet ist und dann die Halbvokale doppelt wiedergibt: also "quwwah" anstatt "qūwa"
