@@ -127,20 +127,47 @@ token_pattern = re.compile("[\u0621-\u0655]+")
 
 conjunction_prefixes = {
     "ف": "fa",
+    "فَ": "fa",
     "و": "wa",
+    "وَ": "wa",
 }
 preposition_prefixes = {
     "ب": "bi",
-    "ك": "ka",
+    "بِ": "bi",
     "ل": "li",
-    "في": "fi",
+    "لِ": "li",
+    "ك": "ka",
+    "كَ": "ka",
+    # "في": "fi",
+}
+future_prefixes = {
+    "س": "sa",
+    "سَ": "sa",
+}
+todo_prefixes = {
+    "ت": "ta",
+    "تَ": "ta",
+    # "": "la",
+    # "": "a"
 }
 article_prefixes = {
     "ال": "al",
     "الْ": "al",
+    "أَل": "al",
     "أَلْ": "al",
 }
-prefixes = conjunction_prefixes | preposition_prefixes | article_prefixes
+conjunction_article_prefixes = {
+    con1 + art1: con2 + art2
+    for con1, con2 in conjunction_prefixes.items()
+    for art1, art2 in article_prefixes.items()
+}
+prefixes = (
+    conjunction_prefixes
+    | preposition_prefixes
+    | article_prefixes
+    | future_prefixes
+    | conjunction_article_prefixes
+)
 prefix_lengths = sorted({len(x) for x in prefixes}, reverse=True)
 
 sentence_stop_marks = ".!?\n"
@@ -150,6 +177,7 @@ after_map = {
     "،": ",",
 }
 after_map_pattern = compile_map_pattern(after_map)
+
 
 def sub_after(after):
     return sub_map_pattern(after_map_pattern, after_map, after)
