@@ -353,7 +353,9 @@
             feedback_modal.hide();
             const text = feedback_text.value;
             const email = email_input.value;
-            fetch('/feedback', { method: 'POST', body: JSON.stringify({email, text}) })
+            const current_input = input.value;
+            const current_output = output.value;
+            fetch('/feedback', { method: 'POST', body: JSON.stringify({email, text, current_input, current_output}) })
             .then(response => {
                 if (response.ok)
                     return response.text() 
