@@ -68,14 +68,9 @@
     padding: unset;
     border: none;
     position: relative;
-    bottom: 2.5px;
+    top: 3px;
 }
 
-@supports (-webkit-user-drag:none) {
-    #theme-toggle {
-        top: 5px;
-    }
-}
 .theme-toggle {
   --size: 2rem;
   --icon-fill: hsl(210 10% 30%);
