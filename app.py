@@ -34,6 +34,7 @@ def trans():
     profile = Profile(**data["profile"])
     return transliterate(text, profile)
 
+
 @app.route("/feedback", methods=["POST"])
 def feedback():
     with open("feedback.jsonl", "ab") as f:
