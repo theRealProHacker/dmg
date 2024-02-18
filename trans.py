@@ -8,12 +8,9 @@ from qalsadi import stemnode
 import data
 from arab_tools import Analex
 from data import (
-    after_map,
-    after_map_pattern,
     article_prefixes,
     preposition_prefixes,
     sentence_stop_marks,
-    sub_map_pattern,
     token_pattern,
 )
 
@@ -21,8 +18,9 @@ analex = Analex()
 
 Pos = Literal["s", "n", "v", ""]
 """
-stopword, noun, verb, punctuation
+stopword, noun, verb, unknown
 """
+
 Case = Literal["n", "g", "a", "j", ""]
 """
 In arabic: marfoo3,     majroor,        mansoob,        majzoom,        unknown
@@ -63,7 +61,7 @@ class Profile:
 @dataclass
 class Token:
     def __post_init__(self):
-        self.latin_after = sub_map_pattern(after_map_pattern, after_map, self.after)
+        self.latin_after = data.sub_after(self.after)
 
     arab: str
     after: str = ""
@@ -104,15 +102,14 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     if not text:
         return ""
     # tokenization
-    tokens, ends, starts = zip(
-        *(
-            (token, match.end(), match.start())
-            for match in token_pattern.finditer(text)
-            if (token := text[match.start() : match.end()])
-        )
-    )
-    if not tokens:
-        return ""
+    matches = [
+        (token, match.end(), match.start())
+        for match in token_pattern.finditer(text)
+        if (token := text[match.start() : match.end()])
+    ]
+    if not matches:
+        return data.sub_after(text)
+    tokens, ends, starts = zip(*matches)
     starts = [*starts[1:], len(text)]
     tokens = [
         Token(token, after=text[end:start], is_pausa=profile.pausa)

@@ -7,8 +7,7 @@ import re
 
 
 def compile_map_pattern(d: dict[str, str]) -> re.Pattern:
-    keys = (re.escape(k) for k in d.keys())
-    return re.compile(r"\b(" + "|".join(keys) + r")\b")
+    return re.compile(f"[{''.join(d)}]")
 
 
 def sub_map_pattern(pattern, d: dict[str, str], s: str) -> str:
@@ -55,6 +54,7 @@ diacritic_map = {
         for half_vowel, latin_half_vowel in half_vowel_map.items()
     },
     fatha + alif: "ā",
+    alif: "ā",
     damma + waw: "ū",
     kasra + ya: "ī",
     fatha: "a",
@@ -150,3 +150,6 @@ after_map = {
     "،": ",",
 }
 after_map_pattern = compile_map_pattern(after_map)
+
+def sub_after(after):
+    return sub_map_pattern(after_map_pattern, after_map, after)
