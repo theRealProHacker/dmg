@@ -1,96 +1,21 @@
 import re
-from dataclasses import dataclass
-from typing import Literal
+from logging import basicConfig, debug
 
 from pyarabic import araby
 from qalsadi import stemnode
 
+import arab_tools
 import data
-from arab_tools import Analex
+import ner
 from data import (
     article_prefixes,
     preposition_prefixes,
     sentence_stop_marks,
     token_pattern,
 )
+from data_types import Case, Profile, Token
 
-analex = Analex()
-
-Pos = Literal["s", "n", "v", ""]
-"""
-stopword, noun, verb, unknown
-"""
-
-Case = Literal["n", "g", "a", "j", ""]
-"""
-In arabic: marfoo3,     majroor,        mansoob,        majzoom,        unknown
-
-For nouns: nominative,  genetive,       accusative,     no application, unknown
-
-For verbs: indicative,  no application, subjunctive,    jussive,        unknown
-"""
-
-
-@dataclass
-class Profile:
-    pausa: bool = False
-    ta_marbutah: bool = False
-    # skip_i3rab: bool = False
-    # """Whether i3rab (flexion endings) should be skipped"""
-    # full_vocalisation: bool = False
-    # """ Full vocalised transcription"""
-    # TODO: Diphtonge: aw -> au
-    # TODO: niyyah -> nīyah, awwal -> auwal
-    # TODO: imalah, ishmam
-    # TODO: alif maqsura to ya
-    # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
-    # TODO: alif maqsura mit Unterpunkt
-
-    descriptions = {
-        "pausa": (
-            "Pausa",
-            "Ob der Text in Pausa gelesen werden soll",
-        ),
-        "ta_marbutah": (
-            "Ta marbuta",
-            "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
-        ),
-    }
-
-
-@dataclass
-class Token:
-    def __post_init__(self):
-        self.latin_after = data.sub_after(self.after)
-
-    arab: str
-    after: str = ""
-    lemma: str = ""
-    pos: Pos = ""
-    gram_case: Case = ""
-    prefix: str = ""
-    is_pausa: bool = False
-    is_end_of_sentence: bool = False
-    is_idafah: bool = False
-    is_name: bool = False
-
-    latin: str = ""
-    latin_after: str = ""
-    latin_prefix: str = ""
-
-    @property
-    def is_genetive(self) -> bool:
-        return self.pos == "n" and self.gram_case == "g"
-
-    @property
-    def result(self) -> str:
-        if self.is_name:
-            self.latin = self.latin.capitalize()
-        return (
-            (self.latin_prefix + "-" if self.prefix else "")
-            + self.latin
-            + self.latin_after
-        )
+basicConfig(level="DEBUG")
 
 
 def transliterate(text: str, profile: Profile = Profile()) -> str:
@@ -99,6 +24,9 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     # from the step of actually transliterating using that data
     # to increase modularity and seperation of concerns
     text = text.strip()
+    text = araby.strip_tatweel(text)
+    text = data.unicode_cleanup(text)
+    debug(text)
     if not text:
         return ""
     # tokenization
@@ -125,28 +53,35 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             current_sentence = []
     if current_sentence:
         sentences.append(current_sentence)
-
-    for sentence in sentences:
+    # sentence-level analysis
+    names = ner.find_names(
+        [
+            [araby.strip_diacritics(token.original) for token in sentence]
+            for sentence in sentences
+        ]
+    )
+    for sentence, is_name_data in zip(sentences, names):
         sentence[-1].is_end_of_sentence = True
+        # named entity recognition
+        for token, is_name in zip(sentence, is_name_data):
+            token.is_name = is_name
         # word analysis and stemming
-        stemmed_words = analex.check_words([token.arab for token in sentence])
+        stemmed_words = arab_tools.check_sentence(sentence)
         for token, stemming in zip(sentence, stemmed_words):
             if not stemming:
                 continue
             node = stemnode.StemNode(stemming, True)
             token.lemma, token.pos = node.get_lemma(return_pos=True)
+            assert token.pos in ("noun", "verb", "stopword", "")
             # print(token.arab, token.lemma, token.pos)
-            prefix: str = node.get_affix().split("-")[0]
-            max_prefix_length = len(prefix)
-            for prefix_length in data.prefix_lengths:
-                if (
-                    prefix_length <= max_prefix_length
-                    and token.arab.startswith(possible_prefix := prefix[:prefix_length])
-                    and (latin_prefix := data.prefixes.get(possible_prefix))
-                ):
-                    token.prefix = possible_prefix
-                    token.latin_prefix = latin_prefix
-                    break
+            if not token.prefix:
+                prefix_guess: str = node.get_affix().split("-")[0]
+                possible_prefixes = arab_tools.possible_prefixes(
+                    token.arab, prefix_guess
+                )
+                if possible_prefixes:
+                    token.prefix = possible_prefixes[0]
+                    token.latin_prefix = data.prefixes[token.prefix]
             sm = node.syntax_mark
             cases: dict[Case, int] = {
                 "n": len(sm["marfou3"]) + len(sm["tanwin_marfou3"]),
@@ -163,7 +98,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
         # idafah
         for token, next_token in zip(sentence, sentence[1:]):
             token.is_idafah = (
-                token.pos == "n"
+                token.pos == "noun"
                 and next_token.is_genetive
                 and next_token.prefix not in preposition_prefixes
             )
@@ -177,9 +112,13 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
         char_map = (
             data.subs | data.special_char_map | data.diacritic_map | data.char_map
         )
+        if profile.diphthongs:
+            char_map |= data.diphthong_map
+        if not profile.double_vowels:
+            char_map |= data.double_vowels_map
         if not token.is_idafah:
             char_map = {
-                f"[{data.long_vowels}]ة": "h",
+                f"(?<=[{data.long_vowels}])ة": "h",
                 "ة$": ("h" if profile.ta_marbutah else ""),
             } | char_map
         # if token.is_pausa:
@@ -190,8 +129,9 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             cont = False
             for pattern, replace in rules:
                 word, n = pattern.subn(replace, word)
+                cont = cont or n
                 if n:
-                    cont = True
+                    print(word, pattern, replace)
         token.latin = word
         # assimilation
         # sun letter assimilation

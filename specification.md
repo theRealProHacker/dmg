@@ -18,3 +18,30 @@ transliterated most of the time?
 
 ## UI
 
+A sleek and modern UI
+
+- Dark/light mode switch
+- Color contrast: white, black, gold and purple
+- Responsive
+- Useful navbar
+- Beautifully extendable sidebar
+
+## Tokenization
+
+...
+
+## Ta marbutah
+
+...
+
+## Assimilation
+
+...
+
+## NER
+
+...
+
+## Full vocalisation
+
+...

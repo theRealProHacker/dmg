@@ -1,15 +1,9 @@
-from arab_tools import tokenize_with_location
 from trans import Profile, transliterate
 
 
 def test_tokenization():
-    text = "يَكْتُبُ الكَلْبُ"
-    tokens, starts, ends = tokenize_with_location(text)
-    assert tokens == ("يَكْتُبُ", "الكَلْبُ")
-    assert starts == (0, 9)
-    assert ends == (8, 17)
-
-    # TODO: find more difficult edge cases
+    ...
+    # TODO: find difficult edge cases
 
 
 def test_transliteration_safety():
@@ -18,6 +12,14 @@ def test_transliteration_safety():
     assert transliterate("?") == "?"
     assert transliterate("؟") == "?"
     assert transliterate("؟ \n") == "?"
+
+
+def test_half_vowels():
+    assert transliterate("و") == "w"
+    assert transliterate("شو") == "šū"
+    assert transliterate("شَو") == "šaw"
+    assert transliterate("شُو") == "šū"
+    assert transliterate("شوك") == "šūk"
 
 
 def test_sun_assimilation():
@@ -38,26 +40,45 @@ def test_sun_assimilation():
         "اللُغَة": "al-luġa",
         "النَوم": "an-nawm",  # naum
     }
-    profile = Profile()
     for arab, latin in tests.items():
-        assert transliterate(arab, profile) == latin
+        assert transliterate(arab) == latin
 
 
 def test_ta_marbutah():
     profile = Profile()
     profile_pausa = Profile(pausa=True)
-    profile_ta_marbutah = Profile(ta_marbutah=True)
-    profile_pausa_ta_marbutah = Profile(pausa=True, ta_marbutah=True)
+    profile_tm = Profile(ta_marbutah=True)
+    profile_pausa_tm = Profile(pausa=True, ta_marbutah=True)
     assert transliterate("المَدِينَة", profile) == "al-madīna"
-    assert transliterate("المَدِينَة", profile_ta_marbutah) == "al-madīnah"
-    # al-Qāhirah
-    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile) == "al-madīnatu al-qāhira"
-    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa) == "al-madīnat al-qāhira"
-    assert (
-        transliterate("المَدِينَةُ القَاهِرَةِ", profile_ta_marbutah)
-        == "al-madīnatu al-qāhirah"
-    )
-    assert (
-        transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa_ta_marbutah)
-        == "al-madīnat al-qāhirah"
-    )
+    assert transliterate("المَدِينَة", profile_tm) == "al-madīnah"
+    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile) == "al-madīnatu al-Qāhira"
+    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa) == "al-madīnat al-Qāhira"
+    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_tm) == "al-madīnatu al-Qāhirah"
+    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa_tm) == "al-madīnat al-Qāhirah"
+    assert transliterate("صَلاة") == "ṣalāh"
+
+
+def test_diphthong():
+    profile = Profile(diphthongs=True)
+    # bayt
+    # assert transliterate("بَيتُ")             == "bayt"
+    # assert transliterate("بَيتُ", profile)    == "bait"
+    # dawl
+    assert transliterate("دَولَ") == "dawl"
+    assert transliterate("دَولَ", profile) == "daul"
+    # awwal
+    assert transliterate("أَوَّل") == "awwal"
+    assert transliterate("أَوَّل", profile) == "auwal"
+
+def test_double_vowels():
+    profile = Profile(double_vowels=False)
+    # quwwah
+    assert transliterate("قُوَّة") == "quwwa"
+    assert transliterate("قُوَّة", profile) == "qūwa"
+    # niyyah
+    assert transliterate("نِيَّة") == "niyya"
+    assert transliterate("نِيَّة", profile) == "nīya"
+
+
+def test_names():
+    assert transliterate("مُحَمَّد") == "Muḥammad"

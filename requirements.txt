@@ -3,5 +3,9 @@ pyarabic
 naftawayh
 qalsadi
 
+# AI
+torch
+transformers
+
 # deployment
 gunicorn
