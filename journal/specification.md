@@ -45,3 +45,17 @@ A sleek and modern UI
 ## Full vocalisation
 
 ...
+
+
+## Hamzatul wasl
+
+- article
+- certain nouns
+    - (iṯnāni / iṯnayni / iṯnatāni / iṯnatayni) اثنان / اثنين / اثنتان / اثنتين - two in different forms
+    - (ibn - son) ابن
+    - (ism - name) اسم
+    - (imraʾa - women) امرأة
+- Verb stems VII-X
+    - verbs and nouns
+    - Without the defected forms
+    [![Verbstems image](verb-stems-7-to-10.png)](https://en.wikipedia.org/wiki/Arabic_verbs)
