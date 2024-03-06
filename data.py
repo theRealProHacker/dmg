@@ -241,8 +241,8 @@ diphthong_map = {
     for half_vowel, short_vowel in zip(half_vowels, half_vowels_as_short_vowels)
 }
 diphthong_map = {
-    "aw":"au",
-    "ay":"ai",
+    "aw": "au",
+    "ay": "ai",
 }
 
 # if not double_vowels

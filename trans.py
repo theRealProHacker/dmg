@@ -6,6 +6,7 @@ from qalsadi import stemnode
 
 import arab_tools
 import data
+
 # import ner
 from data import (
     article_prefixes,

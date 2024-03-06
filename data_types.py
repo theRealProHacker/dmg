@@ -49,7 +49,7 @@ class Profile:
         "double_vowels": (
             "Doppelte Vokale",
             "Ob Halbvokale mit Shaddah doppelt wiedergegeben werden sollen",
-        )
+        ),
     }
 
 

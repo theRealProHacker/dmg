@@ -23,9 +23,9 @@ import data
 from data_types import Sentence
 
 
-
 def get_freq(self, word, wordtype):
-        return 0
+    return 0
+
 
 remove_i3rab = araby.strip_lastharaka
 

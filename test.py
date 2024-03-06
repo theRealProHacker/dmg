@@ -70,6 +70,7 @@ def test_diphthong():
     assert transliterate("أَوَّل") == "awwal"
     assert transliterate("أَوَّل", profile) == "auwal"
 
+
 def test_double_vowels():
     profile = Profile(double_vowels=False)
     # quwwah
