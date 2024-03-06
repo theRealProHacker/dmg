@@ -3,6 +3,7 @@ Extracting the essentials from linuxscouts arabic libraries
 """
 
 from functools import cache
+from logging import debug
 from typing import Literal
 
 import naftawayh.wordtag
@@ -18,9 +19,8 @@ from qalsadi.stem_unknown import UnknownStemmer
 from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
 
-# from arramooz import wordfreqdictionaryclass
-# import tashaphyne.stemming
-# stemmer = tashaphyne.stemming.ArabicLightStemmer()
+import data
+from data_types import Sentence
 
 
 
@@ -28,41 +28,6 @@ def get_freq(self, word, wordtype):
         return 0
 
 remove_i3rab = araby.strip_lastharaka
-
-
-def normalize(text: str) -> str:
-    """
-    Normalizes Arabic text by replacing common ligatures and beautifications
-    and normalizing the hamza and alef characters
-    """
-    text = araby.strip_tatweel(text)
-    text = araby.normalize_ligature(text)
-    text = araby.normalize_hamza(text)
-    text = araby.normalize_alef(text)
-    # autocorrect and fix_spaces are a bit opaque
-    # text = araby.fix_spaces(text)
-    # text = araby.autocorrect(text)
-    return text
-
-
-_tokenize = araby.tokenize_with_location
-
-
-def tokenize_with_location(
-    text: str,
-) -> tuple[tuple[str, ...], tuple[int, ...], tuple[int, ...]]:
-    """
-    Tokenizes Arabic text with the tokens location and without any empty tokens
-
-    From:
-    qalsadi.analex.Analex.text_tokenize
-
-    Usage
-    ```py
-    tokens, starts, ends = tokenize_with_location(text)
-    ```
-    """
-    return zip(*([*x.values()] for x in _tokenize(text) if x["token"]))
 
 
 Tag = Literal["t", "v", "n", "nv"]
@@ -172,163 +137,134 @@ stopwordstemmer = StopWordStemmer()
 # )
 
 
-class Analex:
+@cache
+def get_freq(word, wordtype):
     """
-    This Analex tries to improve on the qalsadi version by removing the cache and making the steps more clear
-
-    Also, this is an implicit singleton, so please don't create multiple instances
-    -> To solve this, this class will be resolved soon and turned into a module
+    Words frequency
     """
+    return 0  # we don't want to access the file system
+    # return freq_dict.get_freq(word, wordtype)
 
-    @staticmethod
-    def get_error_code():
-        """
-        Return error code when word is not recognized
-        """
-        return f"N{nounstemmer.get_error_code()}-V{verbstemmer.get_error_code()}"
 
-    @staticmethod
-    @cache
-    def get_freq(word, wordtype):
-        """
-        Words frequency
-        """
-        return 0  # we don't want to access the file system
-        # return freq_dict.get_freq(word, wordtype)
-
-    @staticmethod
-    def check_word_as_numeric(word: str) -> StemmedWord | None:
-        # TODO: fix it to isdigit, by moatz saad
-        if word.isnumeric():
-            return StemmedWord(
-                {
-                    "word": word,
-                    "affix": ("", "", "", ""),
-                    "stem": "",
-                    "original": word,
-                    "vocalized": word,
-                    "tags": "عدد",
-                    "type": "NUMBER",
-                    "freq": 0,
-                    "syntax": "",
-                    "root": "",
-                }
-            )
-        return None
-
-    @staticmethod
-    def check_partially_vocalized(word: str, data: list[WordCase]) -> list[WordCase]:
-        if not araby.is_vocalized(word):
-            return data
-        filtered = []
-        for item in data:
-            if "vocalized" in item:
-                output = item["vocalized"]
-                is_verb = "Verb" in item["type"]
-                if araby.vocalizedlike(word, output):
+def check_partially_vocalized(word: str, data: list[WordCase]) -> list[WordCase]:
+    if not araby.is_vocalized(word):
+        return data
+    filtered = []
+    for item in data:
+        if "vocalized" in item:
+            output = item["vocalized"]
+            is_verb = "Verb" in item["type"]
+            if araby.vocalizedlike(word, output):
+                item["tags"] += ":" + analex_const.PARTIAL_VOCALIZED_TAG
+                filtered.append(item)
+                # حالة التقا الساكنين، مع نص مشكول مسبقا، والفعل في آخره كسرة بدل السكون
+            elif (
+                is_verb and word.endswith(araby.KASRA) and output.endswith(araby.SUKUN)
+            ):
+                if araby.vocalizedlike(word[:-1], output[:-1]):
                     item["tags"] += ":" + analex_const.PARTIAL_VOCALIZED_TAG
                     filtered.append(item)
-                    # حالة التقا الساكنين، مع نص مشكول مسبقا، والفعل في آخره كسرة بدل السكون
-                elif (
-                    is_verb
-                    and word.endswith(araby.KASRA)
-                    and output.endswith(araby.SUKUN)
-                ):
-                    if araby.vocalizedlike(word[:-1], output[:-1]):
-                        item["tags"] += ":" + analex_const.PARTIAL_VOCALIZED_TAG
-                        filtered.append(item)
-        return filtered
-
-    @cache
-    def check_word(self, word: str, tag: str) -> list[StemmedWord]:
-        """
-        Analyzes an Arabic word by going through all possible cases
-        (number, punctuation, stopword, verb, noun and unknown)
-
-        Assumes that the word is vocalized, normalized and not empty
-
-        From:
-        qalsadi.analex.Analex.check_word
-        """
-        # print("Checking", word, tag)
-        word_nm = araby.strip_tashkeel(word)
-        word_nm_shadda = araby.strip_harakat(word)
-
-        if stemmed := self.check_word_as_numeric(word_nm):
-            return [stemmed]
-
-        result = []
-
-        if araby.is_arabicword(word_nm):
-            if word in qalsadi.stopwords.STOPWORDS:
-                result += stopwordstemmer.stemming_stopword(word_nm)
-            if not any(c in ("ة", *araby.TANWIN) for c in word) and (
-                tagger.has_verb_tag(tag) or tagger.is_stopword_tag(tag)
-            ):
-                result += verbstemmer.stemming_verb(word_nm)
-            if tagger.has_noun_tag(tag) or tagger.is_stopword_tag(tag):
-                result += nounstemmer.stemming_noun(word_nm)
-
-        if not result:
-            result = (
-                unknownstemmer.stemming_noun(word_nm)
-                or nounstemmer.stemming_noun(word_nm)
-                or verbstemmer.stemming_verb(word_nm)
-                or stopwordstemmer.stemming_stopword(word_nm)
-            )
-
-        result = [
-            x
-            for x in result
-            if araby.shaddalike(word_nm_shadda, x.vocalized)
-            and x.unvocalized == word_nm
-        ]
-
-        result = self.check_partially_vocalized(word, result)
-
-        for item in result:
-            freqtype = item.freq
-            if freqtype == "freqverb":
-                wordtype = "verb"
-            elif freqtype == "freqnoun":
-                wordtype = "noun"
-            elif freqtype == "freqstopword":
-                wordtype = "stopword"
-            else:
-                continue
-            item.freq = self.get_freq(item.original, wordtype)
-
-        if not result:
-            print("No result for", word, tag, word_nm, word_nm_shadda)
-
-        return [StemmedWord(w) for w in result]
-
-    def check_words(self, tokens: list[str]) -> list[list[StemmedWord]]:
-        """
-        Analyzes Arabic tokens
-
-        From:
-        qalsadi.analex.Analex.check_text
-        """
-        prev_tokens = ["", *tokens]
-        prev_prev_tokens = ["", "", *tokens]
-        guessed_tags = [
-            tagger.tag_word(token, prev, prev_prev)
-            for token, prev, prev_prev in zip(tokens, prev_tokens, prev_prev_tokens)
-        ]
-
-        return [self.check_word(word, tag) for word, tag in zip(tokens, guessed_tags)]
+    return filtered
 
 
-if __name__ == "__main__":
-    text = "يَكْتُبُ الكَلْبُ"
+def possible_prefixes(arabic_word: str, guess: str | None = None) -> list[str]:
+    guess = guess or arabic_word[:-1]
+    max_prefix_length = len(guess)
+    return [
+        possible_prefix
+        for prefix_length in data.prefix_lengths
+        if (
+            prefix_length <= max_prefix_length
+            and arabic_word.startswith(possible_prefix := guess[:prefix_length])
+            and possible_prefix in data.prefixes
+        )
+    ]
 
-    print(normalize(text))
 
-    tokens, starts, ends = tokenize_with_location(text)
-    print(tokens, starts, ends)
+@cache
+def check_word(word: str, tag: str) -> list[StemmedWord]:
+    """
+    Analyzes an Arabic word by going through all possible cases
+    (number, punctuation, stopword, verb, noun and unknown)
 
-    analex = Analex()
+    Assumes that the word is vocalized, normalized and not empty
 
-    analyzed = analex.check_words(tokens)
-    print(analyzed)
+    From:
+    qalsadi.analex.Analex.check_word
+    """
+    # print("Checking", word, tag)
+    word_nm = araby.strip_tashkeel(word)
+    word_nm_shadda = araby.strip_harakat(word)
+
+    result = []
+
+    if araby.is_arabicword(word_nm):
+        if word in qalsadi.stopwords.STOPWORDS:
+            result += stopwordstemmer.stemming_stopword(word_nm)
+        if not any(c in ("ة", *araby.TANWIN) for c in word) and (
+            tagger.has_verb_tag(tag) or tagger.is_stopword_tag(tag)
+        ):
+            result += verbstemmer.stemming_verb(word_nm)
+        if tagger.has_noun_tag(tag) or tagger.is_stopword_tag(tag):
+            result += nounstemmer.stemming_noun(word_nm)
+
+    if not result:
+        result = (
+            unknownstemmer.stemming_noun(word_nm)
+            or nounstemmer.stemming_noun(word_nm)
+            or verbstemmer.stemming_verb(word_nm)
+            or stopwordstemmer.stemming_stopword(word_nm)
+        )
+
+    result = [
+        x
+        for x in result
+        if araby.shaddalike(word_nm_shadda, x.vocalized) and x.unvocalized == word_nm
+    ]
+
+    result = check_partially_vocalized(word, result)
+
+    for item in result:
+        freqtype = item.freq
+        if freqtype == "freqverb":
+            wordtype = "verb"
+        elif freqtype == "freqnoun":
+            wordtype = "noun"
+        elif freqtype == "freqstopword":
+            wordtype = "stopword"
+        else:
+            continue
+        item.freq = get_freq(item.original, wordtype)
+
+    if not result:
+        debug("No result for", word, tag, word_nm, word_nm_shadda)
+
+    return [StemmedWord(w) for w in result]
+
+
+def check_sentence(sentence: Sentence) -> list[list[StemmedWord]]:
+    """
+    Analyzes Arabic tokens
+
+    From:
+    qalsadi.analex.Analex.check_text
+    """
+    tokens = [token.arab for token in sentence]
+    prev_tokens = ["", *tokens]
+    prev_prev_tokens = ["", "", *tokens]
+    guessed_tags = [
+        tagger.tag_word(token, prev, prev_prev)
+        for token, prev, prev_prev in zip(tokens, prev_tokens, prev_prev_tokens)
+    ]
+
+    result = []
+    for token, tag in zip(sentence, guessed_tags):
+        preliminary_result = check_word(token.arab, tag)
+        # if not preliminary_result:
+        #     for prefix in possible_prefixes(token.arab):
+        #         preliminary_result = check_word(token.arab[len(prefix) :], tag)
+        #         if preliminary_result:
+        #             token.prefix = prefix
+        #             break
+        result.append(preliminary_result)
+    return result

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DMG Transliteration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans&family=Scheherazade+New:wght@500&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
     <!-- Import Bootstrap 5 -->
     <script src="/static/bs-dark-mode.js"></script>
@@ -12,6 +15,17 @@
     <style>
         html, body {
             height: 100%;
+            font-family: 'Google Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: darkorchid;
+            border-color: darkorchid;
+        }
+
+        .btn-primary:hover {
+            background-color: #7e2aa8;
+            border-color: #7e2aa8;
         }
 
         #grid-wrapper {
@@ -27,6 +41,25 @@
 
         nav {
             border-bottom: solid darkorchid 2px;
+        }
+
+        #settings-button {
+            border: none;
+            color: var(--bs-body-color);
+        }
+
+        #settings-button:hover {
+            color: var(--bs-emphasis-color);
+        }
+
+        #feedback-modal textarea {
+            resize: none;
+            margin: 0.25rem 0;
+        }
+
+        #feedback-modal :is(textarea:focus, input:focus) {
+            border-color: darkorchid;
+            box-shadow: 0 0 0 .25rem rgba(152, 87, 185, 0.25);
         }
 
         #side-bar>div {
@@ -68,6 +101,7 @@
 
         #input-output {
             padding: 20px;
+            width: 100%;
             height: 100%;
         }
 
@@ -80,12 +114,13 @@
         }
 
         #input-text {
+            font-size: 1.75rem;
+            font-family: "Scheherazade New", serif;
+            font-weight: 500;
+            font-style: normal;
             outline: none;
             border: 1px solid grey;
             border-radius: 5px;
-        }
-
-        #input-text {
             --bg-color: var(--bs-light);
         }
 
@@ -123,8 +158,15 @@
             --direction: 135deg;
             background:
                 linear-gradient(var(--bg-color),var(--bg-color)) padding-box,
-                linear-gradient(var(--direction), yellow,rgb(255, 183, 0)) border-box;
+                linear-gradient(var(--direction), yellow,rgb(255, 178, 0)) border-box;
             animation: gradient 10s ease infinite;
+        }
+
+        #output-text {
+            font-size: 20px;
+            border: 1px solid grey;
+            border-radius: 5px;
+            outline: none;
         }
     </style>
 </head>
@@ -133,7 +175,7 @@
         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
                 <strong class="me-auto">${title}</strong>
-                <small>just now</small>
+                <!-- <small>just now</small> -->
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
@@ -141,6 +183,32 @@
             </div>
         </div>
     </template>
+    <div id="feedback-modal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <form id="feedback-form" class="form">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Feedback</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Schließen"></button>
+                    </div>
+                    <div class="modal-body container">
+                        <label for="feedback-email">Lassen Sie uns gerne Ihre E-Mail für Rückfragen da!</label>
+                        <input id="feedback-email" class="form-control mt-1" type="email" placeholder="E-Mail (optional)" title="E-Mail (optional)">
+                        <label class="mt-3" for="feedback-text">Erzählen Sie uns, was für eine Transliteration Sie erwartet hätten</label>
+                        <textarea id="feedback-text" class="form-control" rows="5" autofocus></textarea>
+                        <small>Oder schicken Sie eine E-Mail an: </small>
+                        <br>
+                        <span class="text-secondary">rashid[punkt]harvey[at]fu-berlin[punkt]de</span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                        <button type="submit" class="btn btn-primary">Abschicken</button>
+                      </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
     <div class="toast-container bottom-0 end-0 p-3"></div>
     <div id="grid-wrapper">
         <nav class="navbar navbar-expand">
@@ -150,9 +218,9 @@
                     DMG Transliteration
                 </a>
                 <ul class="navbar-nav justify-content-end">
-                    <!-- <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li> -->
+                    <li class="nav-item mx-2">
+                        <a class="nav-link active" data-bs-toggle="modal"data-bs-target="#feedback-modal" role="button" aria-controls="feedback-modal">Feedback</a>
+                    </li>
                     <li class="nav-item mx-2">
                         <button id="theme-toggle" class="theme-toggle btn" type="button" aria-label="auto" aria-live="polite">
                             <svg class="sun-and-moon" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24">
@@ -175,7 +243,7 @@
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#side-bar" aria-controls="side-bar" aria-expanded="false">
+                        <button id="settings-button" class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#side-bar" aria-controls="side-bar" aria-expanded="false" title="Einstellungen">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
                                 <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
                                 <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
@@ -188,10 +256,10 @@
         <main>
             <div id="input-output" class="row">
                 <div class="col-12 mb-1 h-50 col-lg-6 mb-lg-0 h-lg-50">
-                    <textarea id="input-text"></textarea>
+                    <textarea id="input-text" dir="rtl"></textarea>
                 </div>
                 <div class="col-12 h-50 col-lg-6 h-lg-50">
-                    <textarea id="output-text" disabled></textarea>
+                    <textarea id="output-text" class="disabled" readonly></textarea>
                 </div>
             </div>
             <aside id="side-bar" class="collapse-horizontal collapse">
@@ -207,7 +275,7 @@
                                 </label>
                             </div>
                         {% endif %}
-                    {%endfor%}
+                    {% endfor %}
                 </div>
             </aside>
         </main>
@@ -256,19 +324,55 @@
             .then(data => output.value = data)
             .catch(error => {
                 console.error(error)
-                show_title_toast('Failed to reach server', 'Please try again later.')
+                show_title_toast('Der Server konnte nicht erreicht werden', 'Bitte versuchen Sie es später erneut')
             });
             console.debug(text, profile);
         }
 
-        input.addEventListener('input', () => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(send_request, 1000); 
+        input.addEventListener('input', (e) => {
+            clearTimeout(timeoutId); 
+            timeoutId = setTimeout(send_request, e.inputType === 'insertFromPaste' ? 0 : 1000); 
         });
 
         input.addEventListener('change', send_request);
 
+        output.addEventListener('click', () => {
+            output.select();
+            document.execCommand('copy');
+            show_title_toast('Kopiert', output.value);
+        });
+
         profile_inputs.forEach(input => input.addEventListener('change', send_request));
+
+        // Feedback
+        const feedback_form = document.getElementById('feedback-form');
+        const email_input = document.getElementById('feedback-email');
+        const feedback_text = document.getElementById('feedback-text');
+        const feedback_modal = new bootstrap.Modal(document.getElementById('feedback-modal'));
+        feedback_form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            feedback_modal.hide();
+            const text = feedback_text.value;
+            const email = email_input.value;
+            const current_input = input.value;
+            const current_output = output.value;
+            fetch('/feedback', { method: 'POST', body: JSON.stringify({email, text, current_input, current_output}) })
+            .then(response => {
+                if (response.ok)
+                    return response.text() 
+                else {
+                    console.error(response)
+                    throw new Error()
+                }
+            })
+            .then(data => {
+                show_title_toast('Vielen Dank!', 'Ihr Feedback wurde erfolgreich erfasst.')
+                feedback_form.reset();
+            })
+            .catch(error => {
+                show_title_toast('Ihr Feedback konnte nicht gesendet werden', 'Bitte versuchen Sie es später erneut')
+            });
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,7 @@
+# hand-picked from Wikipedia
+# https://de.wikipedia.org/wiki/Kairo
+مصر:Miṣr
+القاهرة:al-Qāhira
+# https://www.aai.uni-hamburg.de/voror/medien/dmg.pdf
+إِسحَاق:Isḥāq
+# TODO: scrape more
