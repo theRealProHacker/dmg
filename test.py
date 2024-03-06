@@ -24,7 +24,7 @@ def test_half_vowels():
 
 def test_sun_assimilation():
     # https://de.wikipedia.org/wiki/Sonnenbuchstabe
-    tests = {
+    no_diphthong_tests = {
         "التَعلِيم": "at-taʿlīm",
         "الثَورَة": "aṯ-ṯawra",
         "الدَولَة": "ad-dawla",  # daula
@@ -40,8 +40,21 @@ def test_sun_assimilation():
         "اللُغَة": "al-luġa",
         "النَوم": "an-nawm",  # naum
     }
-    for arab, latin in tests.items():
+    diphthong_tests = {
+        "الدَولَة": "ad-daula",
+        "الزَيت": "az-zayt",
+        "السُكَّر": "as-sukkar",
+        "الشَمس": "aš-šams",
+        "الضَيف": "aḍ-ḍaif",
+        "الظُهر": "aẓ-ẓuhr",
+        "اللُغَة": "al-luġa",
+        "النَوم": "an-naum",
+    }
+    for arab, latin in no_diphthong_tests.items():
         assert transliterate(arab) == latin
+
+    for arab, latin in diphthong_tests.items():
+        assert transliterate(arab, Profile(diphthongs=True)) == latin
 
 
 def test_ta_marbutah():
