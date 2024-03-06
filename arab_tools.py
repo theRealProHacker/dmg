@@ -20,12 +20,7 @@ from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
 
 import data
-from data_types import Sentence
-
-
-def get_freq(self, word, wordtype):
-    return 0
-
+from data_types import Sentence, Token
 
 remove_i3rab = araby.strip_lastharaka
 
@@ -268,3 +263,14 @@ def check_sentence(sentence: Sentence) -> list[list[StemmedWord]]:
         #             break
         result.append(preliminary_result)
     return result
+
+
+def is_hamzatul_wasl(token: Token) -> bool:
+    """
+    Checks if a word starts with hamzatul wasl
+
+    Assumes the word starts with a hamza
+    """
+    assert token.arab[0] == data.hamza or token.arab[0] == data.alif
+    test_word = token.arab[1:]
+    False and test_word

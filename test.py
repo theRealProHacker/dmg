@@ -94,5 +94,9 @@ def test_double_vowels():
     assert transliterate("نِيَّة", profile) == "nīya"
 
 
+def test_hamzatul_wasl():
+    assert transliterate("أَنَ الحَديقَةِ") == "ana l-ḥadīqa"
+
+
 def test_names():
     assert transliterate("مُحَمَّد") == "Muḥammad"

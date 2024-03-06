@@ -47,7 +47,7 @@ class Profile:
             "Ob Diphthongs wiedergegeben werden sollen",
         ),
         "double_vowels": (
-            "Doppelte Vokale",
+            "Doppelte Halbvokale",
             "Ob Halbvokale mit Shaddah doppelt wiedergegeben werden sollen",
         ),
     }
@@ -68,6 +68,7 @@ class Token:
     is_end_of_sentence: bool = False
     is_idafah: bool = False
     is_name: bool = False
+    apply_hamzatul_wasl: bool = False
 
     latin: str = ""
     latin_after: str = ""

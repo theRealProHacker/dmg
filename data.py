@@ -3,7 +3,30 @@ The data module encapsulates all static data to represent a single source of tru
 for all other modules
 """
 
+import json
 import re
+from contextlib import contextmanager
+
+from pyarabic import araby
+
+
+def read(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def write(path, to_save, indent: int = 2):
+    with open(path, "w", encoding="utf-8") as f:
+        return json.dump(to_save, f, ensure_ascii=False, indent=indent)
+
+
+@contextmanager
+def readWrite(path):
+    data = read(path)
+    try:
+        yield data
+    finally:
+        write(path, data)
 
 
 def compile_single_char_map_pattern(d: dict[str, str]) -> re.Pattern:
@@ -240,10 +263,6 @@ diphthong_map = {
     f"(?<={fatha}){half_vowel}": short_vowel
     for half_vowel, short_vowel in zip(half_vowels, half_vowels_as_short_vowels)
 }
-diphthong_map = {
-    "aw": "au",
-    "ay": "ai",
-}
 
 # if not double_vowels
 double_vowels_map = {
@@ -251,6 +270,9 @@ double_vowels_map = {
     "uww": "ūw",
     "iyy": "īy",
 }
+
+# if token.is_hamzatul_wasl
+hamzatul_wasl_map = {"^" + hamza + short_vowel: "" for short_vowel in short_vowels}
 
 char_map = {
     "(.)" + shaddah: lambda match: match.group(1) * 2,
@@ -333,11 +355,6 @@ preposition_prefixes = {
     "ل": "li",
     "لِ": "li",
     # "في": "fi",
-    "ل": "li",
-    "لِ": "li",
-    "ك": "ka",
-    "كَ": "ka",
-    # "في": "fi",
 }
 future_prefixes = {
     "س": "sa",
@@ -354,8 +371,14 @@ article_prefixes = {
     "الْ": "al",
     "أَل": "al",
     "أَلْ": "al",
-    # fal, wal, bil, lil
 }
+# bil, lil
+preposition_article_prefixes = {
+    pre_a + art: pre_l + "l"
+    for pre_a, pre_l in preposition_prefixes.items()
+    for art in article_prefixes
+}
+# fal, wal
 conjunction_article_prefixes = {
     con1 + art1: con2 + art2
     for con1, con2 in conjunction_prefixes.items()
@@ -366,6 +389,7 @@ prefixes = (
     | preposition_prefixes
     | article_prefixes
     | future_prefixes
+    | preposition_article_prefixes
     | conjunction_article_prefixes
 )
 prefix_lengths = sorted({len(x) for x in prefixes}, reverse=True)
@@ -381,3 +405,46 @@ after_map_pattern = compile_single_char_map_pattern(after_map)
 
 def sub_after(after):
     return sub_map_pattern(after_map_pattern, after_map, after)
+
+
+# hamzatul wasl
+# Without the starting alif
+hamzatul_wasl_patterns = {
+    # ithnan
+    "ثنان",
+    "ثنين",
+    "ثنتان",
+    "ثنتين",
+    # ibn
+    "بن",
+    # ism
+    "سم",
+    # imra'a
+    "مرأ",
+    # imra'at
+    "مرأة",
+    "مرأت",
+}
+# consonant pattern
+_cp = f"([{araby.LETTERS[1:]}])"
+unvocalized_verb_stems_7_to_10_verbs = {
+    # 7
+    f"ن{_cp}{_cp}{_cp}",
+    # 8
+    f"{_cp}ت{_cp}{_cp}",
+    # 9
+    f"{_cp}{_cp}{_cp}{shaddah}?",
+    # 10
+    f"ست{_cp}{_cp}{_cp}",
+}
+
+unvocalized_verb_stems_7_to_10_nouns = {
+    # 7
+    f"ن{_cp}{_cp}{alif}{_cp}",
+    # 8
+    f"{_cp}ت{_cp}{alif}{_cp}",
+    # 9
+    f"{_cp}{_cp}{alif}{_cp}",
+    # 10
+    f"ست{_cp}{_cp}{alif}{_cp}",
+}
