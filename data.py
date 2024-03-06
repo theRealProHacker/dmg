@@ -131,14 +131,18 @@ conjunction_prefixes = {
 }
 preposition_prefixes = {
     "ب": "bi",
+    "بِ": "bi",
     "ك": "ka",
+    "كَ": "ka",
     "ل": "li",
-    "في": "fi",
+    "لِ": "li",
+    # "في": "fi",
 }
 article_prefixes = {
     "ال": "al",
     "الْ": "al",
     "أَلْ": "al",
+    # fal, wal, bil, lil
 }
 prefixes = conjunction_prefixes | preposition_prefixes | article_prefixes
 prefix_lengths = sorted({len(x) for x in prefixes}, reverse=True)

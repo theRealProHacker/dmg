@@ -22,6 +22,11 @@ from qalsadi.wordcase import WordCase
 # import tashaphyne.stemming
 # stemmer = tashaphyne.stemming.ArabicLightStemmer()
 
+
+
+def get_freq(self, word, wordtype):
+        return 0
+
 remove_i3rab = araby.strip_lastharaka
 
 
