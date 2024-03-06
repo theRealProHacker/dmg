@@ -6,8 +6,6 @@ from qalsadi import stemnode
 
 import arab_tools
 import data
-
-# import ner
 from data import (
     article_prefixes,
     preposition_prefixes,
@@ -15,6 +13,13 @@ from data import (
     token_pattern,
 )
 from data_types import Case, Profile, Token
+
+try:
+    import ner
+
+    ner_available = True
+except ImportError:
+    ner_available = False
 
 basicConfig(level="DEBUG")
 
@@ -55,13 +60,12 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     if current_sentence:
         sentences.append(current_sentence)
     # sentence-level analysis
-    # names = ner.find_names(
-    #     [
-    #         [araby.strip_diacritics(token.original) for token in sentence]
-    #         for sentence in sentences
-    #     ]
-    # )
-    names = [[False] * len(sentence) for sentence in sentences]
+    names = ner.find_names(
+        [
+            [araby.strip_diacritics(token.original) for token in sentence]
+            for sentence in sentences
+        ]
+    ) if ner_available else [[False] * len(sentence) for sentence in sentences]
     for sentence, is_name_data in zip(sentences, names):
         sentence[-1].is_end_of_sentence = True
         # named entity recognition
