@@ -127,9 +127,13 @@ nounstemmer = NounStemmer()
 verbstemmer = VerbStemmer()
 unknownstemmer = UnknownStemmer()
 stopwordstemmer = StopWordStemmer()
-# freq_dict = wordfreqdictionaryclass.WordFreqDictionary(
-#     "wordfreq", wordfreqdictionaryclass.WORDFREQ_DICTIONARY_INDEX
-# )
+
+
+freq_dict = {}
+
+for entry in data.read("data/wordfreq.json"):
+    freq_dict[(entry["vocalized"], entry["wordtype"])] = entry["freq"]
+    freq_dict[(entry["unvocalized"], entry["wordtype"])] = entry["freq"]
 
 
 @cache
@@ -137,8 +141,7 @@ def get_freq(word, wordtype):
     """
     Words frequency
     """
-    return 0  # we don't want to access the file system
-    # return freq_dict.get_freq(word, wordtype)
+    return freq_dict.get((word, wordtype), 0)
 
 
 def check_partially_vocalized(word: str, data: list[WordCase]) -> list[WordCase]:
