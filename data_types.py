@@ -25,7 +25,6 @@ class Profile:
     # """Whether i3rab (flexion endings) should be skipped"""
     # full_vocalisation: bool = False
     # """ Full vocalised transcription"""
-    # TODO: niyyah -> nīyah, awwal -> auwal
     # TODO: imalah, ishmam
     # TODO: alif maqsura to ya
     # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
