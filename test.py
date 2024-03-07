@@ -42,7 +42,7 @@ def test_sun_assimilation():
     }
     diphthong_tests = {
         "الدَولَة": "ad-daula",
-        "الزَيت": "az-zayt",
+        "الزَيت": "az-zait",
         "السُكَّر": "as-sukkar",
         "الشَمس": "aš-šams",
         "الضَيف": "aḍ-ḍaif",
