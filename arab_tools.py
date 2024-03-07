@@ -222,16 +222,9 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     result = check_partially_vocalized(word, result)
 
     for item in result:
-        freqtype = item.freq
-        if freqtype == "freqverb":
-            wordtype = "verb"
-        elif freqtype == "freqnoun":
-            wordtype = "noun"
-        elif freqtype == "freqstopword":
-            wordtype = "stopword"
-        else:
-            continue
-        item.freq = get_freq(item.original, wordtype)
+        # item.freq is a string and becomes a number
+        if len(item.freq) > 4:
+            item.freq = get_freq(item.original, item.freq[4:])
 
     if not result:
         debug("No result for", word, tag, word_nm, word_nm_shadda)
@@ -275,4 +268,4 @@ def is_hamzatul_wasl(token: Token) -> bool:
     """
     assert token.arab[0] == data.hamza or token.arab[0] == data.alif
     test_word = token.arab[1:]
-    False and test_word
+    return False and test_word
