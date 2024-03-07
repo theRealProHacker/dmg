@@ -263,6 +263,10 @@ diphthong_map = {
     f"(?<={fatha}){half_vowel}": short_vowel
     for half_vowel, short_vowel in zip(half_vowels, half_vowels_as_short_vowels)
 }
+diphthong_map = {
+    f"(?<=a){l_hw}(?!a|u|i)": short_vowel
+    for l_hw, short_vowel in zip(half_vowels_as_consonants, half_vowels_as_short_vowels)
+}
 
 # if not double_vowels
 double_vowels_map = {
@@ -322,21 +326,17 @@ number_token_pattern = re.compile(f"[{''.join(number_map)}]+")
 special_char_map = {"ﷲ": "allah"}
 
 # Not currently necessary
-pausa_map = {
-    "[" + fatha + damma + kasra + fathatan + dammatan + kasratan + shaddah + "]$": "",
-    fathatan + alif + "$": alif,
-    alif + fathatan + "$": alif,
-}
+# pausa_map = {
+#     "[" + fatha + damma + kasra + fathatan + dammatan + kasratan + shaddah + "]$": "",
+#     fathatan + alif + "$": alif,
+#     alif + fathatan + "$": alif,
+# }
 
 
 sun_letters = {"ت", "ث", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ن"}
 
 # latin sun letters
 sun_letters = set("tṯdḏrzsšṣḍṭẓn")
-
-# print([
-#     "|".join(hex(ord(x)) for x in arab) for arab in char_map|diacritic_map
-# ])
 
 # Pattern to match an arabic word
 token_pattern = re.compile("[\u0621-\u0655]+")
