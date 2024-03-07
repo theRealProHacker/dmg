@@ -136,7 +136,6 @@ for entry in data.read("data/wordfreq.json"):
     freq_dict[(entry["unvocalized"], entry["wordtype"])] = entry["freq"]
 
 
-@cache
 def get_freq(word, wordtype):
     """
     Words frequency
