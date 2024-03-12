@@ -25,7 +25,6 @@ class Profile:
     # """Whether i3rab (flexion endings) should be skipped"""
     # full_vocalisation: bool = False
     # """ Full vocalised transcription"""
-    # TODO: niyyah -> nīyah, awwal -> auwal
     # TODO: imalah, ishmam
     # TODO: alif maqsura to ya
     # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
@@ -47,9 +46,9 @@ class Profile:
             "Ob Diphthonge wiedergegeben werden sollen",
         ),
         "double_vowels": (
-            "Doppelte Vokale",
+            "Doppelte Halbvokale",
             "Ob Halbvokale mit Shaddah als verdoppelte Konsonanten wiedergegeben werden sollen",
-        )
+        ),
     }
 
 
@@ -68,6 +67,7 @@ class Token:
     is_end_of_sentence: bool = False
     is_idafah: bool = False
     is_name: bool = False
+    apply_hamzatul_wasl: bool = False
 
     latin: str = ""
     latin_after: str = ""

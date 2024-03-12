@@ -20,7 +20,7 @@ from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
 
 import data
-from data_types import Sentence
+from data_types import Sentence, Token
 
 remove_i3rab = araby.strip_lastharaka
 
@@ -127,18 +127,20 @@ nounstemmer = NounStemmer()
 verbstemmer = VerbStemmer()
 unknownstemmer = UnknownStemmer()
 stopwordstemmer = StopWordStemmer()
-# freq_dict = wordfreqdictionaryclass.WordFreqDictionary(
-#     "wordfreq", wordfreqdictionaryclass.WORDFREQ_DICTIONARY_INDEX
-# )
 
 
-@cache
+freq_dict = {}
+
+for entry in data.read("data/wordfreq.json"):
+    freq_dict[(entry["vocalized"], entry["wordtype"])] = entry["freq"]
+    freq_dict[(entry["unvocalized"], entry["wordtype"])] = entry["freq"]
+
+
 def get_freq(word, wordtype):
     """
     Words frequency
     """
-    return 0  # we don't want to access the file system
-    # return freq_dict.get_freq(word, wordtype)
+    return freq_dict.get((word, wordtype), 0)
 
 
 def check_partially_vocalized(word: str, data: list[WordCase]) -> list[WordCase]:
@@ -220,16 +222,9 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     result = check_partially_vocalized(word, result)
 
     for item in result:
-        freqtype = item.freq
-        if freqtype == "freqverb":
-            wordtype = "verb"
-        elif freqtype == "freqnoun":
-            wordtype = "noun"
-        elif freqtype == "freqstopword":
-            wordtype = "stopword"
-        else:
-            continue
-        item.freq = get_freq(item.original, wordtype)
+        # item.freq is a string and becomes a number
+        if len(item.freq) > 4:
+            item.freq = get_freq(item.original, item.freq[4:])
 
     if not result:
         debug("No result for", word, tag, word_nm, word_nm_shadda)
@@ -263,3 +258,14 @@ def check_sentence(sentence: Sentence) -> list[list[StemmedWord]]:
         #             break
         result.append(preliminary_result)
     return result
+
+
+def is_hamzatul_wasl(token: Token) -> bool:
+    """
+    Checks if a word starts with hamzatul wasl
+
+    Assumes the word starts with a hamza
+    """
+    assert token.arab[0] == data.hamza or token.arab[0] == data.alif
+    test_word = token.arab[1:]
+    return False and test_word
