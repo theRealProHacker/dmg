@@ -30,7 +30,7 @@ class Profile:
     # TODO: alif maqsura to ya
     # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
     # TODO: alif maqsura mit Unterpunkt
-    # IDEA: Use ner
+    # IDEA: Whether to use ner
     # IDEA: Capitalize beginning of each sentence
 
     descriptions = {
@@ -43,12 +43,12 @@ class Profile:
             "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
         ),
         "diphthongs": (
-            "Diphthongs",
-            "Ob Diphthongs wiedergegeben werden sollen",
+            "Diphthonge",
+            "Ob Diphthonge wiedergegeben werden sollen",
         ),
         "double_vowels": (
             "Doppelte Vokale",
-            "Ob Halbvokale mit Shaddah doppelt wiedergegeben werden sollen",
+            "Ob Halbvokale mit Shaddah als verdoppelte Konsonanten wiedergegeben werden sollen",
         )
     }
 
