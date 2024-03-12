@@ -18,8 +18,9 @@ try:
     import ner
 
     ner_available = True
-except ImportError:
+except ImportError as e:
     ner_available = False
+    print("NER disabled", e.msg)
 
 basicConfig(level="DEBUG")
 
