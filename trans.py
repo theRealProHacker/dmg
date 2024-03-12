@@ -87,6 +87,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             # print(token.arab, token.lemma, token.pos)
             # prefixes
             if not token.prefix:
+                # TODO: fix this getting the affix
                 prefix_guess: str = node.get_affix().split("-")[0]
                 possible_prefixes = arab_tools.possible_prefixes(
                     token.arab, prefix_guess
@@ -108,38 +109,35 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 if cases[sorted_cases[0]] == cases[sorted_cases[1]]
                 else sorted_cases[0]
             )
-            # hamzatul wasl for token
-            if token.latin_prefix and token.latin_prefix[-1] not in ("a", "i"):
-                # we don't care about hamzatul wasl
-                continue
-            first_char = token.arab[0]
-            if first_char == data.alif_wasl or first_char == data.alif:
-                token.apply_hamzatul_wasl = True
-                token.arab = data.hamza + token.arab[1:]
-            elif first_char == data.hamza:
-                token.apply_hamzatul_wasl = arab_tools.is_hamzatul_wasl(token)
         # two tokens together
         for token, next_token in zip(sentence, sentence[1:]):
             # idafah
-            # TODO: first token has no article but is definite
+            # TODO: check that first token has no article but is definite
             token.is_idafah = (
                 token.pos == "noun"
                 and next_token.is_genetive
                 and next_token.prefix not in preposition_prefixes
             )
-            # hamzatul_wasl
-            if next_token.prefix:
-                if next_token.prefix in article_prefixes:
-                    next_token.latin_prefix = "l"
-                continue
-            # don't apply hamzatul wasl if previous token doesn't end with a vowel
-            if token.is_pausa:
-                next_token.apply_hamzatul_wasl = False
-            elif not (
-                token.arab[-1] in data.long_vowels
-                or token.arab[-1] in data.short_vowels
-            ):
-                next_token.apply_hamzatul_wasl = False
+            # hamzatul wasl for next_token
+            next_is_hamzatul_wasl = False
+            if next_token.prefix in article_prefixes:
+                next_is_hamzatul_wasl = True
+            else:
+                first_char = token.arab[0]
+                if first_char == data.alif_wasl or first_char == data.alif:
+                    next_is_hamzatul_wasl = True
+                    token.arab = data.hamza + token.arab[1:]
+                elif first_char == data.hamza:
+                    next_is_hamzatul_wasl = arab_tools.is_hamzatul_wasl(token)
+            prev_is_hamzatul_wasl = False
+            if next_token.prefix and next_token.prefix not in article_prefixes:
+                prev_is_hamzatul_wasl = next_token.latin_prefix[-1] in ("a", "i")
+            else:
+                prev_is_hamzatul_wasl = not token.is_pausa and (
+                    token.arab[-1] in data.long_vowels
+                    or token.arab[-1] in data.short_vowels
+                )
+            next_token.apply_hamzatul_wasl = next_is_hamzatul_wasl and prev_is_hamzatul_wasl
 
     # transliteration
     for token in tokens:
@@ -160,7 +158,10 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 "ة$": ("h" if profile.ta_marbutah else ""),
             } | char_map
         if token.apply_hamzatul_wasl:
-            char_map |= data.hamzatul_wasl_map
+            if not token.prefix:
+                char_map |= data.hamzatul_wasl_map
+            elif token.prefix in article_prefixes:
+                token.latin_prefix = "l"
         # if token.is_pausa:
         #     char_map = data.pausa_map | char_map | data.pausa_map
         rules = [(re.compile(arab), latin) for arab, latin in char_map.items()]

@@ -68,6 +68,12 @@ class Token:
     is_idafah: bool = False
     is_name: bool = False
     apply_hamzatul_wasl: bool = False
+    """
+    Whether hamzatul wasl should be applied to the token or not
+
+    If the token has an article prefix, the prefix is set to "l"
+    else the short vowel after the first hamzah is removed
+    """
 
     latin: str = ""
     latin_after: str = ""
