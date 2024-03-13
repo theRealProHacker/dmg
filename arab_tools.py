@@ -132,8 +132,8 @@ stopwordstemmer = StopWordStemmer()
 freq_dict = {}
 
 for entry in data.read("data/wordfreq.json"):
-    freq_dict[(entry["vocalized"], entry["wordtype"])] = entry["freq"]
-    freq_dict[(entry["unvocalized"], entry["wordtype"])] = entry["freq"]
+    freq_dict[(entry["vocalized"], entry["word_type"])] = entry["freq"]
+    freq_dict[(entry["unvocalized"], entry["word_type"])] = entry["freq"]
 
 
 def get_freq(word, wordtype):

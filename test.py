@@ -64,9 +64,9 @@ def test_ta_marbutah():
     profile_pausa_tm = Profile(pausa=True, ta_marbutah=True)
     assert transliterate("المَدِينَة", profile) == "al-madīna"
     assert transliterate("المَدِينَة", profile_tm) == "al-madīnah"
-    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile) == "al-madīnatu al-Qāhira"
+    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile) == "al-madīnatu l-Qāhira"
     assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa) == "al-madīnat al-Qāhira"
-    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_tm) == "al-madīnatu al-Qāhirah"
+    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_tm) == "al-madīnatu l-Qāhirah"
     assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa_tm) == "al-madīnat al-Qāhirah"
     assert transliterate("صَلاة") == "ṣalāh"
 

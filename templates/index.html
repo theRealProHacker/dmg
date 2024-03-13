@@ -128,6 +128,10 @@
             --bg-color: #222128;
         }
 
+        #input-text::placeholder {
+            opacity: 1;
+        }
+
         /* @property --direction {
             syntax: '<angle>';
             inherits: false;
@@ -254,11 +258,14 @@
         </nav>
         <main>
             <div id="input-output" class="row">
+                <div class="col-12 mb-3" style="height: min-content;">
+                    Transliterieren Sie Ihren arabischen Text in DMG
+                </div>
                 <div class="col-12 mb-1 h-50 col-lg-6 mb-lg-0 h-lg-50">
-                    <textarea id="input-text" dir="rtl"></textarea>
+                    <textarea id="input-text" dir="rtl" placeholder="نص عربي ..."></textarea>
                 </div>
                 <div class="col-12 h-50 col-lg-6 h-lg-50">
-                    <textarea id="output-text" class="disabled" readonly></textarea>
+                    <textarea id="output-text" class="disabled" readonly placeholder="Transliteration ..."></textarea>
                 </div>
             </div>
             <aside id="side-bar" class="collapse-horizontal collapse">
@@ -336,9 +343,11 @@
         input.addEventListener('change', send_request);
 
         output.addEventListener('click', () => {
-            output.select();
-            document.execCommand('copy');
-            show_title_toast('Kopiert', output.value);
+            if (output.value){
+                output.select();
+                document.execCommand('copy');
+                show_title_toast('Kopiert', output.value);
+            }
         });
 
         profile_inputs.forEach(input => input.addEventListener('change', send_request));
