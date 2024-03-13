@@ -3,7 +3,6 @@ Extracting the essentials from linuxscouts arabic libraries
 """
 
 from functools import cache
-from logging import debug
 from typing import Literal
 
 import naftawayh.wordtag
@@ -226,8 +225,8 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
         if isinstance(item.freq, str) and len(item.freq) > 4:
             item.freq = get_freq(item.original, item.freq[4:])
 
-    if not result:
-        debug("No result for", word, tag, word_nm, word_nm_shadda)
+    # if not result:
+    #     debug("No result for", word, tag, word_nm, word_nm_shadda)
 
     return [StemmedWord(w) for w in result]
 

@@ -1,5 +1,5 @@
 import re
-from logging import basicConfig, debug
+from logging import basicConfig
 
 from pyarabic import araby
 from qalsadi import stemnode
@@ -33,7 +33,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     text = text.strip()
     text = araby.strip_tatweel(text)
     text = data.unicode_cleanup(text)
-    debug(text)
+    # debug(text)
     if not text:
         return ""
     # tokenization
@@ -123,12 +123,12 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             if next_token.prefix in article_prefixes:
                 next_is_hamzatul_wasl = True
             else:
-                first_char = token.arab[0]
+                first_char = next_token.arab[0]
                 if first_char == data.alif_wasl or first_char == data.alif:
                     next_is_hamzatul_wasl = True
-                    token.arab = data.hamza + token.arab[1:]
+                    next_token.arab = data.hamza + next_token.arab[1:]
                 elif first_char == data.hamza:
-                    next_is_hamzatul_wasl = arab_tools.is_hamzatul_wasl(token)
+                    next_is_hamzatul_wasl = arab_tools.is_hamzatul_wasl(next_token)
             prev_is_hamzatul_wasl = False
             if next_token.prefix and next_token.prefix not in article_prefixes:
                 prev_is_hamzatul_wasl = next_token.latin_prefix[-1] in ("a", "i")
@@ -179,7 +179,8 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
         # assimilation
         # sun letter assimilation
         if (
-            token.prefix in article_prefixes
+            token.latin_prefix
+            and token.latin_prefix[-1] == "l"
             and (first_letter := token.latin[0]) in data.sun_letters
         ):
             token.latin_prefix = token.latin_prefix[:-1] + first_letter
