@@ -24,3 +24,7 @@ Ich habe zum ersten Mal Feedback zu und Tips für mein Tool bekommen.
 # Dialekte
 
 [Translating Arabic Dialectical Text to Modern Standard Arabic](https://aclanthology.org/2023.arabicnlp-1.71/)
+
+# Das Ende
+
+Dies ist das letzte Journal. Weitere Informationen sind in der Spezifikation zu finden, da das Projekt sich nun langsam dem Ende neigt und es nun wichtig ist alle Informationen zentral zu sammeln.  
