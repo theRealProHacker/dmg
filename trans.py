@@ -137,7 +137,9 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                     token.arab[-1] in data.long_vowels
                     or token.arab[-1] in data.short_vowels
                 )
-            next_token.apply_hamzatul_wasl = next_is_hamzatul_wasl and prev_is_hamzatul_wasl
+            next_token.apply_hamzatul_wasl = (
+                next_is_hamzatul_wasl and prev_is_hamzatul_wasl
+            )
 
     # transliteration
     for token in tokens:
