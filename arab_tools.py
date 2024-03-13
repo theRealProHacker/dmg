@@ -223,7 +223,7 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
 
     for item in result:
         # item.freq is a string and becomes a number
-        if len(item.freq) > 4:
+        if isinstance(item.freq, str) and len(item.freq) > 4:
             item.freq = get_freq(item.original, item.freq[4:])
 
     if not result:
