@@ -304,6 +304,65 @@
             toast.show()
         }
 
+        // Arabic input
+        const map = {
+            "0": "٠",
+            "1": "١",
+            "2": "٢",
+            "3": "٣",
+            "4": "٤",
+            "5": "٥",
+            "6": "٦",
+            "7": "٧",
+            "8": "٨",
+            "9": "٩",
+            "a": "\u064E",
+            "u": "\u064F",
+            "i": "\u0650",
+            "\u064Ea": "\u0627",
+            "\u064Eu": "\u0648",
+            "\u064Ei": "\u064A",
+            "b": "ب",
+            "t": "ت",
+            // "th": "ث",
+            "j": "ج",
+            "H": "ح",
+            "x": "خ",
+            "d": "د",
+            // "dh": "ذ",
+            "r": "ر",
+            "z": "ز",
+            "s": "س",
+            // "sh": "ش",
+            "S": "ص",
+            "D": "ض",
+            "T": "ط",
+            "Z": "ظ",
+            "e": "ع",
+            "g": "غ",
+            "f": "ف",
+            "q": "ق",
+            "k": "ك",
+            "l": "ل",
+            "m": "م",
+            "n": "ن",
+            "h": "ه",
+            "w": "و",
+            "y": "ي",
+            "'": "ء",
+        }
+
+        const compiled_map = Object.entries(map).sort(
+            ([key1, value1], [key2, value2]) => key2.length - key1.length
+        ).map(([key, value]) => [new RegExp(key+"$", 'g'), value])
+
+        const process_input = (input) => {
+            for (const [pattern, value] of compiled_map) {
+                input = input.replace(pattern, value)
+            }
+            return input
+        }
+
         // Main stuff
         let timeoutId;
         const input = document.getElementById('input-text');
@@ -337,6 +396,11 @@
 
         input.addEventListener('input', (e) => {
             clearTimeout(timeoutId); 
+            // when the event was triggered by manual input map the input
+            input.value = process_input(input.value);
+            if (e.inputType === 'insertText') {
+                
+            }
             timeoutId = setTimeout(send_request, e.inputType === 'insertFromPaste' ? 0 : 1000); 
         });
 
