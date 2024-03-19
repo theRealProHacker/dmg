@@ -1,6 +1,5 @@
 """ Arabic named entity recognition """
 from contextlib import redirect_stderr
-from logging import debug
 from os import devnull
 
 import torch
