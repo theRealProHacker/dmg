@@ -116,6 +116,7 @@ class NounStemmer(qalsadi.stem_noun.NounStemmer):
             return self.noun_cache[word]
         else:
             result = self.noun_dictionary.lookup(word)
+            print(f"Result for {word=} is {result=}")
             # Avoid SQLite call
             # result +=  self.custom_noun_dictionary.lookup(word)
             self.noun_cache[word] = result
@@ -227,7 +228,7 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
             item.freq = get_freq(item.original, item.freq[4:])
 
     if not result:
-        debug("No result for", word, tag, word_nm, word_nm_shadda)
+        debug(f"No result for {word}, {tag}, {word_nm}, {word_nm_shadda}")
 
     return [StemmedWord(w) for w in result]
 
