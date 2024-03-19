@@ -73,18 +73,21 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     )
     for sentence, is_name_data in zip(sentences, names):
         sentence[-1].is_end_of_sentence = True
-        # named entity recognition
-        for token, is_name in zip(sentence, is_name_data):
-            token.is_name = is_name
         # word analysis and stemming
         stemmed_words = arab_tools.check_sentence(sentence)
-        for token, stemming in zip(sentence, stemmed_words):
+        for token, stemming, is_name in zip(sentence, stemmed_words, is_name_data):
+            token.is_name = is_name
             if not stemming:
                 continue
             node = stemnode.StemNode(stemming, True)
             token.lemma, token.pos = node.get_lemma(return_pos=True)
             assert token.pos in ("noun", "verb", "stopword", "")
             # print(token.arab, token.lemma, token.pos)
+            if profile.vocalize:
+                for vocalized in node.get_vocalizeds():
+                    if araby.strip_harakat(token.arab) == araby.strip_harakat(vocalized):
+                        token.arab = vocalized
+                        continue
             # prefixes
             if not token.prefix:
                 # TODO: fix this getting the affix
@@ -137,7 +140,9 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                     token.arab[-1] in data.long_vowels
                     or token.arab[-1] in data.short_vowels
                 )
-            next_token.apply_hamzatul_wasl = next_is_hamzatul_wasl and prev_is_hamzatul_wasl
+            next_token.apply_hamzatul_wasl = (
+                next_is_hamzatul_wasl and prev_is_hamzatul_wasl
+            )
 
     # transliteration
     for token in tokens:
@@ -188,5 +193,5 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
 if __name__ == "__main__":
     text = "يَكْتُبُ الكَلْبُ"
     text = "هذا الكتابُ الجديدُ الطالبِ. هو يقرأ الكتابَ الجديدَ."
-    text = "هَذَا الكِتَابُ الْجَدِيدُ الطَالِبِ۔ هُوَ يَقْرَأُ الْكِتَابَ الْجَدِيدَ۔"
+    # text = "هَذَا الكِتَابُ الْجَدِيدُ الطَالِبِ۔ هُوَ يَقْرَأُ الْكِتَابَ الْجَدِيدَ۔"
     print(transliterate(text))
