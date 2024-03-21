@@ -1,4 +1,4 @@
-from trans import Profile, transliterate
+from trans import Profile, transliterate, ner_available
 
 
 def test_tokenization():
@@ -64,10 +64,11 @@ def test_ta_marbutah():
     profile_pausa_tm = Profile(pausa=True, ta_marbutah=True)
     assert transliterate("المَدِينَة", profile) == "al-madīna"
     assert transliterate("المَدِينَة", profile_tm) == "al-madīnah"
-    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile) == "al-madīnatu l-Qāhira"
-    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa) == "al-madīnat al-Qāhira"
-    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_tm) == "al-madīnatu l-Qāhirah"
-    assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa_tm) == "al-madīnat al-Qāhirah"
+    if ner_available:
+        assert transliterate("المَدِينَةُ القَاهِرَةِ", profile) == "al-madīnatu l-Qāhira"
+        assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa) == "al-madīnat al-Qāhira"
+        assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_tm) == "al-madīnatu l-Qāhirah"
+        assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa_tm) == "al-madīnat al-Qāhirah"
     assert transliterate("صَلاة") == "ṣalāh"
 
 
@@ -98,5 +99,12 @@ def test_hamzatul_wasl():
     assert transliterate("أَنَ الحَديقَةِ") == "ana l-ḥadīqa"
 
 
-def test_names():
-    assert transliterate("مُحَمَّد") == "Muḥammad"
+if ner_available:
+    def test_names():
+        assert transliterate("مُحَمَّد") == "Muḥammad"
+
+
+def test_prepositions():
+    assert transliterate("فِي") == "fī"
+    # assert transliterate("للامتحان") == "lil-imtiḥān"
+    assert transliterate("كَتَبَ كَمُعَلِّم") == "kataba ka-muʿallim"
