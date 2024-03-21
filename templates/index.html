@@ -193,11 +193,11 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Feedback</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Schließen"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Schließen" data-bs-toggle="tooltip"></button>
                     </div>
                     <div class="modal-body container">
                         <label for="feedback-email">Lassen Sie uns gerne Ihre E-Mail für Rückfragen da!</label>
-                        <input id="feedback-email" class="form-control mt-1" type="email" placeholder="E-Mail (optional)" title="E-Mail (optional)">
+                        <input id="feedback-email" class="form-control mt-1" type="email" placeholder="E-Mail (optional)">
                         <label class="mt-3" for="feedback-text">Erzählen Sie uns, was für eine Transliteration Sie erwartet hätten</label>
                         <textarea id="feedback-text" class="form-control" rows="5" autofocus></textarea>
                         <small>Oder schicken Sie eine E-Mail an: </small>
@@ -276,7 +276,7 @@
                         {% if type == 'bool' %}
                             <div class="form-check form-switch mb-3">
                                 <input id="{{name}}-profile-input" class="form-check-input" type="checkbox" role="switch" name="{{name}}" {% if value %} checked {% endif %}>
-                                <label class="form-check-label" for="{{name}}-profile-input" title="{{description}}">
+                                <label class="form-check-label" for="{{name}}-profile-input" title="{{description}}" data-bs-toggle="tooltip">
                                     {{title}}
                                 </label>
                             </div>
@@ -289,7 +289,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script>
-        // Toast stuff
+        // Bootstrap stuff
+        // Toasts
         const toast_container = document.querySelector('.toast-container')
         const title_toast_template = document.getElementById('title-toast-template')
 
@@ -303,6 +304,11 @@
             const toast = new bootstrap.Toast(toast_elem)
             toast.show()
         }
+
+        // Tooltips
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
 
         // Arabic input
         const map = {
