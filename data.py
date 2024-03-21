@@ -377,6 +377,8 @@ preposition_article_prefixes = {
     pre_a + art: pre_l + "l"
     for pre_a, pre_l in preposition_prefixes.items()
     for art in article_prefixes
+} | {
+    "لل": "lil",
 }
 # fal, wal
 conjunction_article_prefixes = {
