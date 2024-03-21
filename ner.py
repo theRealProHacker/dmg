@@ -51,5 +51,5 @@ def find_names(sentences: list[list[str]]):
             else:
                 break
             is_name_data[current_token] = True
-            debug(f"{sentence[current_token]}, {tag}")
+            print(f"{sentence[current_token]}, {tag}")
         yield is_name_data
