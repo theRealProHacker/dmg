@@ -119,6 +119,9 @@ class VerbStemmer(qalsadi.stem_verb.VerbStemmer):
         return self.stamp_cache.get(stamp, False)
 
 
+# Fix qalsadi from here
+qalsadi.stem_verb.VerbStemmer = VerbStemmer
+
 tagger = WordTagger()
 verbstemmer = VerbStemmer()
 unknownstemmer = UnknownStemmer()

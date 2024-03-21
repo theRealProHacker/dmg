@@ -263,12 +263,7 @@ def vocalize(noun, proclitic, suffix, enclitic):
 
 def stem_noun(noun: str) -> list[WordCase]:
     detailed_result = []
-    noun_list = [
-        *{
-            noun,
-            *noun_variants(noun)
-        }
-    ]
+    noun_list = [*{noun, *noun_variants(noun)}]
 
     word_segmented_list = []
     for noun in noun_list:
@@ -431,3 +426,9 @@ def stem_noun(noun: str) -> list[WordCase]:
                     )
                 )
     return detailed_result
+
+
+# Fix qalsadi from here
+import qalsadi.stem_noun  # noqa
+
+qalsadi.stem_noun.NounStemmer.lookup_dict = lambda _, *args: lookup_dict(*args)

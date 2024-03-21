@@ -3,9 +3,12 @@ pyarabic
 naftawayh
 qalsadi
 
+# vocalization
+mishkal
+
 # AI
-torch
-transformers
+# torch
+# transformers
 
 # deployment
-gunicorn
+# gunicorn

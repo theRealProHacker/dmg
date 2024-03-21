@@ -3,6 +3,7 @@ import json
 from flask import Flask, render_template, request
 
 from trans import Profile, transliterate
+from vocalization import vocalize
 
 app = Flask(__name__)
 
@@ -33,6 +34,15 @@ def trans():
     text = data["text"]
     profile = Profile(**data["profile"])
     return transliterate(text, profile)
+
+
+@app.route("/vocalize", methods=["POST"])
+def vocalization():
+    """
+    Takes a string of Arabic text and returns a vocalized version
+    """
+    text = request.data.decode("utf-8")
+    return vocalize(text)
 
 
 @app.route("/feedback", methods=["POST"])
