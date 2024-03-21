@@ -10,32 +10,53 @@ def sqlite2json(db_path, table_name, json_path, id="id"):
         )
 
 
+def wordfreq():
+    sqlite2json(
+        r"..\.venv\Lib\site-packages\arramooz\data\wordfreq.sqlite",
+        "wordfreq",
+        "./data/wordfreq.json",
+    )
+
+
+def nouns():
+    sqlite2json(
+        r"..\.venv\Lib\site-packages\arramooz\data\arabicdictionary.sqlite",
+        "nouns",
+        "./data/nouns.json",
+    )
+
+
+def stopwords():
+    sqlite2json(
+        r"..\.venv\Lib\site-packages\arramooz\data\stopwords.sqlite",
+        "stopwords",
+        "./data/stopwords.json",
+        id="ID",
+    )
+
+
+def q_nouns():
+    sqlite2json(
+        r"..\.venv\Lib\site-packages\qalsadi\data\custom_dictionary.sqlite",
+        "nouns",
+        "./data/qalsadi_nouns.json",
+    )
+
+
 if __name__ == "__main__":
     import sys
 
     match sys.argv[1:]:
+        case ["all"]:
+            wordfreq()
+            nouns()
+            stopwords()
+            q_nouns()
         case ["ar", "wordfreq"]:
-            sqlite2json(
-                r"..\.venv\Lib\site-packages\arramooz\data\wordfreq.sqlite",
-                "wordfreq",
-                "./data/wordfreq.json",
-            )
+            wordfreq()
         case ["ar", "nouns"]:
-            sqlite2json(
-                r"..\.venv\Lib\site-packages\arramooz\data\arabicdictionary.sqlite",
-                "nouns",
-                "./data/nouns.json",
-            )
+            nouns()
         case ["ar", "stopwords"]:
-            sqlite2json(
-                r"..\.venv\Lib\site-packages\arramooz\data\stopwords.sqlite",
-                "stopwords",
-                "./data/stopwords.json",
-                id="ID",
-            )
+            stopwords()
         case ["qalsadi", "nouns"]:
-            sqlite2json(
-                r"..\.venv\Lib\site-packages\qalsadi\data\custom_dictionary.sqlite",
-                "nouns",
-                "./data/qalsadi_nouns.json",
-            )
+            q_nouns()
