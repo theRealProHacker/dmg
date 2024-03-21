@@ -154,7 +154,7 @@ def validate_tags(noun_tuple, affix_tags, proclitic, enclitic_nm, suffix_nm):
 def get_stem_variants(stem: str, suffix_nm: str):
     """
     Generate the Noun stem variants according to the affixes.
-    For example مدرستي = >مدرست+ي = > مدرسة +ي.
+    For example مدرستي => مدرست+ي => مدرسة + ي.
     Return a list of possible cases.
     @param stem: the input stem.
     @type stem: unicode.
@@ -200,10 +200,7 @@ def get_stem_variants(stem: str, suffix_nm: str):
     return [*possible_noun_list]
 
 
-@cache
-def is_valid_affix(
-    proclitic_tags, enclitic_tags, suffix_tags, _: bool
-) -> bool:
+def is_valid_affix(proclitic_tags, enclitic_tags, suffix_tags) -> bool:
     if (
         "تعريف" in proclitic_tags
         and "مضاف" in suffix_tags
@@ -223,9 +220,7 @@ def is_valid_affix(
     return True
 
 
-def check_clitic_affix(noun_tuple, proclitic_nm, enclitic, suffix):
-    # ~ print "XXXstem_noun", noun_tuple["unvocalized"].encode('utf8'), noun_tuple['mamnou3_sarf'],type(noun_tuple['mamnou3_sarf']),    bool(noun_tuple['mamnou3_sarf'])
-
+def check_clitic_affix(noun_tuple, proclitic, enclitic, suffix):
     # avoid Fathatan on no ALEF Tawnwin expect on Teh marbuta and Alef followed by Hamza
     if suffix == araby.FATHATAN and not (
         noun_tuple["unvocalized"].endswith(araby.TEH_MARBUTA)
@@ -233,45 +228,47 @@ def check_clitic_affix(noun_tuple, proclitic_nm, enclitic, suffix):
     ):
         return False
     # avoid masculin regular plural with unallowed case
-    # تجنب جمع المذكر السالم للكلمات التي لا تقبلها
     if (
         "جمع مذكر سالم" in SNC.CONJ_SUFFIX_LIST_TAGS[suffix]["tags"]
         and not noun_tuple["masculin_plural"]
     ):
         return False
-    # ~ print "XXXstem_noun", noun_tuple["unvocalized"].encode('utf8'), noun_tuple['mamnou3_sarf'],type(noun_tuple['mamnou3_sarf']),    bool(noun_tuple['mamnou3_sarf'])
-    # ~ print "stem_noun", noun_tuple["unvocalized"].encode('utf8'), noun_tuple['masculin_plural'],type(noun_tuple['masculin_plural']),    bool(noun_tuple['masculin_plural'])
+
     if (
         "تنوين" in SNC.CONJ_SUFFIX_LIST_TAGS[suffix]["tags"]
         and noun_tuple["mamnou3_sarf"]
     ):
         return False
-    # if not proclitic and not enclitic:  return True
+    if not proclitic and not enclitic:
+        return True
 
     # get proclitics and enclitics tags
-    proclitic_tags = SNC.COMP_PREFIX_LIST_TAGS[proclitic_nm]["tags"]
+    proclitic_tags = SNC.COMP_PREFIX_LIST_TAGS[proclitic]["tags"]
     enclitic_tags = SNC.COMP_SUFFIX_LIST_TAGS[enclitic]["tags"]
     # in nouns there is no prefix
     suffix_tags = SNC.CONJ_SUFFIX_LIST_TAGS[suffix]["tags"]
     # in some cases the suffixes have more cases
     # add this cases to suffix tags
     suffix_tags += SNC.CONJ_SUFFIX_LIST_TAGS[suffix].get("cases", ())
-    return is_valid_affix(
-        proclitic_tags, enclitic_tags, suffix_tags, bool(noun_tuple["mamnou3_sarf"])
-    )
+    return is_valid_affix(proclitic_tags, enclitic_tags, suffix_tags)
 
 
 @cache
 def vocalize(noun, proclitic, suffix, enclitic):
+    """
+    Vocalizes a noun.
+    """
     return generator.vocalize(noun, proclitic, suffix, enclitic)
 
 
 def stem_noun(noun: str) -> list[WordCase]:
     detailed_result = []
     noun_list = [
-        noun,
-    ] + noun_variants(noun)
-    noun_list = list(set(noun_list))
+        *{
+            noun,
+            *noun_variants(noun)
+        }
+    ]
 
     word_segmented_list = []
     for noun in noun_list:
@@ -299,7 +296,6 @@ def stem_noun(noun: str) -> list[WordCase]:
                 word_segmented_list.append(word_seg)
 
     # level two
-
     tmp_list = []
 
     for word_seg in word_segmented_list:
@@ -331,12 +327,7 @@ def stem_noun(noun: str) -> list[WordCase]:
     word_segmented_list = tmp_list
     tmp_list = []
     for word_seg in word_segmented_list:
-        # search the noun in the dictionary
-        # we can return the tashkeel
         inf_noun = word_seg["stem_conj"]
-        # get the noun and get all its forms from the dict
-        # if the noun has plural suffix, don't look up in
-        # broken plural dictionary
         infnoun_foundlist = lookup_dict(inf_noun)
 
         for noun_tuple in infnoun_foundlist:
@@ -351,10 +342,8 @@ def stem_noun(noun: str) -> list[WordCase]:
     word_segmented_list = tmp_list
     tmp_list = []
     for word_seg in word_segmented_list:
-        # test if the  given word from dictionary accept those
+        # test if the given word from dictionary accept those
         # tags given by affixes
-        # دراسة توافق الزوائد مع خصائص الاسم،
-        # مثلا هل يقبل الاسم التأنيث.
         if validate_tags(
             word_seg["noun_tuple"],
             word_seg["affix_tags"],
