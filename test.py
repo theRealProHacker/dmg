@@ -1,4 +1,4 @@
-from trans import Profile, transliterate, ner_available
+from trans import Profile, ner_available, transliterate
 
 
 def test_tokenization():
@@ -68,7 +68,10 @@ def test_ta_marbutah():
         assert transliterate("المَدِينَةُ القَاهِرَةِ", profile) == "al-madīnatu l-Qāhira"
         assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa) == "al-madīnat al-Qāhira"
         assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_tm) == "al-madīnatu l-Qāhirah"
-        assert transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa_tm) == "al-madīnat al-Qāhirah"
+        assert (
+            transliterate("المَدِينَةُ القَاهِرَةِ", profile_pausa_tm)
+            == "al-madīnat al-Qāhirah"
+        )
     assert transliterate("صَلاة") == "ṣalāh"
 
 
@@ -100,6 +103,7 @@ def test_hamzatul_wasl():
 
 
 if ner_available:
+
     def test_names():
         assert transliterate("مُحَمَّد") == "Muḥammad"
 
