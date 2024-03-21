@@ -15,14 +15,12 @@ The files in this module are licensed under the GPL-3.0 License.
 
 """
 
-from contextlib import suppress
 from functools import cache
 from typing import Literal
 
 import naftawayh.wordtag
 import naftawayh.wordtag_const as wordtag_const
 import qalsadi.analex_const as analex_const
-import qalsadi.stem_noun
 import qalsadi.stem_verb
 import qalsadi.stopwords
 from pyarabic import araby

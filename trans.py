@@ -85,7 +85,9 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             # print(token.arab, token.lemma, token.pos)
             if profile.vocalize:
                 for vocalized in node.get_vocalizeds():
-                    if araby.strip_harakat(token.arab) == araby.strip_harakat(vocalized):
+                    if araby.strip_harakat(token.arab) == araby.strip_harakat(
+                        vocalized
+                    ):
                         token.arab = vocalized
                         continue
             # prefixes
