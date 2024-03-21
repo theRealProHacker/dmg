@@ -21,7 +21,7 @@ class Profile:
     ta_marbutah: bool = False
     diphthongs: bool = False
     double_vowels: bool = True
-    vocalize: bool = True
+    vocalize: bool = False
     # skip_i3rab: bool = False
     # """Whether i3rab (flexion endings) should be skipped"""
     # full_vocalisation: bool = False
