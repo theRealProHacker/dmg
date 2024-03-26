@@ -445,8 +445,13 @@
 
         input.addEventListener('change', send_request);
 
+        let last_copied_interval = null;
+        let last_copied = '';
         output.addEventListener('click', () => {
-            if (output.value){
+            if (output.value && output.value !== last_copied){
+                last_copied = output.value
+                clearInterval(last_copied_interval);
+                last_copied_interval = setTimeout(() => last_copied = '', 5000);
                 output.select();
                 document.execCommand('copy');
                 show_title_toast('Kopiert', output.value);
