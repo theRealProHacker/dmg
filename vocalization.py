@@ -13,8 +13,11 @@ vocalizer = mishkal.tashkeel.TashkeelClass("")
 def vocalize(text: str) -> str:
     return vocalizer.tashkeel(text)
 
+
 # fix asmai from here
 
-import asmai.semdictionary # noqa
+import asmai.semdictionary  # noqa
 
-asmai.semdictionary.SemanticDictionary.lookup_rule = lambda self, primate_word, second_word: False
+asmai.semdictionary.SemanticDictionary.lookup_rule = (
+    lambda self, primate_word, second_word: False
+)
