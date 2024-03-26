@@ -18,6 +18,7 @@ The files in this module are licensed under the GPL-3.0 License.
 from functools import cache
 from typing import Literal
 
+import asmai.semdictionary
 import naftawayh.wordtag
 import naftawayh.wordtag_const as wordtag_const
 import qalsadi.analex_const as analex_const
@@ -119,8 +120,14 @@ class VerbStemmer(qalsadi.stem_verb.VerbStemmer):
         return self.stamp_cache.get(stamp, False)
 
 
-# Fix qalsadi from here
+class SemanticDictionary(asmai.semdictionary.SemanticDictionary):
+    def get_original(self, primate_word):
+        return data.sem_derivations.get(primate_word, ("", ""))
+
+
+# Fix qalsadi and asmai from here
 qalsadi.stem_verb.VerbStemmer = VerbStemmer
+asmai.semdictionary.SemanticDictionary = SemanticDictionary
 
 tagger = WordTagger()
 verbstemmer = VerbStemmer()

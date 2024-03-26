@@ -42,6 +42,11 @@ noun_dict: dict[str, list] = defaultdict(list)
 for entry in read("./data/nouns.json"):
     noun_dict[entry["vocalized"]].append([*entry.values()])
 
+sem_derivations: dict[str, tuple[str, str]] = {}
+
+for entry in read("./data/semantic_derivations.json"):
+    sem_derivations.setdefault(entry["derived"], (entry["verb"], entry["type"]))
+
 
 def compile_single_char_map_pattern(d: dict[str, str]) -> re.Pattern:
     return re.compile(f"[{''.join(d)}]")

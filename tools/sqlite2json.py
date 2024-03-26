@@ -43,6 +43,14 @@ def q_nouns():
     )
 
 
+def sem_derivations():
+    sqlite2json(
+        r"..\.venv\Lib\site-packages\asmai\data\semantic.sqlite",
+        "derivations",
+        "./data/semantic_derivations.json",
+    )
+
+
 if __name__ == "__main__":
     import sys
 
@@ -60,3 +68,10 @@ if __name__ == "__main__":
             stopwords()
         case ["qalsadi", "nouns"]:
             q_nouns()
+        case ["asmai", "derivations"]:
+            sem_derivations()
+        case _:
+            print("Invalid arguments")
+            print(
+                "Usage: py sqlite2json.py [all|module table]; module = [ar|qalsadi|asmai]"
+            )
