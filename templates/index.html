@@ -400,13 +400,17 @@
         // Vocalization
         const magic_button = document.getElementById('magic');
         magic_button.addEventListener('click', async (e) => {
+            input.focus()
             const response = await fetch('/vocalize', { method: 'POST', body: input.value });
             if (!response.ok) {
                 console.error(response)
                 show_title_toast('Es gab einen Fehler bei der Vokalisierung', 'Bitte versuchen Sie es später erneut')
                 return
             }
-            input.value = await response.text();
+            const text = await response.text()
+            document.execCommand("selectAll", false, null);
+            document.execCommand("insertText", false, text);
+            // magic_button.focus()
             send_request();
         });
 
