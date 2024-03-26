@@ -5,6 +5,7 @@ for all other modules
 
 import json
 import re
+from collections import defaultdict
 from contextlib import contextmanager
 
 from pyarabic import araby
@@ -27,6 +28,19 @@ def readWrite(path):
         yield data
     finally:
         write(path, data)
+
+
+freq_dict = {}
+
+for entry in read("data/wordfreq.json"):
+    freq_dict[(entry["vocalized"], entry["word_type"])] = entry["freq"]
+    freq_dict[(entry["unvocalized"], entry["word_type"])] = entry["freq"]
+
+
+noun_dict: dict[str, list] = defaultdict(list)
+
+for entry in read("./data/nouns.json"):
+    noun_dict[entry["vocalized"]].append([*entry.values()])
 
 
 def compile_single_char_map_pattern(d: dict[str, str]) -> re.Pattern:

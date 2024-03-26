@@ -7,7 +7,6 @@ https://github.com/linuxscout/qalsadi/blob/master/qalsadi/stem_noun.py
 
 """
 
-from collections import defaultdict
 from functools import cache
 
 import alyahmor.aly_stem_noun_const as SNC
@@ -28,14 +27,9 @@ conj_stemmer.set_suffix_list(SNC.CONJ_SUFFIX_LIST)
 
 generator = alyahmor.noun_affixer.noun_affixer()
 
-noun_dict: dict[str, list] = defaultdict(list)
-
-for entry in data.read("./data/nouns.json"):
-    noun_dict[entry["vocalized"]].append([*entry.values()])
-
 
 def lookup_dict(word):
-    return noun_dict.get(word, [])
+    return data.noun_dict.get(word, [])
 
 
 def verify_affix(word, list_seg, affix_list):
