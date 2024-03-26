@@ -189,6 +189,8 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             and (first_letter := token.latin[0]) in data.sun_letters
         ):
             token.latin_prefix = token.latin_prefix[:-1] + first_letter
+            if len(token.latin) >= 2 and token.latin[1] == first_letter:
+                token.latin = token.latin[1:]
 
     return "".join(token.result for token in tokens)
 
