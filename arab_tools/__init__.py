@@ -93,14 +93,8 @@ class VerbStemmer(qalsadi.stem_verb.VerbStemmer):
         """
         lookup for word in dict
         """
-        if word in self.verb_cache:
-            return self.verb_cache[word]
-        else:
-            result = self.verb_dictionary.lookup_by_stamp(word)
-            # remove this line to avoid SQLite call
-            # result += self.custom_verb_dictionary.lookup_by_stamp(word)
-            self.verb_cache[word] = result
-        return result
+        stamp = self.verb_dictionary.word_stamp(word)
+        return data.verb_dict[stamp]
 
     def exists_as_stamp(self, word):
         """
@@ -109,15 +103,9 @@ class VerbStemmer(qalsadi.stem_verb.VerbStemmer):
         stamp = self.verb_dictionary.word_stamp(word)
         stamp = stamp.replace(araby.TEH, "")
         # a verb stamp can't more than 4 letters
-        # لا يمكن للفعل أن يكون فيه أكثر من أربعة حروف أصلية
         if len(stamp) > 4:
             return False
-        if stamp not in self.stamp_cache:
-            result = self.verb_dictionary.exists_as_stamp(word)
-            # remove this line to avoid SQLite call
-            # result +=  self.custom_verb_dictionary.exists_as_stamp(word)
-            self.stamp_cache[stamp] = result
-        return self.stamp_cache.get(stamp, False)
+        return stamp in data.verb_dict
 
 
 class SemanticDictionary(asmai.semdictionary.SemanticDictionary):

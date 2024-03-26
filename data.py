@@ -42,6 +42,11 @@ noun_dict: dict[str, list] = defaultdict(list)
 for entry in read("./data/nouns.json"):
     noun_dict[entry["vocalized"]].append([*entry.values()])
 
+verb_dict: dict[str, list] = defaultdict(list)
+
+for entry in read("./data/verbs.json"):
+    verb_dict[entry["stamped"]].append(entry)
+
 sem_derivations: dict[str, tuple[str, str]] = {}
 
 for entry in read("./data/semantic_derivations.json"):

@@ -26,6 +26,14 @@ def nouns():
     )
 
 
+def verbs():
+    sqlite2json(
+        r"..\.venv\Lib\site-packages\arramooz\data\arabicdictionary.sqlite",
+        "verbs",
+        "./data/verbs.json",
+    )
+
+
 def stopwords():
     sqlite2json(
         r"..\.venv\Lib\site-packages\arramooz\data\stopwords.sqlite",
@@ -64,6 +72,8 @@ if __name__ == "__main__":
             wordfreq()
         case ["ar", "nouns"]:
             nouns()
+        case ["ar", "verbs"]:
+            verbs()
         case ["ar", "stopwords"]:
             stopwords()
         case ["qalsadi", "nouns"]:
