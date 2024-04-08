@@ -53,12 +53,12 @@
             border-bottom: solid var(--purple-accent) 2px;
         }
 
-        #settings-button {
+        nav .nav-item button {
             border: none;
             color: var(--bs-body-color);
         }
 
-        #settings-button:hover {
+        nav .nav-item button:hover {
             color: var(--bs-emphasis-color);
         }
 
@@ -105,19 +105,10 @@
             grid-template-columns: 1fr auto;
         }
 
-        #magic {
-            position: absolute;
-            bottom: 0.9rem;
-            right: 0.75rem;
-            width: 2rem;
-            padding: 0;
-            height: 2rem;
-        }
-
-        #input-output {
-            padding: 20px;
+        #main {
             width: 100%;
             height: 100%;
+            padding: 20px;
         }
 
         #input-output textarea {
@@ -126,6 +117,15 @@
             max-height: 40vh; 
             width: 100%;
             padding: 10px;
+        }
+
+        #magic {
+            position: absolute;
+            bottom: 0.9rem;
+            right: 0.75rem;
+            width: 2rem;
+            padding: 0;
+            height: 2rem;
         }
 
         #input-text {
@@ -237,7 +237,17 @@
                 </a>
                 <ul class="navbar-nav justify-content-end">
                     <li class="nav-item mx-2">
-                        <a class="nav-link active" data-bs-toggle="modal"data-bs-target="#feedback-modal" role="button" aria-controls="feedback-modal">Feedback</a>
+                        <button class="btn" type="button" data-bs-toggle="modal" data-bs-target="#feedback-modal" aria-controls="feedback-modal" title="Feedback" style="vertical-align: text-top;">
+                            Feedback
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#keyboard" aria-controls="keyboard" aria-expanded="false" title="Keyboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="28" fill="currentColor" class="bi bi-keyboard" viewBox="0 0 16 16">
+                                <path d="M14 5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM2 4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+                                <path d="M13 10.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25zm0-2a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25zm-5 0A.25.25 0 0 1 8.25 8h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 8 8.75zm2 0a.25.25 0 0 1 .25-.25h1.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-1.5a.25.25 0 0 1-.25-.25zm1 2a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25zm-5-2A.25.25 0 0 1 6.25 8h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 6 8.75zm-2 0A.25.25 0 0 1 4.25 8h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 4 8.75zm-2 0A.25.25 0 0 1 2.25 8h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 2 8.75zm11-2a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25zm-2 0a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25zm-2 0A.25.25 0 0 1 9.25 6h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 9 6.75zm-2 0A.25.25 0 0 1 7.25 6h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 7 6.75zm-2 0A.25.25 0 0 1 5.25 6h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 5 6.75zm-3 0A.25.25 0 0 1 2.25 6h1.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-1.5A.25.25 0 0 1 2 6.75zm0 4a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25zm2 0a.25.25 0 0 1 .25-.25h5.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-5.5a.25.25 0 0 1-.25-.25z"/>
+                            </svg>
+                        </button>
                     </li>
                     <li class="nav-item mx-2">
                         <button id="theme-toggle" class="theme-toggle btn" type="button" aria-label="auto" aria-live="polite">
@@ -261,7 +271,7 @@
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button id="settings-button" class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#side-bar" aria-controls="side-bar" aria-expanded="false" title="Einstellungen">
+                        <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#side-bar" aria-controls="side-bar" aria-expanded="false" title="Einstellungen">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
                                 <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
                                 <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
@@ -272,22 +282,27 @@
             </div>
         </nav>
         <main>
-            <div id="input-output" class="row">
+            <div id="main">
                 <div class="col-12 mb-3">
                     Transliterieren Sie Ihren arabischen Text in DMG
                 </div>
-                <div class="col-12 mb-1 h-50 col-lg-6 mb-lg-0 h-lg-50">
-                    <div id="textarea-magic-wrapper" style="position:relative;">
-                        <textarea id="input-text" dir="rtl" placeholder="نص عربي ..."></textarea>
-                        <button id="magic" class="btn btn-primary" title="Vokalisieren" data-bs-toggle="tooltip">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-magic" viewBox="0 0 16 16">
-                                <path d="M9.5 2.672a.5.5 0 1 0 1 0V.843a.5.5 0 0 0-1 0zm4.5.035A.5.5 0 0 0 13.293 2L12 3.293a.5.5 0 1 0 .707.707zM7.293 4A.5.5 0 1 0 8 3.293L6.707 2A.5.5 0 0 0 6 2.707zm-.621 2.5a.5.5 0 1 0 0-1H4.843a.5.5 0 1 0 0 1zm8.485 0a.5.5 0 1 0 0-1h-1.829a.5.5 0 0 0 0 1zM13.293 10A.5.5 0 1 0 14 9.293L12.707 8a.5.5 0 1 0-.707.707zM9.5 11.157a.5.5 0 0 0 1 0V9.328a.5.5 0 0 0-1 0zm1.854-5.097a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L8.646 5.94a.5.5 0 0 0 0 .707l.708.708a.5.5 0 0 0 .707 0l1.293-1.293Zm-3 3a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L.646 13.94a.5.5 0 0 0 0 .707l.708.708a.5.5 0 0 0 .707 0z"/>
-                            </svg>
-                        </button>
+                <div id="input-output" class="row">
+                    <div class="col-12 col-lg-6 mb-1">
+                        <div id="textarea-magic-wrapper" style="position:relative;">
+                            <textarea id="input-text" dir="rtl" placeholder="نص عربي ..."></textarea>
+                            <button id="magic" class="btn btn-primary" title="Vokalisieren" data-bs-toggle="tooltip">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-magic" viewBox="0 0 16 16">
+                                    <path d="M9.5 2.672a.5.5 0 1 0 1 0V.843a.5.5 0 0 0-1 0zm4.5.035A.5.5 0 0 0 13.293 2L12 3.293a.5.5 0 1 0 .707.707zM7.293 4A.5.5 0 1 0 8 3.293L6.707 2A.5.5 0 0 0 6 2.707zm-.621 2.5a.5.5 0 1 0 0-1H4.843a.5.5 0 1 0 0 1zm8.485 0a.5.5 0 1 0 0-1h-1.829a.5.5 0 0 0 0 1zM13.293 10A.5.5 0 1 0 14 9.293L12.707 8a.5.5 0 1 0-.707.707zM9.5 11.157a.5.5 0 0 0 1 0V9.328a.5.5 0 0 0-1 0zm1.854-5.097a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L8.646 5.94a.5.5 0 0 0 0 .707l.708.708a.5.5 0 0 0 .707 0l1.293-1.293Zm-3 3a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L.646 13.94a.5.5 0 0 0 0 .707l.708.708a.5.5 0 0 0 .707 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <textarea id="output-text" class="disabled" readonly placeholder="Transliteration ..."></textarea>
                     </div>
                 </div>
-                <div class="col-12 h-50 col-lg-6 h-lg-50">
-                    <textarea id="output-text" class="disabled" readonly placeholder="Transliteration ..."></textarea>
+                <div id="keyboard" class="my-3 collapse"> 
+
                 </div>
             </div>
             <aside id="side-bar" class="collapse-horizontal collapse">
