@@ -365,45 +365,62 @@ sun_letters = set("tṯdḏrzsšṣḍṭẓn")
 # Pattern to match an arabic word
 token_pattern = re.compile("[\u0621-\u0655]+")
 
+UNVOCALIZED_PREFIXES = False
+
 conjunction_prefixes = {
-    "ف": "fa",
     "فَ": "fa",
-    "و": "wa",
     "وَ": "wa",
 }
-preposition_prefixes = {
-    "ب": "bi",
-    "بِ": "bi",
-    "ك": "ka",
-    "كَ": "ka",
-    "ل": "li",
-    "لِ": "li",
-    # "في": "fi",
+unvocalized_conjunction_prefixes = {
+    "ف": "fa",
+    "و": "wa",
 }
+
+preposition_prefixes = {
+    "بِ": "bi",
+    "كَ": "ka",
+    "لِ": "li",
+}
+unvocalized_preposition_prefixes = {
+    "ب": "bi",
+    "ك": "ka",
+    "ل": "li",
+}
+
 future_prefixes = {
-    "س": "sa",
     "سَ": "sa",
 }
+
 todo_prefixes = {
     "ت": "ta",
     "تَ": "ta",
     # "": "la",
     # "": "a"
 }
+
 article_prefixes = {
     "ال": "al",
     "الْ": "al",
     "أَل": "al",
     "أَلْ": "al",
 }
+
 # bil, lil
 preposition_article_prefixes = {
     pre_a + art: pre_l + "l"
     for pre_a, pre_l in preposition_prefixes.items()
     for art in article_prefixes
 } | {
-    "لل": "lil",
+    "لِل":"lil"
 }
+
+if UNVOCALIZED_PREFIXES:
+    conjunction_prefixes.update(unvocalized_conjunction_prefixes)
+    preposition_prefixes.update(unvocalized_preposition_prefixes)
+    preposition_article_prefixes["لل"] = "lil"
+    future_prefixes["س"] = "sa"
+
+
 # fal, wal
 conjunction_article_prefixes = {
     con1 + art1: con2 + art2
