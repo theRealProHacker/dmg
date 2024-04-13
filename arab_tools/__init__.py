@@ -3,11 +3,11 @@
 
 Arab tools is a module that uses the essentials from Taha Zerroukis (aka linuxscout) Arabic libraries.
 
-The changes were mainly to 
+The changes were mainly to
 - clean up the code,
-- make it Python 3, 
-- remove unnecessary OOP, 
-- remove prints, 
+- make it Python 3,
+- remove unnecessary OOP,
+- remove prints,
 - remove caching,
 - etc.
 

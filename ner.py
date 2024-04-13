@@ -1,4 +1,5 @@
-""" Arabic named entity recognition """
+"""Arabic named entity recognition"""
+
 from contextlib import redirect_stderr
 from os import devnull
 

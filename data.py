@@ -68,12 +68,12 @@ def sub_map_pattern(pattern, d: dict[str, str], s: str) -> str:
 alif = "\u0627"
 waw = "\u0648"
 alif_maksurah = "\u0649"
-ya = "\u064A"
-fathatan = "\u064B"
-dammatan = "\u064C"
-kasratan = "\u064D"
-fatha = "\u064E"
-damma = "\u064F"
+ya = "\u064a"
+fathatan = "\u064b"
+dammatan = "\u064c"
+kasratan = "\u064d"
+fatha = "\u064e"
+damma = "\u064f"
 kasra = "\u0650"
 shaddah = "\u0651"
 sukun = "\u0652"
@@ -410,9 +410,7 @@ preposition_article_prefixes = {
     pre_a + art: pre_l + "l"
     for pre_a, pre_l in preposition_prefixes.items()
     for art in article_prefixes
-} | {
-    "لِل":"lil"
-}
+} | {"لِل": "lil"}
 
 if UNVOCALIZED_PREFIXES:
     conjunction_prefixes.update(unvocalized_conjunction_prefixes)
