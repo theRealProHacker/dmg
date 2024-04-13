@@ -102,6 +102,10 @@ def test_hamzatul_wasl():
     assert transliterate("أَنَ الحَديقَةِ") == "ana l-ḥadīqa"
 
 
+def test_special_words():
+    assert transliterate("اللَّه") == "Allāh"
+
+
 if ner_available:
 
     def test_names():
