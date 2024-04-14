@@ -6,7 +6,7 @@ A short guidance for anyone to contribute
 
 ```shell
 # on top of requirements.txt
-pip install pytest, ruff
+pip install pytest, ruff, pandas
 
 # tests
 pytest test.py
