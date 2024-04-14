@@ -12,7 +12,7 @@ vocalizer = mishkal.tashkeel.TashkeelClass("")
 
 def vocalize(text: str) -> str:
     o = vocalizer.tashkeel(text)
-    o = "".join(c if c.isprintable() else " " for c in o)
+    o = "".join(c if c.isprintable() else " " for c in o).strip()
     return o
 
 
