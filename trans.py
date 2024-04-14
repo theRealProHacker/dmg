@@ -83,13 +83,13 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             token.lemma, token.pos = node.get_lemma(return_pos=True)
             assert token.pos in ("noun", "verb", "stopword", "")
             # print(token.arab, token.lemma, token.pos)
-            if profile.vocalize:
-                for vocalized in node.get_vocalizeds():
-                    if araby.strip_harakat(token.arab) == araby.strip_harakat(
-                        vocalized
-                    ):
-                        token.arab = vocalized
-                        continue
+            # if profile.vocalize:
+            #     for vocalized in node.get_vocalizeds():
+            #         if araby.strip_harakat(token.arab) == araby.strip_harakat(
+            #             vocalized
+            #         ):
+            #             token.arab = vocalized
+            #             continue
             # prefixes
             if not token.prefix:
                 # TODO: fix this getting the affix
