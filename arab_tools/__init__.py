@@ -151,20 +151,6 @@ def check_partially_vocalized(word: str, data: list[WordCase]) -> list[WordCase]
     return filtered
 
 
-def possible_prefixes(arabic_word: str, guess: str | None = None) -> list[str]:
-    guess = guess or arabic_word[:-1]
-    max_prefix_length = len(guess)
-    return [
-        possible_prefix
-        for prefix_length in data.prefix_lengths
-        if (
-            prefix_length <= max_prefix_length
-            and arabic_word.startswith(possible_prefix := guess[:prefix_length])
-            and possible_prefix in data.prefixes
-        )
-    ]
-
-
 @cache
 def check_word(word: str, tag: str) -> list[StemmedWord]:
     """

@@ -91,15 +91,17 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             #             token.arab = vocalized
             #             continue
             # prefixes
-            if not token.prefix:
-                # TODO: fix this getting the affix
+            if not token.prefix and len(arab_tools.araby.strip_diacritics(token.arab)):
                 prefix_guess: str = node.get_affix().split("-")[0]
-                possible_prefixes = arab_tools.possible_prefixes(
-                    token.arab, prefix_guess
-                )
-                if possible_prefixes:
-                    token.prefix = possible_prefixes[0]
-                    token.latin_prefix = data.prefixes[token.prefix]
+                assert token.arab.startswith(prefix_guess)
+                while prefix_guess and token.arab[len(prefix_guess)] in araby.DIACRITICS:
+                    prefix_guess += token.arab[len(prefix_guess)]
+                    if len(prefix_guess)*2 >= len(token.arab):
+                        prefix_guess = ""
+                print(token, f"{prefix_guess=}")
+                if (latin_prefix := data.prefixes.get(prefix_guess)):
+                    token.prefix = prefix_guess
+                    token.latin_prefix = latin_prefix
             # cases
             sm = node.syntax_mark
             cases: dict[Case, int] = {

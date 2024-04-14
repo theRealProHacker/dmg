@@ -78,8 +78,8 @@ def test_ta_marbutah():
 def test_diphthong():
     profile = Profile(diphthongs=True)
     # bayt
-    # assert transliterate("بَيتُ")             == "bayt"
-    # assert transliterate("بَيتُ", profile)    == "bait"
+    assert transliterate("بَيتُ") == "bayt"
+    assert transliterate("بَيتُ", profile) == "bait"
     # dawl
     assert transliterate("دَولَ") == "dawl"
     assert transliterate("دَولَ", profile) == "daul"
