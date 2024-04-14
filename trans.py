@@ -78,6 +78,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
         for token, stemming, is_name in zip(sentence, stemmed_words, is_name_data):
             token.is_name = is_name
             if not stemming:
+                print(token.arab, "not found")
                 continue
             node = stemnode.StemNode(stemming, True)
             token.lemma, token.pos = node.get_lemma(return_pos=True)
@@ -93,14 +94,20 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             # prefixes
             if not token.prefix and len(arab_tools.araby.strip_diacritics(token.arab)):
                 prefix_guess: str = node.get_affix().split("-")[0]
-                assert token.arab.startswith(prefix_guess)
-                while prefix_guess and token.arab[len(prefix_guess)] in araby.DIACRITICS:
-                    prefix_guess += token.arab[len(prefix_guess)]
-                    if len(prefix_guess)*2 >= len(token.arab):
-                        prefix_guess = ""
-                print(token, f"{prefix_guess=}")
-                if (latin_prefix := data.prefixes.get(prefix_guess)):
-                    token.prefix = prefix_guess
+                # assert token.arab.startswith(prefix_guess)
+                prefix = 0
+                for c in prefix_guess:
+                    prefix = token.arab.find(c, prefix) + 1
+                    if not prefix:
+                        break
+                while prefix > 0 and token.arab[prefix] in araby.DIACRITICS:
+                    prefix += 1
+                    if prefix * 2 > len(token.arab):
+                        prefix = 0
+                if prefix > 0 and (
+                    latin_prefix := data.prefixes.get(token.arab[:prefix])
+                ):
+                    token.prefix = token.arab[:prefix]
                     token.latin_prefix = latin_prefix
             # cases
             sm = node.syntax_mark
@@ -116,12 +123,22 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 if cases[sorted_cases[0]] == cases[sorted_cases[1]]
                 else sorted_cases[0]
             )
+            token.is_definite = len(sm["marfou3"]) + len(sm["mansoub"]) + len(
+                sm["majrour"]
+            ) > len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
+                sm["tanwin_majrour"]
+            )
+            # applying pausa
+            if (token.is_pausa or token.is_end_of_sentence) and token.pos == "noun":
+                token.arab = araby.strip_lastharaka(token.arab)
         # two tokens together
         for token, next_token in zip(sentence, sentence[1:]):
             # idafah
             # TODO: check that first token has no article but is definite
             token.is_idafah = (
                 token.pos == "noun"
+                and token.latin_prefix.endswith("l")
+                and token.is_definite
                 and next_token.is_genetive
                 and next_token.prefix not in preposition_prefixes
             )
@@ -140,9 +157,10 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             if next_token.prefix and next_token.prefix not in article_prefixes:
                 prev_is_hamzatul_wasl = next_token.latin_prefix[-1] in ("a", "i")
             else:
-                prev_is_hamzatul_wasl = not token.is_pausa and (
+                prev_is_hamzatul_wasl = (
                     token.arab[-1] in data.long_vowels
                     or token.arab[-1] in data.short_vowels
+                    or token.arab[-1] == data.alif_maksurah
                 )
             next_token.apply_hamzatul_wasl = (
                 next_is_hamzatul_wasl and prev_is_hamzatul_wasl
@@ -151,8 +169,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     # transliteration
     for token in tokens:
         word = token.arab[len(token.prefix) :]
-        if token.is_pausa or token.is_end_of_sentence:
-            word = araby.strip_lastharaka(word)
+        print(word, token)
         # char mapping
         char_map = (
             data.subs | data.special_char_map | data.diacritic_map | data.char_map
@@ -180,8 +197,8 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             for pattern, replace in rules:
                 word, n = pattern.subn(replace, word)
                 cont = cont or n
-                if n:
-                    print(word, pattern, replace)
+                # if n:
+                #     print(word, pattern, replace)
         token.latin = word
         # assimilation
         # sun letter assimilation

@@ -22,11 +22,11 @@ import asmai.semdictionary
 import naftawayh.wordtag
 import naftawayh.wordtag_const as wordtag_const
 import qalsadi.analex_const as analex_const
+import qalsadi.stem_stop
+import qalsadi.stem_unknown
 import qalsadi.stem_verb
 import qalsadi.stopwords
 from pyarabic import araby
-from qalsadi.stem_stop import StopWordStemmer
-from qalsadi.stem_unknown import UnknownStemmer
 from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
 
@@ -108,6 +108,19 @@ class VerbStemmer(qalsadi.stem_verb.VerbStemmer):
         return stamp in data.verb_dict
 
 
+class UnknownStemmer(qalsadi.stem_unknown.UnknownStemmer):
+    def lookup_dict(self, word):
+        result = []
+        if item := data.unknown_dict.get(word):
+            result.append(item)
+        if result:
+            print(result)
+        return result
+
+
+class StopWordStemmer(qalsadi.stem_stop.StopWordStemmer): ...
+
+
 class SemanticDictionary(asmai.semdictionary.SemanticDictionary):
     def get_original(self, primate_word):
         return data.sem_derivations.get(primate_word, ("", ""))
@@ -115,6 +128,8 @@ class SemanticDictionary(asmai.semdictionary.SemanticDictionary):
 
 # Fix qalsadi and asmai from here
 qalsadi.stem_verb.VerbStemmer = VerbStemmer
+qalsadi.stem_unknown.UnknownStemmer = UnknownStemmer
+qalsadi.stem_stop.StopWordStemmer = StopWordStemmer
 asmai.semdictionary.SemanticDictionary = SemanticDictionary
 
 tagger = WordTagger()

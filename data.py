@@ -31,10 +31,12 @@ def readWrite(path):
 
 
 freq_dict = {}
+unknown_dict = {}
 
 for entry in read("data/wordfreq.json"):
     freq_dict[(entry["vocalized"], entry["word_type"])] = entry["freq"]
     freq_dict[(entry["unvocalized"], entry["word_type"])] = entry["freq"]
+    unknown_dict[entry["unvocalized"]] = entry
 
 
 noun_dict: dict[str, list] = defaultdict(list)
@@ -46,6 +48,12 @@ verb_dict: dict[str, list] = defaultdict(list)
 
 for entry in read("./data/verbs.json"):
     verb_dict[entry["stamped"]].append(entry)
+
+# stopword_dict: dict[str, list] = defaultdict(list)
+
+# for entry in read("./data/stopwords.json"):
+#     stopword_dict[(entry["vocalized"], entry["word_type"])] = entry
+#     stopword_dict[(entry["unvocalized"], entry["word_type"])] = entry
 
 sem_derivations: dict[str, tuple[str, str]] = {}
 
@@ -421,9 +429,9 @@ if UNVOCALIZED_PREFIXES:
 
 # fal, wal
 conjunction_article_prefixes = {
-    con1 + art1: con2 + art2
+    con1 + art1: con2 + "l"
     for con1, con2 in conjunction_prefixes.items()
-    for art1, art2 in article_prefixes.items()
+    for art1 in article_prefixes
 }
 prefixes = (
     conjunction_prefixes
@@ -433,7 +441,6 @@ prefixes = (
     | preposition_article_prefixes
     | conjunction_article_prefixes
 )
-prefix_lengths = sorted({len(x) for x in prefixes}, reverse=True)
 
 sentence_stop_marks = ".!?\n"
 after_map = {

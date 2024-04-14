@@ -297,7 +297,8 @@
         <main>
             <div id="main">
                 <div class="col-12 mb-3">
-                    Transliterieren Sie Ihren arabischen Text in DMG
+                    Transliterieren Sie Ihren arabischen Text in DMG. <br>
+                    Mit dem Zauberstab-Button können Sie Ihren Text automatisch vokalisieren lassen.
                 </div>
                 <div id="input-output" class="row">
                     <div class="col-12 col-lg-6 mb-3">
@@ -541,7 +542,7 @@
                 } else if (button == "{delete}") {
                     document.execCommand("forwardDelete")
                 }
-                if (button.length == 1) {
+                if (button.length > 0 && button[0] != "{") {
                     document.execCommand("insertText", false, button);
                 }
             },

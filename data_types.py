@@ -67,6 +67,7 @@ class Token:
     lemma: str = ""
     pos: Pos = ""
     gram_case: Case = ""
+    is_definite: bool = False
     prefix: str = ""
     is_pausa: bool = False
     is_end_of_sentence: bool = False
