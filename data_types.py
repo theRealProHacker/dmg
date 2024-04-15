@@ -58,10 +58,6 @@ class Profile:
             "nīya",
             "niyya"
         ),
-        # "vocalize": (
-        #     "Vokalisation",
-        #     "Ob automatisch vokalisiert werden soll",
-        # ),
     }
 
 
