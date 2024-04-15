@@ -17,7 +17,7 @@ def index():
             field.default,
             field.type.__name__,
             *Profile.descriptions.get(
-                name, (" ".join(name.split("_")).capitalize(), "")
+                name, (" ".join(name.split("_")).capitalize(), "", "", "")
             ),
         )
         for (name, field) in Profile.__dataclass_fields__.items()

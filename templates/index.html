@@ -323,11 +323,16 @@
                 <div class="container-fluid">
                     <h2 class="pt-4 mb-5">Einstellungen</h2>
 
-                    {% for (name, value, type, title, description) in profile %}
+                    {% for (name, value, type, title, description, off, on) in profile %}
                         {% if type == 'bool' %}
                             <div class="form-check form-switch mb-3">
                                 <input id="{{name}}-profile-input" class="form-check-input" type="checkbox" role="switch" name="{{name}}" {% if value %} checked {% endif %}>
-                                <label class="form-check-label" for="{{name}}-profile-input" title="{{description}}" data-bs-toggle="tooltip">
+                                <label class="form-check-label" for="{{name}}-profile-input" title="{{description}}
+                                    {% if on and off %}
+                                        <br><em>{{on}}</em> (an)
+                                        <br><em>{{off}}</em> (aus) 
+                                    {% endif %}" 
+                                data-bs-html="true" data-bs-toggle="tooltip">
                                     {{title}}
                                 </label>
                             </div>

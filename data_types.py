@@ -37,18 +37,26 @@ class Profile:
         "pausa": (
             "Pausa",
             "Ob der Text in Pausa gelesen werden soll",
+            "al-kalbu",
+            "al-kalb",
         ),
         "ta_marbutah": (
             "Ta marbuta",
             "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
+            "al-madina",
+            "al-madinah"
         ),
         "diphthongs": (
             "Diphthonge",
             "Ob Diphthonge wiedergegeben werden sollen",
+            "nawm",
+            "naum"
         ),
         "double_vowels": (
             "Doppelte Halbvokale",
             "Ob Halbvokale mit Shaddah als verdoppelte Konsonanten wiedergegeben werden sollen",
+            "nīya",
+            "niyya"
         ),
         # "vocalize": (
         #     "Vokalisation",
