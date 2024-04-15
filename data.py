@@ -245,6 +245,7 @@ def unicode_cleanup(s: str) -> str:
 
 subs = {
     alif_maksurah: alif,
+    alif_maddah: alif,
     "[\u0622-\u0626-\u0676\u0678]": hamza,
 }
 

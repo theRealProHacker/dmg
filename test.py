@@ -8,13 +8,14 @@ def test_tokenization():
     # TODO: find difficult edge cases
 
 
-def test_transliteration_safety():
+def test_transliteration_robustness():
     assert transliterate("") == ""
     assert transliterate(" ") == ""
     assert transliterate("?") == "?"
     assert transliterate("؟") == "?"
     assert transliterate("؟ \n") == "?"
-    assert transliterate("أَ") == "a"  # ? what should this be ?
+    assert transliterate("أَ") == "a"
+    assert transliterate("آ") == "ā"
     assert transliterate("ذَهَبَ إِ") == "ḏahaba i"
 
 
@@ -136,6 +137,8 @@ def test_ibrahim_text():
         )
         == "waṣala ibrāhīm ilā l-maktab fī s-sāʿat at-tāsiʿa wan-niṣf fa-ṭaradahu l-mudīr."
     )
+
+    assert transliterate("براون آند كو") == ""
 
     # assert
 
