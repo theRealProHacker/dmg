@@ -42,7 +42,7 @@ for entry in read("data/wordfreq.json"):
 noun_dict: dict[str, list] = defaultdict(list)
 
 for entry in read("./data/nouns.json"):
-    noun_dict[entry["vocalized"]].append([*entry.values()])
+    noun_dict[entry["vocalized"]].append(entry)
 
 verb_dict: dict[str, list] = defaultdict(list)
 
