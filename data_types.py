@@ -21,7 +21,6 @@ class Profile:
     ta_marbutah: bool = False
     diphthongs: bool = False
     double_vowels: bool = True
-    # vocalize: bool = False
     # skip_i3rab: bool = False
     # """Whether i3rab (flexion endings) should be skipped"""
     # full_vocalisation: bool = False
@@ -30,10 +29,10 @@ class Profile:
     # TODO: alif maqsura to ya
     # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
     # TODO: alif maqsura mit Unterpunkt
-    # IDEA: Whether to use ner
     # IDEA: Capitalize beginning of each sentence
 
     descriptions = {
+        # id, title, description, off, on
         "pausa": (
             "Pausa",
             "Ob der Text in Pausa gelesen werden soll",
@@ -44,19 +43,19 @@ class Profile:
             "Ta marbuta",
             "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
             "al-madina",
-            "al-madinah"
+            "al-madinah",
         ),
         "diphthongs": (
             "Diphthonge",
             "Ob Diphthonge wiedergegeben werden sollen",
             "nawm",
-            "naum"
+            "naum",
         ),
         "double_vowels": (
             "Doppelte Halbvokale",
             "Ob Halbvokale mit Shaddah als verdoppelte Konsonanten wiedergegeben werden sollen",
             "nīya",
-            "niyya"
+            "niyya",
         ),
     }
 
