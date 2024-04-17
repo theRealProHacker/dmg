@@ -109,7 +109,6 @@ unicode_cleanup_map = {
         "ﮬ": "ه",
         "ﮭ": "ه",
         "ﺀ": "ء",
-        # alif maddah?
         "ﺃ": hamza,
         "ﺄ": hamza,
         "ﺅ": hamza,
@@ -235,6 +234,8 @@ unicode_cleanup_map = {
     },
     # put shaddah before harakah always
     **{harakah + shaddah: shaddah + harakah for harakah in short_vowels},
+    # remove left to right marker
+    "\u200e": "",
 }
 unicode_cleanup_pattern = compile_map_pattern(unicode_cleanup_map)
 
@@ -244,8 +245,6 @@ def unicode_cleanup(s: str) -> str:
 
 
 subs = {
-    alif_maksurah: alif,
-    alif_maddah: alif,
     "[\u0622-\u0626-\u0676\u0678]": hamza,
 }
 
@@ -274,7 +273,8 @@ diacritic_map = {
         rf"^{half_vowel}": consonant
         for half_vowel, consonant in zip(half_vowels, half_vowels_as_consonants)
     },
-    # TODO: nisba suffix
+    alif_maddah: alif,
+    alif_maksurah: alif,
     fatha + alif: "ā",
     alif: "ā",
     damma + waw: "ū",
@@ -313,7 +313,7 @@ hamzatul_wasl_map = {"^" + hamza + short_vowel: "" for short_vowel in short_vowe
 
 char_map = {
     "(.)" + shaddah: lambda match: match.group(1) * 2,
-    "^" + hamza: "",
+    "^" + hamza + "(?!$)": "",
     hamza: "ʾ",
     "ب": "b",
     "ت": "t",
