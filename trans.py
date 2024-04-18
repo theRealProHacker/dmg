@@ -45,6 +45,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     if not matches:
         return data.sub_after(text)
     tokens, ends, starts = zip(*matches)
+    beginning_non_token = data.sub_after(text[: starts[0]])
     starts = [*starts[1:], len(text)]
     tokens = [
         Token(token, after=text[end:start], is_pausa=profile.pausa)
@@ -79,20 +80,39 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             token.is_name = is_name
             if not stemming:
                 print(token.arab, "not found")
-                continue
-            node = stemnode.StemNode(stemming, True)
-            token.lemma, token.pos = node.get_lemma(return_pos=True)
+                token.lemma = araby.strip_diacritics(token.arab)
+                token.pos = "noun"
+                prefix_guess = ""
+                sm = {
+                    "marfou3": [],
+                    "mansoub": [],
+                    "majrour": [],
+                    "majzoum": [],
+                    "tanwin_marfou3": [],
+                    "tanwin_mansoub": [],
+                    "tanwin_majrour": [],
+                }
+            else:
+                node = stemnode.StemNode(stemming, True)
+                token.lemma, token.pos = node.get_lemma(return_pos=True)
+                prefix_guess: str = node.get_affix().split("-")[0]
+                sm = node.syntax_mark
             assert token.pos in ("noun", "verb", "stopword", "")
             # print(token.arab, token.lemma, token.pos)
+
+            # applying pausa
+            if (token.is_pausa or token.is_end_of_sentence) and token.pos == "noun":
+                token.arab = araby.strip_lastharaka(token.arab)
+
             # prefixes
-            if not token.prefix and len(arab_tools.araby.strip_diacritics(token.arab)):
-                prefix_guess: str = node.get_affix().split("-")[0]
-                # assert token.arab.startswith(prefix_guess)
+            if arab_tools.araby.strip_diacritics(token.arab):
                 prefix = 0
                 for c in prefix_guess:
                     prefix = token.arab.find(c, prefix) + 1
                     if not prefix:
                         break
+                if prefix * 2 > len(token.arab):
+                    prefix = 0
                 while prefix > 0 and token.arab[prefix] in araby.DIACRITICS:
                     prefix += 1
                     if prefix * 2 > len(token.arab):
@@ -102,8 +122,8 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 ):
                     token.prefix = token.arab[:prefix]
                     token.latin_prefix = latin_prefix
+
             # cases
-            sm = node.syntax_mark
             cases: dict[Case, int] = {
                 "n": len(sm["marfou3"]) + len(sm["tanwin_marfou3"]),
                 "a": len(sm["mansoub"]) + len(sm["tanwin_mansoub"]),
@@ -121,13 +141,10 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             ) > len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
                 sm["tanwin_majrour"]
             )
-            # applying pausa
-            if (token.is_pausa or token.is_end_of_sentence) and token.pos == "noun":
-                token.arab = araby.strip_lastharaka(token.arab)
+
         # two tokens together
         for token, next_token in zip(sentence, sentence[1:]):
             # idafah
-            # TODO: check that first token has no article but is definite
             token.is_idafah = (
                 token.pos == "noun"
                 and token.latin_prefix.endswith("l")
@@ -135,6 +152,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 and next_token.is_genetive
                 and next_token.prefix not in preposition_prefixes
             )
+
             # hamzatul wasl for next_token
             next_is_hamzatul_wasl = False
             if next_token.prefix in article_prefixes:
@@ -162,7 +180,6 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     # transliteration
     for token in tokens:
         word = token.arab[len(token.prefix) :]
-        print(word, token)
         # char mapping
         char_map = (
             data.subs | data.special_char_map | data.diacritic_map | data.char_map
@@ -204,7 +221,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             if len(token.latin) >= 2 and token.latin[1] == first_letter:
                 token.latin = token.latin[1:]
 
-    return "".join(token.result for token in tokens)
+    return beginning_non_token + "".join(token.result for token in tokens)
 
 
 if __name__ == "__main__":
