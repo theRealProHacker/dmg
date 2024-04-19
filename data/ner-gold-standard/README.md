@@ -1,4 +1,6 @@
-More details about those corpora is fully described in the paper:
+From https://fsalotaibi.kau.edu.sa/Pages-Arabic-NE-Corpora.aspx
+
+More details about those corpora is fully described in [the paper](https://aclanthology.org/C14-1093.pdf):
 
 F. Alotaibi and M. Lee, "A Hybrid Approach to Features Representation for Fine-grained Arabic Named Entity Recognition", In Proceedings of COLING 2014, Dublin, Ireland, August 23-29. 2014.
 
