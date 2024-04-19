@@ -118,7 +118,16 @@ if ner_available:
 
     def test_names():
         assert transliterate("مُحَمَّد") == "Muḥammad"
-        assert transliterate("اللَّه") == "Allāh"
+
+    def test_allah():
+        allah_forms = {
+            "ﷲ": "Allah",
+            # billah
+            # lillah
+            # "ﺑﺴﻢ ﷲ": ""
+        }
+        for arab, latin in allah_forms.items():
+            assert transliterate(arab) == latin
 
 
 def test_prepositions():

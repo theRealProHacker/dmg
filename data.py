@@ -30,6 +30,9 @@ def readWrite(path):
         write(path, data)
 
 
+known_names = {*read("data/ner.json")}
+
+
 freq_dict = {}
 unknown_dict = {}
 
