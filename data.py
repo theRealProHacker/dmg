@@ -375,7 +375,7 @@ sun_letters = {"ت", "ث", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط",
 sun_letters = set("tṯdḏrzsšṣḍṭẓn")
 
 # Pattern to match an arabic word
-token_pattern = re.compile("[\u0621-\u0655]+")
+token_pattern = re.compile(f"[\u0621-\u0655{alif_wasl}]+")
 
 UNVOCALIZED_PREFIXES = False
 
@@ -461,7 +461,7 @@ def sub_after(after):
 
 # hamzatul wasl
 # Without the starting alif
-hamzatul_wasl_patterns = {
+hamzatul_wasl_nouns = {
     # ithnan
     "ثنان",
     "ثنين",
@@ -477,6 +477,7 @@ hamzatul_wasl_patterns = {
     "مرأة",
     "مرأت",
 }
+
 # consonant pattern
 _cp = f"([{araby.LETTERS[1:]}])"
 unvocalized_verb_stems_7_to_10_verbs = {
@@ -500,3 +501,8 @@ unvocalized_verb_stems_7_to_10_nouns = {
     # 10
     f"ست{_cp}{_cp}{alif}{_cp}",
 }
+
+unvocalized_verb_stems_7_to_10 = [
+    re.compile(p)
+    for p in unvocalized_verb_stems_7_to_10_verbs | unvocalized_verb_stems_7_to_10_nouns
+]

@@ -76,13 +76,7 @@ class Token:
     is_end_of_sentence: bool = False
     is_idafah: bool = False
     is_name: bool = False
-    apply_hamzatul_wasl: bool = False
-    """
-    Whether hamzatul wasl should be applied to the token or not
-
-    If the token has an article prefix, the prefix is set to "l"
-    else the short vowel after the first hamzah is removed
-    """
+    hamzatul_wasl_short_vowel: str = ""
 
     latin: str = ""
     latin_after: str = ""
@@ -101,7 +95,10 @@ class Token:
             else:
                 latin = self.latin.capitalize()
         return (
-            (self.latin_prefix + "-" if self.prefix else "") + latin + self.latin_after
+            (self.latin_prefix + "-" if self.prefix else "")
+            + self.hamzatul_wasl_short_vowel
+            + latin
+            + self.latin_after
         )
 
     @property

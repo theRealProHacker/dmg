@@ -29,7 +29,15 @@ A sleek and modern UI
 
 ## Ta marbutah
 
-...
+Option: "Ta marbutah"
+
+The ta marbutah is a special Arabic character that only appears in nouns and adjectives (but not in verbs or stopwords). The character can be romanized as either "t", "h" or not at all. This depends on the grammatical context and the user preference. 
+
+If the noun is the first word (nomens regens) of an idafah (see below) then the ta marbutah is romanized as "t". In every other case it is romanized as "h" or not. If the ta marbutah is not the last letter or a long vowel is before it, then it must be romanized as "h". Else, the romanizer can choose whether he wants to keep the ta marbutah or not. This is represented in the "Ta marbutah" flag. 
+
+> Bei einer Idafah / Genitivverbindung stehen zwei Nomen in einer Verbindung, die eine Zugehörigkeit oder einen Besitz ausdrücken. Das erste Nomen (nomen regens) steht immer ohne Artikel, aber mit bestimmter Nunation. Das zweite Nomen (nomen rectum) steht im Genitiv. Wenn er mit Artikel steht, handelt es sich um eine bestimmte Genitivverbindung. 
+
+> (translated) In an idafah (genetive construction) two nouns are connected to indicate a link or ownership. The first noun (Latin: nomens regens) is definite but without article; the case doesn't matter. The second noun must be in the genitive case (which gives the genetive construction it's name). 
 
 ## Assimilation
 
