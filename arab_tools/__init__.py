@@ -27,6 +27,7 @@ import qalsadi.stem_unknown
 import qalsadi.stem_verb
 import qalsadi.stopwords
 from pyarabic import araby
+from qalsadi import stemnode
 from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
 
@@ -113,8 +114,8 @@ class UnknownStemmer(qalsadi.stem_unknown.UnknownStemmer):
         result = []
         if item := data.unknown_dict.get(word):
             result.append(item)
-        if result:
-            print(result)
+        # if result:
+        #     print(result)
         return result
 
 
@@ -215,7 +216,7 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     return [StemmedWord(w) for w in result]
 
 
-def check_sentence(sentence: Sentence) -> list[list[StemmedWord]]:
+def check_sentence(sentence: Sentence):
     """
     Analyzes Arabic tokens
 
@@ -230,7 +231,6 @@ def check_sentence(sentence: Sentence) -> list[list[StemmedWord]]:
         for token, prev, prev_prev in zip(tokens, prev_tokens, prev_prev_tokens)
     ]
 
-    result = []
     for token, tag in zip(sentence, guessed_tags):
         preliminary_result = check_word(token.arab, tag)
         # if not preliminary_result:
@@ -239,8 +239,32 @@ def check_sentence(sentence: Sentence) -> list[list[StemmedWord]]:
         #         if preliminary_result:
         #             token.prefix = prefix
         #             break
-        result.append(preliminary_result)
-    return result
+        if not preliminary_result:
+            print(token.arab, "not found")
+            # lemma, pos, prefix, sm
+            yield (
+                araby.strip_diacritics(token.arab),
+                "noun",
+                "",
+                # TODO: look at the last harakah
+                {
+                    "marfou3": [],
+                    "mansoub": [],
+                    "majrour": [],
+                    "majzoum": [],
+                    "tanwin_marfou3": [],
+                    "tanwin_mansoub": [],
+                    "tanwin_majrour": [],
+                },
+            )
+            continue
+        node = stemnode.StemNode(preliminary_result, True)
+        print(token.arab, node.get_affix().split("-"))
+        yield (
+            *node.get_lemma(return_pos=True),
+            node.get_affix().split("-")[0],
+            node.syntax_mark,
+        )
 
 
 def is_hamzatul_wasl(token: Token) -> bool:

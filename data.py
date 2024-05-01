@@ -248,7 +248,7 @@ def unicode_cleanup(s: str) -> str:
 
 
 subs = {
-    "[\u0622-\u0626-\u0676\u0678]": hamza,
+    "[\u0623-\u0626-\u0676\u0678]": hamza,
 }
 
 diacritic_map = {
@@ -270,6 +270,11 @@ diacritic_map = {
         for half_vowel, consonant in zip(half_vowels, half_vowels_as_consonants)
         if (short_vowel != kasra or half_vowel != ya)
         and (short_vowel != damma or half_vowel != waw)
+    },
+    # alif + half_vowel -> consonant
+    **{
+        rf"(?<={alif}){half_vowel}": consonant
+        for half_vowel, consonant in zip(half_vowels, half_vowels_as_consonants)
     },
     # half_vowel at beginning of string -> consonant
     **{
@@ -300,7 +305,7 @@ diphthong_map = {
     for half_vowel, short_vowel in zip(half_vowels, half_vowels_as_short_vowels)
 }
 diphthong_map = {
-    f"(?<=a){l_hw}(?!a|u|i)": short_vowel
+    f"(?<=[aā]){l_hw}(?!a|u|i)": short_vowel
     for l_hw, short_vowel in zip(half_vowels_as_consonants, half_vowels_as_short_vowels)
 }
 

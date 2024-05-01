@@ -46,10 +46,10 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
         return data.sub_after(text)
     tokens, ends, starts = zip(*matches)
     beginning_non_token = data.sub_after(text[: starts[0]])
-    starts = [*starts[1:], len(text)]
+
     tokens = [
         Token(token, after=text[end:start], is_pausa=profile.pausa)
-        for token, end, start in zip(tokens, ends, starts)
+        for token, end, start in zip(tokens, ends, [*starts[1:], len(text)])
     ]
     # sentence splitting
     sentences: list[list[Token]] = []
@@ -76,29 +76,9 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
     for sentence, is_name_data in zip(sentences, names):
         sentence[-1].is_end_of_sentence = True
         # word analysis and stemming
-        stemmed_words = arab_tools.check_sentence(sentence)
+        stemmed_words = [*arab_tools.check_sentence(sentence)]
         for token, stemming, is_name in zip(sentence, stemmed_words, is_name_data):
-            token.is_name = is_name
-            if not stemming:
-                print(token.arab, "not found")
-                token.lemma = araby.strip_diacritics(token.arab)
-                token.pos = "noun"
-                prefix_guess = ""
-                # TODO: look at the last harakah
-                sm = {
-                    "marfou3": [],
-                    "mansoub": [],
-                    "majrour": [],
-                    "majzoum": [],
-                    "tanwin_marfou3": [],
-                    "tanwin_mansoub": [],
-                    "tanwin_majrour": [],
-                }
-            else:
-                node = stemnode.StemNode(stemming, True)
-                token.lemma, token.pos = node.get_lemma(return_pos=True)
-                prefix_guess: str = node.get_affix().split("-")[0]
-                sm = node.syntax_mark
+            token.is_name, token.lemma, token.pos, prefix_guess, sm = is_name, *stemming
             assert token.pos in ("noun", "verb", "stopword", "")
             # print(token.arab, token.lemma, token.pos)
 
@@ -153,7 +133,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 data.alif,
                 data.alif_wasl,
             ):
-                if (short_vowel:=token.arab[1]) in data.short_vowels:
+                if (short_vowel := token.arab[1]) in data.short_vowels:
                     token.arab = token.arab[2:]
                     short_vowel = data.diacritic_map[short_vowel]
                 elif (
