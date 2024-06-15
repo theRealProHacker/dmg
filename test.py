@@ -96,6 +96,7 @@ def test_double_vowels():
     assert transliterate("نِيَّة", profile_double_vowels) == "nīya"
 
 
+
 def test_hamzatul_wasl():
     assert transliterate("ابن") == "ibn"
     assert transliterate("اسم") == "ism"
@@ -132,43 +133,21 @@ def test_prepositions():
 
 
 def test_ibrahim_text():
-    # A more general test that includes all kind of features
+    p = Profile(pausa=True, double_vowels=False)
+    with open("data/ibrahim-in.txt", encoding="utf-8") as inp, open("data/ibrahim-out.txt", encoding="utf-8") as outp:
+        arab = "\n".join(line for line in inp.readlines() if not line.startswith("#"))
+        latin = "\n".join(line for line in outp.readlines() if not line.startswith("#"))
+        assert transliterate(arab, p) == latin.strip()
 
-    assert (
-        transliterate("وَظِيفَةُ خَالِيَّةُ", Profile(pausa=True, double_vowels=False))
-        == "waẓīfa ḫālīya"
-    )
-
+    # Still errors:
     # It's acually wan-niṣf, not wālniṣf
-    assert (
-        transliterate(
-            "وَصَلَ إِبراهيم أِلَى الْمَكْتَبَ فِي السَّاعَةِ التَّاسِعَةِ وَالنِصف فَطَرَدَهُ المُدير۔",
-            profile=Profile(pausa=True, double_vowels=False),
-        )
-        == "waṣala ibrāhīm ilā l-maktab fī s-sāʿa at-tāsiʿa wālniṣf fa-ṭaradahu l-mudīr."
-    )
-
-    assert (
-        transliterate(
-            "ذَهَبَ إِبراهيم إِلى مَكتَبِ العَمَلِ وَطَلَبَ وَظيفَةَ خالِيَّةِ فَقالَ لَهُ المُوَظَّف۔",
-            profile=Profile(double_vowels=False),
-        )
-        == "ḏahaba ibrāhīm ilā maktabi l-ʿamali wa-ṭalaba waẓīfata ḫālīyati fa-qāla lahu l-muwaẓẓaf."
-    )
-
-    assert (
-        transliterate(
-            "هُناكَ وَظيفَة خَلِيَّة في شَرِكَة تَأمين",
-            profile=Profile(double_vowels=False),
-        )
-        == "hunāka waẓīfa ḫalīya fī šarika taʾmīn"
-    )
+    # Ibrahim is not capitalized
 
     assert transliterate("براون آند كو", Profile(diphthongs=True)) == "brāun ānd kū"
 
 
 if __name__ == "__main__":
-    test_prepositions()
+    # test_prepositions()
     # test_transliteration_robustness()
-    # test_ibrahim_text()
+    test_ibrahim_text()
     # test_hamzatul_wasl()
