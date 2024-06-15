@@ -103,7 +103,7 @@ class VerbStemmer(qalsadi.stem_verb.VerbStemmer):
         """
         stamp = self.verb_dictionary.word_stamp(word)
         stamp = stamp.replace(araby.TEH, "")
-        # a verb stamp can't more than 4 letters
+        # a verb stamp can't be more than 4 letters
         if len(stamp) > 4:
             return False
         return stamp in data.verb_dict
@@ -178,14 +178,14 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     From:
     qalsadi.analex.Analex.check_word
     """
-    # print("Checking", word, tag)
     word_nm = araby.strip_tashkeel(word)
     word_nm_shadda = araby.strip_harakat(word)
+    print("Checking", word, word_nm, tag)
 
     result = []
 
     if araby.is_arabicword(word_nm):
-        if word in qalsadi.stopwords.STOPWORDS:
+        if word_nm in qalsadi.stopwords.STOPWORDS:
             result += stopwordstemmer.stemming_stopword(word_nm)
         if not any(c in ("ة", *araby.TANWIN) for c in word) and (
             tagger.has_verb_tag(tag) or tagger.is_stopword_tag(tag)
@@ -193,6 +193,7 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
             result += verbstemmer.stemming_verb(word_nm)
         if tagger.has_noun_tag(tag) or tagger.is_stopword_tag(tag):
             result += stem_noun(word_nm)
+        print(result)
 
     if not result:
         result = unknownstemmer.stemming_noun(word_nm)
@@ -208,10 +209,7 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     for item in result:
         # item.freq is a string and becomes a number
         if isinstance(item.freq, str) and len(item.freq) > 4:
-            item.freq = get_freq(item.original, item.freq[4:])
-
-    # if not result:
-    #     debug("No result for", word, tag, word_nm, word_nm_shadda)
+            item.freq = get_freq(item.unvocalized, item.freq[4:])
 
     return [StemmedWord(w) for w in result]
 
@@ -233,38 +231,38 @@ def check_sentence(sentence: Sentence):
 
     for token, tag in zip(sentence, guessed_tags):
         preliminary_result = check_word(token.arab, tag)
-        # if not preliminary_result:
-        #     for prefix in possible_prefixes(token.arab):
-        #         preliminary_result = check_word(token.arab[len(prefix) :], tag)
-        #         if preliminary_result:
-        #             token.prefix = prefix
-        #             break
+
+        def return_result(result):
+            node = stemnode.StemNode(result, True)
+            # print(token.arab, node.get_affix().split("-"))
+            return (
+                *node.get_lemma(return_pos=True),
+                node.get_affix().split("-")[0],
+                node.syntax_mark,
+            )
+
         if not preliminary_result:
             print(token.arab, "not found")
             # lemma, pos, prefix, sm
+            cases = {
+                "marfou3": [],
+                "mansoub": [],
+                "majrour": [],
+                "majzoum": [],
+                "tanwin_marfou3": [],
+                "tanwin_mansoub": [],
+                "tanwin_majrour": [],
+            }
+            if case := data.case_mapping.get(token.arab[-1]):
+                cases[case].append(0)
             yield (
                 araby.strip_diacritics(token.arab),
                 "noun",
                 "",
-                # TODO: look at the last harakah
-                {
-                    "marfou3": [],
-                    "mansoub": [],
-                    "majrour": [],
-                    "majzoum": [],
-                    "tanwin_marfou3": [],
-                    "tanwin_mansoub": [],
-                    "tanwin_majrour": [],
-                },
+                cases,
             )
             continue
-        node = stemnode.StemNode(preliminary_result, True)
-        print(token.arab, node.get_affix().split("-"))
-        yield (
-            *node.get_lemma(return_pos=True),
-            node.get_affix().split("-")[0],
-            node.syntax_mark,
-        )
+        yield return_result(preliminary_result)
 
 
 def is_hamzatul_wasl(token: Token) -> bool:

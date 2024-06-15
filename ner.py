@@ -64,3 +64,43 @@ def find_names(sentences: list[list[str]]):
 #             is_name_data[current_token] = True
 #             print(f"{sentence[current_token]}, {tag}")
 #         yield is_name_data
+
+# Tests
+if __name__ == "__main__":
+    from data import known_names
+
+
+    wiki_input = "data/ner-gold-standard/wiki.txt"
+
+
+    correct_positive = 0
+    correct_negative = 0
+    incorrect_positive = 0
+    incorrect_negative = 0
+
+
+    with open(wiki_input, encoding="utf-8") as i:
+        for line in i.readlines():
+            if not line.strip():
+                continue
+            word, tag = line.split()
+            word = word.removeprefix("‎")
+            is_name = tag != "O"
+            test_is_name = word in known_names
+            if test_is_name:
+                if is_name:
+                    correct_positive += 1
+                else:
+                    incorrect_positive += 1
+            else:
+                if is_name:
+                    incorrect_negative += 1
+                else:
+                    correct_negative += 1
+
+    print(f"{correct_positive=}")
+    print(f"{correct_negative=}")
+    print(f"{incorrect_positive=}")
+    print(f"{incorrect_negative=}")
+    print("-"*30)
+    print(f"Sum: {correct_positive + correct_negative + incorrect_positive + incorrect_negative}")

@@ -30,7 +30,7 @@ def readWrite(path):
         write(path, data)
 
 
-known_names = {*read("data/ner.json")}
+known_names: set[str] = {*read("data/ner.json")}
 
 
 freq_dict = {}
@@ -40,7 +40,6 @@ for entry in read("data/wordfreq.json"):
     freq_dict[(entry["vocalized"], entry["word_type"])] = entry["freq"]
     freq_dict[(entry["unvocalized"], entry["word_type"])] = entry["freq"]
     unknown_dict[entry["unvocalized"]] = entry
-
 
 noun_dict: dict[str, list] = defaultdict(list)
 
@@ -373,7 +372,6 @@ special_char_map = {"ﷲ": "allah"}
 #     alif + fathatan + "$": alif,
 # }
 
-
 sun_letters = {"ت", "ث", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ن"}
 
 # latin sun letters
@@ -511,3 +509,38 @@ unvocalized_verb_stems_7_to_10 = [
     re.compile(p)
     for p in unvocalized_verb_stems_7_to_10_verbs | unvocalized_verb_stems_7_to_10_nouns
 ]
+
+case_mapping = {
+    fatha: "marfou3",
+    damma: "mansoub",
+    kasra: "majrour",
+    fathatan: "tanwin_marfou3",
+    dammatan: "tanwin_mansoub",
+    kasratan: "tanwin_majrour",
+}
+
+special_words = {
+    # ma3a
+    ""
+    # (all pronouns)
+    "أنا",
+    "أنت",
+    "أنتم",
+    "أنتن",
+    "هو",
+    "هي",
+    "هم",
+    "هن",
+    "نحن",
+    
+    # names
+    "محمد",
+    "علي",
+    "عمر",
+    "عبدالله",
+    "عبدالرحمن",
+    # ibrahim 2x
+    "إبرهيم",
+    "إبراهيم",
+
+}
