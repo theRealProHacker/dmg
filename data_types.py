@@ -23,6 +23,7 @@ class Profile:
     double_vowels: bool = True
     begin_hamza: bool = False
     orth: bool = False
+
     # skip_i3rab: bool = False
     # """Whether i3rab (flexion endings) should be skipped"""
     # full_vocalisation: bool = False
@@ -91,7 +92,6 @@ class Token:
     is_end_of_sentence: bool = False
     is_idafah: bool = False
     is_name: bool = False
-    # hamzatul_wasl_short_vowel: str = ""
 
     latin: str = ""
     latin_after: str = ""
@@ -105,16 +105,11 @@ class Token:
     def result(self) -> str:
         latin = self.latin
         if self.is_name:
-            if len(latin) >= 2 and latin[0] == "ʿ" and latin[1] in "aui":
-                latin = "ʿ" + latin[1:].capitalize()
+            if len(latin) >= 2 and latin[0] in "ʿʾ" and latin[1] in "aui":
+                latin = latin[0] + latin[1:].capitalize()
             else:
                 latin = self.latin.capitalize()
-        return (
-            (self.latin_prefix + "-" if self.prefix else "")
-            # + self.hamzatul_wasl_short_vowel
-            + latin
-            + self.latin_after
-        )
+        return self.latin_prefix + latin + self.latin_after
 
 
 Sentence = list[Token]
