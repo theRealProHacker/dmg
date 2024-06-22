@@ -2,9 +2,9 @@
 Farasa (https://farasa.qcri.org/)
 """
 
-import requests
 import json
 
+import requests
 from gen_test import total_unvocalized_file
 
 with open("vocalization/farasa.key", "r", encoding="utf-8") as f:
