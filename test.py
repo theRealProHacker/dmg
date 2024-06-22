@@ -155,17 +155,18 @@ def test_endings():
 
     # waw + alif -> waw
 
+
 def test_special_words():
     # Allah
-    assert transliterate("ﷲ") == "Allāh" # ligature
+    assert transliterate("ﷲ") == "Allāh"  # ligature
     assert transliterate("الله") == "Allāh"
     assert transliterate("لله") == "li-llāh"
+
 
 if ner_available:
 
     def test_names():
         assert transliterate("مُحَمَّد") == "Muḥammad"
-
 
 
 def _test_ibrahim_text():

@@ -130,7 +130,11 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 and data.half_vowel_is_long(arab, len(arab) - 1)
                 or arab[-1] in data.short_vowels
             )
-            next_wasl = "u" if arab_tools.hum_pattern(arab) or arab_tools.antum_pattern(arab) else ""
+            next_wasl = (
+                "u"
+                if arab_tools.hum_pattern(arab) or arab_tools.antum_pattern(arab)
+                else ""
+            )
 
             if len(araby.strip_diacritics(arab)) <= 2:
                 continue
