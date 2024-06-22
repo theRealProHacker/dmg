@@ -44,7 +44,7 @@ for entry in read("data/wordfreq.json"):
 noun_dict: dict[str, list] = defaultdict(list)
 
 for entry in read("./data/nouns.json"):
-    noun_dict[entry["vocalized"]].append(entry)
+    noun_dict[entry["normalized"]].append(entry)
 
 verb_dict: dict[str, list] = defaultdict(list)
 
@@ -61,6 +61,12 @@ sem_derivations: dict[str, tuple[str, str]] = {}
 
 for entry in read("./data/semantic_derivations.json"):
     sem_derivations.setdefault(entry["derived"], (entry["verb"], entry["type"]))
+
+
+sem_relations: dict[tuple[str, str], str] = {}
+
+for entry in read("./data/semantic_relations.json"):
+    sem_relations.setdefault((entry["first"], entry["second"]), entry["rule"])
 
 
 def compile_single_char_map_pattern(d: dict[str, str]) -> re.Pattern:
@@ -91,8 +97,10 @@ hamza = "\u0621"
 alif_maddah = "\u0622"
 alif_wasl = "ٱ"
 
-short_vowels = fatha + damma + kasra + fathatan + dammatan + kasratan
-harakat_wo_shaddah = short_vowels + sukun
+short_vowels = fatha + damma + kasra
+tanween = fathatan + dammatan + kasratan
+harakat_wo_shaddah = short_vowels + tanween + sukun
+harakat = harakat_wo_shaddah + shaddah
 long_vowels = alif + waw + ya
 half_vowels = waw + ya
 half_vowels_as_consonants = "wy"
@@ -121,6 +129,8 @@ unicode_cleanup_map = {
         "ﺊ": hamza,
         "ﺋ": hamza,
         "ﺌ": hamza,
+        # small alif
+        "\u0670": alif,
         "ﺍ": alif,
         "ﺎ": alif,
         "ﺏ": "ب",
@@ -225,6 +235,7 @@ unicode_cleanup_map = {
         "ﻲ": "ي",
         "ﻳ": "ي",
         "ﻴ": "ي",
+        "ﺁ": alif_maddah,
         "ﻵ": "ل" + alif_maddah,
         "ﻶ": "ل" + alif_maddah,
         "ﻷ": "ل" + hamza,
@@ -233,9 +244,13 @@ unicode_cleanup_map = {
         "ﻺ": "ل" + hamza,
         "ﻻ": "لا",
         "ﻼ": "لا",
+        "ﷲ": "الله",
     },
     # put shaddah before harakah always
-    **{harakah + shaddah: shaddah + harakah for harakah in short_vowels},
+    **{harakah + shaddah: shaddah + harakah for harakah in harakat_wo_shaddah},
+    # put fathatan before alif always (to protect it from pausa)
+    alif + fathatan + "$": fathatan + alif,
+    alif_maddah + fathatan + "$": fathatan + alif_maddah,
     # remove left to right marker
     "\u200e": "",
 }
@@ -250,7 +265,12 @@ subs = {
     "[\u0623-\u0626-\u0676\u0678]": hamza,
 }
 
-diacritic_map = {
+vowel_map = {
+    # half_vowel at beginning of string -> consonant
+    **{
+        rf"^{half_vowel}": consonant
+        for half_vowel, consonant in zip(half_vowels, half_vowels_as_consonants)
+    },
     # half_vowel + harakat -> consonant
     **{
         rf"{half_vowel}(?={harakah})": consonant
@@ -262,7 +282,7 @@ diacritic_map = {
         half_vowel + shaddah: 2 * consonant
         for half_vowel, consonant in zip(half_vowels, half_vowels_as_consonants)
     },
-    # short_vowel + half_vowel -> consonant
+    # other short_vowel + half_vowel -> consonant
     **{
         rf"(?<={short_vowel}){half_vowel}": consonant
         for short_vowel in short_vowels
@@ -275,28 +295,47 @@ diacritic_map = {
         rf"(?<={alif}){half_vowel}": consonant
         for half_vowel, consonant in zip(half_vowels, half_vowels_as_consonants)
     },
-    # half_vowel at beginning of string -> consonant
-    **{
-        rf"^{half_vowel}": consonant
-        for half_vowel, consonant in zip(half_vowels, half_vowels_as_consonants)
-    },
-    alif_maddah: alif,
+    # alif variants
+    alif_maddah: hamza + alif,
     alif_maksurah: alif,
+    # harakat + long vowel
     fatha + alif: "ā",
-    alif: "ā",
     damma + waw: "ū",
     kasra + ya: "ī",
+    # long vowels alone
+    waw + alif: waw,
+    alif: "ā",
+    **dict(zip(half_vowels, half_vowels_as_vowels)),
+    # harakat
     fatha: "a",
     damma: "u",
     kasra: "i",
     fathatan: "an",
     dammatan: "un",
     kasratan: "in",
-    alif + fathatan + "$": "an",
     fathatan + alif + "$": "an",
     sukun: "",
-    **dict(zip(half_vowels, half_vowels_as_vowels)),
 }
+
+
+def half_vowel_is_long(word: str, i: int):
+    assert word[i] in half_vowels
+    if i == 0:
+        return False
+    if len(word) > i + 1:
+        if word[i - 1] == alif:
+            return False
+        for haraka in harakat:
+            if word[i + 1] == haraka:
+                return False
+        for short_vowel in short_vowels:
+            if (
+                word[i - 1] == short_vowel
+                and (short_vowel != kasra or word[i] != ya)
+                and (short_vowel != damma or word[i] != waw)
+            ):
+                return False
+
 
 # if diphthongs
 diphthong_map = {
@@ -315,12 +354,11 @@ double_vowels_map = {
     "iyy": "īy",
 }
 
-# if token.is_hamzatul_wasl
-hamzatul_wasl_map = {"^" + hamza + short_vowel: "" for short_vowel in short_vowels}
+# if not begin_hamza
+begin_hamza_map = {"^" + hamza + "(?!$)": ""}
 
-char_map = {
+con_map = {
     "(.)" + shaddah: lambda match: match.group(1) * 2,
-    "^" + hamza + "(?!$)": "",
     hamza: "ʾ",
     "ب": "b",
     "ت": "t",
@@ -449,6 +487,14 @@ prefixes = (
     | conjunction_article_prefixes
 )
 
+unvocalized_prefix_pattern = f"({waw}|ف{fatha}?)?\
+(?=(سَ?)|\
+(?=(\
+(?=لِ)?|\
+(?=بِ)?|\
+(?=ك)?)\
+({alif}{fatha}?ل{sukun}?)))?"
+
 sentence_stop_marks = ".!?\n"
 after_map = {
     "۔": ".",
@@ -521,7 +567,7 @@ case_mapping = {
 
 special_words = {
     # ma3a
-    ""
+    "مع",
     # (all pronouns)
     "أنا",
     "أنت",
@@ -532,7 +578,6 @@ special_words = {
     "هم",
     "هن",
     "نحن",
-    
     # names
     "محمد",
     "علي",
@@ -542,5 +587,17 @@ special_words = {
     # ibrahim 2x
     "إبرهيم",
     "إبراهيم",
-
+    # allah
+    "الله",
+    # rahman
+    "رحمن",
+    # hadha
+    "هذا",
+    "هذه",
+    # dhalika
+    "ذلك",
+    # hakadha
+    "هكذا",
+    # lakin
+    "لكن",
 }
