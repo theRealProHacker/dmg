@@ -16,7 +16,7 @@ The files in this module are licensed under the GPL-3.0 License.
 """
 
 from functools import cache
-from typing import Literal
+from typing import Callable, Literal
 
 import asmai.semdictionary
 import naftawayh.wordtag
@@ -180,7 +180,6 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     """
     word_nm = araby.strip_tashkeel(word)
     word_nm_shadda = araby.strip_harakat(word)
-    print("Checking", word, word_nm, tag)
 
     result = []
 
@@ -193,7 +192,6 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
             result += verbstemmer.stemming_verb(word_nm)
         if tagger.has_noun_tag(tag) or tagger.is_stopword_tag(tag):
             result += stem_noun(word_nm)
-        print(result)
 
     if not result:
         result = unknownstemmer.stemming_noun(word_nm)
@@ -274,3 +272,20 @@ def is_hamzatul_wasl(token: Token) -> bool:
     assert token.arab[0] == data.hamza or token.arab[0] == data.alif
     test_word = token.arab[1:]
     return False and test_word
+
+
+def gen_arab_pattern_match(word: str) -> Callable[[str], bool]:
+    """
+    Matches a pattern to a word excluding the flexion endings
+    """
+    rasm, harakat = araby.separate(araby.strip_lastharaka(word))
+
+    def match_pattern(word: str) -> bool:
+        test_rasm, test_harakat = araby.separate(araby.strip_lastharaka(word))
+        return test_rasm == rasm and all(
+            t and h != t for h, t in zip(harakat, test_harakat)
+        )
+
+    return match_pattern
+
+min_pattern = gen_arab_pattern_match("مِنْ")
