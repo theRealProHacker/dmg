@@ -30,7 +30,7 @@ def readWrite(path):
         write(path, data)
 
 
-known_names: set[str] = {*read("data/ner.json")}
+known_names: set[str] = {*read("data/ner.json"), "محمد", "القاهرة"}
 
 
 freq_dict = {}
