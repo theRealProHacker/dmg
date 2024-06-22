@@ -275,7 +275,7 @@
     <div id="grid-wrapper">
         <nav class="navbar navbar-expand">
             <div class="container-fluid">
-                <a class="navbar-brand">
+                <a class="navbar-brand" href="">
                     <img src="/static/logo.svg" width="50" height="30" class="d-inline-block align-text-top me-2" alt="DMG icon">
                     DMG Transliteration
                 </a>
@@ -432,9 +432,9 @@
             "a": "\u064E",
             "u": "\u064F",
             "i": "\u0650",
-            "\u064Ea": "\u0627",
-            "\u064Eu": "\u0648",
-            "\u064Ei": "\u064A",
+            "A": "\u0627",
+            "U": "\u0648",
+            "I": "\u064A",
             "b": "ب",
             "t": "ت",
             // "th": "ث",
@@ -525,7 +525,7 @@
                 })
             })
             .catch(error => {
-                console.error(error)
+                console.error(error.message)
                 show_title_toast('Der Server konnte nicht erreicht werden', 'Bitte versuchen Sie es später erneut')
             });
             console.debug(text, profile);

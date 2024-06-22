@@ -5,6 +5,7 @@ qalsadi
 
 # vocalization
 mishkal
+gradio_client
 
 # AI
 # torch
