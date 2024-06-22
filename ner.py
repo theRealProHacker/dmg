@@ -69,15 +69,12 @@ def find_names(sentences: list[list[str]]):
 if __name__ == "__main__":
     from data import known_names
 
-
     wiki_input = "data/ner-gold-standard/wiki.txt"
-
 
     correct_positive = 0
     correct_negative = 0
     incorrect_positive = 0
     incorrect_negative = 0
-
 
     with open(wiki_input, encoding="utf-8") as i:
         for line in i.readlines():
@@ -87,20 +84,16 @@ if __name__ == "__main__":
             word = word.removeprefix("‎")
             is_name = tag != "O"
             test_is_name = word in known_names
-            if test_is_name:
-                if is_name:
-                    correct_positive += 1
-                else:
-                    incorrect_positive += 1
-            else:
-                if is_name:
-                    incorrect_negative += 1
-                else:
-                    correct_negative += 1
+            # the best way to do it
+            correct_positive += test_is_name * is_name
+            incorrect_positive += test_is_name * (not is_name)
+            incorrect_negative += (not test_is_name) * is_name
+            correct_negative += (not test_is_name) * (not is_name)
 
+    s = correct_positive + correct_negative + incorrect_positive + incorrect_negative
     print(f"{correct_positive=}")
     print(f"{correct_negative=}")
     print(f"{incorrect_positive=}")
     print(f"{incorrect_negative=}")
-    print("-"*30)
-    print(f"Sum: {correct_positive + correct_negative + incorrect_positive + incorrect_negative}")
+    print("-" * 30)
+    print(f"Sum: {s}")
