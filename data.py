@@ -253,6 +253,9 @@ unicode_cleanup_map = {
     alif_maddah + fathatan + "$": fathatan + alif_maddah,
     # remove left to right marker
     "\u200e": "",
+    # replace alif wasl with alif because they are treated the same
+    # assumes alif wasl only appears at the beginning of a word
+    alif_wasl: alif,
 }
 unicode_cleanup_pattern = compile_map_pattern(unicode_cleanup_map)
 
