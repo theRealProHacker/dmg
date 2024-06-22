@@ -283,9 +283,11 @@ def gen_arab_pattern_match(word: str) -> Callable[[str], bool]:
     def match_pattern(word: str) -> bool:
         test_rasm, test_harakat = araby.separate(araby.strip_lastharaka(word))
         return test_rasm == rasm and all(
-            t and h != t for h, t in zip(harakat, test_harakat)
+            not t or h == t for h, t in zip(harakat, test_harakat)
         )
 
     return match_pattern
 
-min_pattern = gen_arab_pattern_match("مِنْ")
+
+hum_pattern = gen_arab_pattern_match("هُمْ")
+antum_pattern = gen_arab_pattern_match("أَنْتُمْ")

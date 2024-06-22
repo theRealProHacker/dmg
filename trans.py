@@ -130,12 +130,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 and data.half_vowel_is_long(arab, len(arab) - 1)
                 or arab[-1] in data.short_vowels
             )
-            if arab_tools.min_pattern(arab):
-                next_wasl = "a"
-            # elif
-
-            # else:
-            #     next_wasl = ""
+            next_wasl = "u" if arab_tools.hum_pattern(arab) or arab_tools.antum_pattern(arab) else ""
 
             if len(araby.strip_diacritics(arab)) <= 2:
                 continue
@@ -157,9 +152,11 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 elif not haraka:
                     if token.arab[0] == "ل":
                         haraka = "a"
+                    elif araby.separate(token.arab)[1][1] == data.damma:
+                        haraka = "u"
                     else:
                         haraka = "i"
-                    token.arab = haraka + token.arab
+                    token.arab = (next_wasl or haraka) + token.arab
 
         # idafah
         for token, next_token in zip(sentence, sentence[1:]):
