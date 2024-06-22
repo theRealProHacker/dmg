@@ -21,12 +21,13 @@ class Profile:
     ta_marbutah: bool = False
     diphthongs: bool = False
     double_vowels: bool = True
+    begin_hamza: bool = False
+    orth: bool = False
     # skip_i3rab: bool = False
     # """Whether i3rab (flexion endings) should be skipped"""
     # full_vocalisation: bool = False
     # """ Full vocalised transcription"""
     # TODO: imalah, ishmam
-    # TODO: alif maqsura to ya
     # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
     # TODO: alif maqsura mit Unterpunkt
     # IDEA: Capitalize beginning of each sentence
@@ -52,10 +53,22 @@ class Profile:
             "naum",
         ),
         "double_vowels": (
-            "Doppelte Halbvokale",
-            "Ob Halbvokale mit Shaddah als verdoppelte Konsonanten wiedergegeben werden sollen",
+            "Geminierte Halbvokale konsonantisch",
+            "Ob Halbvokale mit Shaddah als doppelte Konsonanten wiedergegeben werden sollen",
             "nīya",
             "niyya",
+        ),
+        "begin_hamza": (
+            "Anlautendes Hamza",
+            "Ob ein anlautendes Hamza wiedergegeben werden soll",
+            "amr",
+            "ʾamr",
+        ),
+        "orth": (
+            "Orthographie",
+            "Ob die Orthographie des Arabischen beachtet werden soll",
+            "anā",
+            "ana",
         ),
     }
 
@@ -64,9 +77,11 @@ class Profile:
 class Token:
     def __post_init__(self):
         self.latin_after = data.sub_after(self.after)
+        self.original = self.arab
 
     arab: str
     after: str = ""
+    original: str = ""
     lemma: str = ""
     pos: Pos = ""
     gram_case: Case = ""
@@ -76,7 +91,7 @@ class Token:
     is_end_of_sentence: bool = False
     is_idafah: bool = False
     is_name: bool = False
-    hamzatul_wasl_short_vowel: str = ""
+    # hamzatul_wasl_short_vowel: str = ""
 
     latin: str = ""
     latin_after: str = ""
@@ -96,15 +111,10 @@ class Token:
                 latin = self.latin.capitalize()
         return (
             (self.latin_prefix + "-" if self.prefix else "")
-            + self.hamzatul_wasl_short_vowel
+            # + self.hamzatul_wasl_short_vowel
             + latin
             + self.latin_after
         )
-
-    @property
-    def original(self) -> str:
-        # This is not true for a short amount of time after the prefix is set, but has not yet been deducted from arab
-        return self.prefix + self.arab + self.after
 
 
 Sentence = list[Token]
