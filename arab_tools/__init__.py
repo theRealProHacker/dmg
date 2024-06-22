@@ -16,6 +16,7 @@ The files in this module are licensed under the GPL-3.0 License.
 """
 
 from functools import cache
+import itertools
 from typing import Callable, Literal
 
 import asmai.semdictionary
@@ -273,17 +274,29 @@ def is_hamzatul_wasl(token: Token) -> bool:
     test_word = token.arab[1:]
     return False and test_word
 
+def separate(word: str) -> tuple[list[str], list[str]]:
+    """
+    Splits a word into the rasm and the harakat
+    """
+    rasm, harakat = araby.separate(word)
+    return list(rasm), ["" if h == araby.NOT_DEF_HARAKA else h for h in harakat]
+
+def join(rasm: list[str], harakat: list[str]) -> str:
+    """
+    Joins the rasm and the harakat into a word
+    """
+    return "".join(itertools.chain(*zip(rasm, harakat)))
 
 def gen_arab_pattern_match(word: str) -> Callable[[str], bool]:
     """
     Matches a pattern to a word excluding the flexion endings
     """
-    rasm, harakat = araby.separate(araby.strip_lastharaka(word))
+    rasm, harakat = separate(araby.strip_lastharaka(word))
 
     def match_pattern(word: str) -> bool:
-        test_rasm, test_harakat = araby.separate(araby.strip_lastharaka(word))
+        test_rasm, test_harakat = separate(araby.strip_lastharaka(word))
         return test_rasm == rasm and all(
-            not t or h == t for h, t in zip(harakat, test_harakat)
+            not t or not h or h == t for h, t in zip(harakat, test_harakat)
         )
 
     return match_pattern
