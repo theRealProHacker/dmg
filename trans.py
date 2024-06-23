@@ -1,16 +1,15 @@
 import re
-from collections import deque
+from contextlib import suppress
 
 from pyarabic import araby
 
 import arab_tools
 import data
 from data import (
-    preposition_prefixes,
     sentence_stop_marks,
     token_pattern,
 )
-from data_types import Case, Profile, Token
+from data_types import Profile, Token
 
 try:
     import ner
@@ -56,7 +55,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             current_sentence = []
     if current_sentence:
         sentences.append(current_sentence)
-    # sentence-level analysis
+    # NER
     names = (
         ner.find_names(
             [
@@ -74,62 +73,111 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
         # word analysis and stemming
         stemmed_words = [*arab_tools.check_sentence(sentence)]
         for token, stemming, is_name in zip(sentence, stemmed_words, is_name_data):
-            token.is_name, token.lemma, token.pos, prefix_guess, sm = is_name, *stemming
+            (
+                token.is_name,
+                token.lemma,
+                token.pos,
+                token.gram_case,
+                token.is_definite,
+                prefix_suggestion,
+                token.suffix,
+            ) = is_name, *stemming
             assert token.pos in ("noun", "verb", "stopword", "")
+
             # applying pausa
-            if token.is_pausa and token.pos == "noun":
+            if (
+                token.is_pausa
+                and token.pos == "noun"
+                and not token.gram_case == "a"
+                and not token.suffix
+            ):
                 token.arab = araby.strip_lastharaka(token.arab)
 
-            # prefixes
-            if arab_tools.araby.strip_diacritics(token.arab):
-                prefix = 0
-                for c in prefix_guess:
-                    prefix = token.arab.find(c, prefix) + 1
-                    if not prefix:
-                        break
-                if prefix * 2 > len(token.arab):
-                    prefix = 0
-                while prefix > 0 and token.arab[prefix] in araby.DIACRITICS:
-                    prefix += 1
-                    if prefix * 2 > len(token.arab):
-                        prefix = 0
-                if prefix > 0 and (
-                    latin_prefix := data.prefixes.get(token.arab[:prefix])
-                ):
-                    token.prefix = token.arab[:prefix]
-                    token.latin_prefix = latin_prefix
+            # getting the prefix
+            rasm, harakat = arab_tools.separate(token.arab)
+            sug_rasm, sug_harakat = arab_tools.separate(prefix_suggestion)
+            i = 0  # the index in the rasm
 
-            # cases
-            cases: dict[Case, int] = {
-                "n": len(sm["marfou3"]) + len(sm["tanwin_marfou3"]),
-                "a": len(sm["mansoub"]) + len(sm["tanwin_mansoub"]),
-                "g": len(sm["majrour"]) + len(sm["tanwin_majrour"]),
-                "j": len(sm["majzoum"]),
-            }
-            sorted_cases = sorted(cases, key=cases.get, reverse=True)
-            token.gram_case = (
-                ""
-                if cases[sorted_cases[0]] == cases[sorted_cases[1]]
-                else sorted_cases[0]
-            )
-            token.is_definite = len(sm["marfou3"]) + len(sm["mansoub"]) + len(
-                sm["majrour"]
-            ) > len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
-                sm["tanwin_majrour"]
-            )
+            def get_rasm(i: int) -> bool:
+                return sug_rasm[i] if sug_rasm[i] == rasm[i] else "___"
+
+            def check_haraka(i: int, haraka: str) -> bool:
+                return (not harakat[i] or harakat[i] == haraka) and (
+                    not sug_harakat[i] or sug_harakat[i] == haraka
+                )
+
+            with suppress(IndexError):
+                # wa- and fa- prefix
+                if (conjunction := get_rasm(i)) in "فو" and check_haraka(i, data.fatha):
+                    token.latin_prefix += ("w" if conjunction == "و" else "f") + "a-"
+                    i += 1
+                # sa- prefix
+                next_letter = get_rasm(i)
+                if next_letter == "س" and check_haraka(i, data.fatha):
+                    token.latin_prefix += "sa-"
+                    i += 1
+                # li-, bi-, ka- and then al- prefix
+                elif next_letter in "لباك":
+                    if next_letter in "لب" and (
+                        not harakat[i] or harakat[i] == data.kasra
+                    ):
+                        token.latin_prefix += (
+                            "l" if next_letter == "ل" else "b"
+                        ) + "i-"
+                        i += 1
+                        if (
+                            next_letter == "ل"
+                            and rasm[i] == "ل"
+                            and (not harakat[i] or harakat[i] == data.sukun)
+                        ):
+                            token.latin_prefix += "l-"
+                            i += 1
+                    elif next_letter == "ك" and (
+                        not harakat[i] or harakat[i] == data.fatha
+                    ):
+                        token.latin_prefix += "ka-"
+                        i += 1
+                if (
+                    get_rasm(i) == "ا"
+                    and check_haraka(i, "")
+                    and get_rasm(i + 1) == "ل"
+                    and check_haraka(i + 1, data.sukun)
+                ):
+                    token.latin_prefix += "al-" if not i else "l-"
+                    i += 2
+            token.prefix = arab_tools.join(rasm[:i], harakat[:i])
+            token.arab = arab_tools.join(rasm[i:], harakat[i:])
+
+            # special cases
+            if arab_tools.allah_pattern(token.arab):
+                token.arab = arab_tools.inject("ا", token.arab, 3)
+                token.is_name = not apply_hamzatul_wasl
+            elif arab_tools.lillah_pattern(token.arab):
+                token.prefix = "لِ"
+                token.latin_prefix = "li-"
+                token.arab = "للاهِ" if not token.is_pausa else "للاه"
+
+            if (
+                profile.hu_hi
+                and araby.strip_harakat(token.suffix) == "ه"
+                and (haraka := token.arab[-1]) in (data.damma, data.kasra)
+                and len(token.arab) >= 3
+                and rasm[-2] not in data.half_vowels
+            ):
+                token.arab += data.waw if haraka == data.damma else data.ya
 
             # hamzatul wasl
-            prev_ended_vowel = apply_hamzatul_wasl
-
             # applying hamzatul wasl for next token
             arab = token.arab
+            prev_ended_vowel = apply_hamzatul_wasl
+            prev_wasl = next_wasl
             apply_hamzatul_wasl = (
                 arab[-1] in (data.alif, data.alif_maksurah)
                 and (len(arab) == 1 or arab[-2] != data.fathatan)
                 or arab[-1] in data.half_vowels
                 and data.half_vowel_is_long(arab, len(arab) - 1)
                 or arab[-1] in data.short_vowels
-            )
+            )  # TODO: and no number between
             next_wasl = (
                 "u"
                 if arab_tools.hum_pattern(arab) or arab_tools.antum_pattern(arab)
@@ -140,11 +188,13 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 continue
 
             if token.prefix:
-                if prev_ended_vowel and token.latin_prefix == "al":
-                    token.latin_prefix = "l"
+                if prev_ended_vowel and token.latin_prefix == "al-":
+                    token.latin_prefix = "l-"
+                elif token.latin_prefix == "al-" and prev_wasl:
+                    token.latin_prefix = prev_wasl + "l-"
                 # every other prefix ends on a short vowel
-                prev_ended_vowel = not token.latin.endswith("l")
-            elif token.arab[0] in (
+                prev_ended_vowel = not token.latin_prefix.endswith("l-")
+            if token.arab[0] in (
                 data.alif,
                 data.alif_wasl,
             ):
@@ -154,36 +204,37 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                     if haraka:
                         token.arab = token.arab[1:]
                 elif not haraka:
-                    if token.arab[0] == "ل":
+                    if token.arab[0] == "ل":  # and not matches something else
                         haraka = "a"
                     elif araby.separate(token.arab)[1][1] == data.damma:
                         haraka = "u"
                     else:
                         haraka = "i"
-                    token.arab = (next_wasl or haraka) + token.arab
+                    token.arab = (prev_wasl or haraka) + token.arab
 
         # idafah
         for token, next_token in zip(sentence, sentence[1:]):
             token.is_idafah = (
                 token.pos == "noun"
                 # sun letter assimilation not executed yet
-                and not token.latin_prefix.endswith("l")
+                and not token.latin_prefix.endswith("l-")
                 and token.is_definite
+                and not token.suffix
+                and token.after.isspace()  # there can't be anything else (like numbers, etc.) between
                 and next_token.is_genetive
-                and next_token.prefix not in preposition_prefixes
+                and next_token.latin_prefix in ("al-", "l-", "")
             )
 
     # transliteration
     for token in tokens:
-        word = token.arab[len(token.prefix) :]
+        word = token.arab
         # char mapping
         char_map = (
             data.subs
-            | data.special_char_map
             | data.vowel_map
             | (
                 {
-                    f"(?<=[āūī])ة$": "h",
+                    "(?<=[āūī])ة$": "h",
                     "ة$": ("h" if profile.ta_marbutah else ""),
                 }
                 if not token.is_idafah
@@ -196,6 +247,8 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             char_map |= data.diphthong_map
         if not profile.double_vowels:
             char_map |= data.double_vowels_map
+        if profile.nisba:
+            char_map |= data.nisba_map
         # if token.is_pausa:
         #     char_map = data.pausa_map | char_map | data.pausa_map
         rules = [(re.compile(arab), latin) for arab, latin in char_map.items()]
@@ -207,16 +260,17 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 cont = cont or n
                 # if n:
                 #     print(word, pattern, replace)
-        token.latin = word
         # sun letter assimilation
+        prefix = token.latin_prefix
         if (
-            token.latin_prefix
-            and token.latin_prefix[-1] == "l"
-            and (first_letter := token.latin[0]) in data.sun_letters
+            prefix
+            and prefix[-2] == "l"
+            and (first_letter := word[0]) in data.sun_letters
         ):
-            token.latin_prefix = token.latin_prefix[:-1] + first_letter
-            if len(token.latin) >= 2 and token.latin[1] == first_letter:
-                token.latin = token.latin[1:]
+            token.latin_prefix = prefix[:-2] + first_letter + "-"
+            if len(word) >= 2 and word[1] == first_letter:
+                word = word[1:]
+        token.latin = word
 
     return beginning_non_token + "".join(token.result for token in tokens)
 
@@ -224,5 +278,5 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
 if __name__ == "__main__":
     text = "يَكْتُبُ الكَلْبُ"
     text = "هذا الكتابُ الجديدُ الطالبِ. هو يقرأ الكتابَ الجديدَ."
-    # text = "هَذَا الكِتَابُ الْجَدِيدُ الطَالِبِ۔ هُوَ يَقْرَأُ الْكِتَابَ الْجَدِيدَ۔"
+    text = "هَذَا الكِتَابُ الْجَدِيدُ الطَالِبِ۔ هُوَ يَقْرَأُ الْكِتَابَ الْجَدِيدَ۔"
     print(transliterate(text))

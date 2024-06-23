@@ -10,6 +10,8 @@ from contextlib import contextmanager
 
 from pyarabic import araby
 
+from data_types import Case
+
 
 def read(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -30,7 +32,14 @@ def readWrite(path):
         write(path, data)
 
 
-known_names: set[str] = {*read("data/ner.json"), "محمد", "القاهرة"}
+known_names: set[str] = {
+    *read("data/ner.json"),
+    "محمد",
+    "القاهرة",
+    # ibrahim 2x
+    "إبرهيم",
+    "إبراهيم",
+}
 
 
 freq_dict = {}
@@ -249,8 +258,8 @@ unicode_cleanup_map = {
     # put shaddah before harakah always
     **{harakah + shaddah: shaddah + harakah for harakah in harakat_wo_shaddah},
     # put fathatan before alif always (to protect it from pausa)
-    alif + fathatan + "$": fathatan + alif,
-    alif_maddah + fathatan + "$": fathatan + alif_maddah,
+    alif + fathatan: fathatan + alif,
+    alif_maddah + fathatan: fathatan + alif_maddah,
     # remove left to right marker
     "\u200e": "",
     # replace alif wasl with alif because they are treated the same
@@ -302,6 +311,7 @@ vowel_map = {
     alif_maddah: hamza + alif,
     alif_maksurah: alif,
     # harakat + long vowel
+    fathatan + alif + "$": "an",
     fatha + alif: "ā",
     damma + waw: "ū",
     kasra + ya: "ī",
@@ -316,8 +326,9 @@ vowel_map = {
     fathatan: "an",
     dammatan: "un",
     kasratan: "in",
-    fathatan + alif + "$": "an",
     sukun: "",
+    # ...
+    "ūā$": "ū",
 }
 
 
@@ -338,6 +349,7 @@ def half_vowel_is_long(word: str, i: int):
                 and (short_vowel != damma or word[i] != waw)
             ):
                 return False
+    return True
 
 
 # if diphthongs
@@ -355,6 +367,14 @@ double_vowels_map = {
     # uww -> ūw
     "uww": "ūw",
     "iyy": "īy",
+}
+
+# if nisba
+nisba_map = {
+    "uww$": "ū",
+    "ūw$": "ū",
+    "iyy$": "ī",
+    "īy$": "ī",
 }
 
 # if not begin_hamza
@@ -404,8 +424,6 @@ number_map = {
 number_map_pattern = compile_single_char_map_pattern(number_map)
 number_token_pattern = re.compile(f"[{''.join(number_map)}]+")
 
-special_char_map = {"ﷲ": "allah"}
-
 # Not currently necessary
 # pausa_map = {
 #     "[" + fatha + damma + kasra + fathatan + dammatan + kasratan + shaddah + "]$": "",
@@ -421,82 +439,6 @@ sun_letters = set("tṯdḏrzsšṣḍṭẓn")
 # Pattern to match an arabic word
 token_pattern = re.compile(f"[\u0621-\u0655{alif_wasl}]+")
 
-UNVOCALIZED_PREFIXES = False
-
-conjunction_prefixes = {
-    "فَ": "fa",
-    "وَ": "wa",
-}
-unvocalized_conjunction_prefixes = {
-    "ف": "fa",
-    "و": "wa",
-}
-
-preposition_prefixes = {
-    "بِ": "bi",
-    "كَ": "ka",
-    "لِ": "li",
-}
-unvocalized_preposition_prefixes = {
-    "ب": "bi",
-    "ك": "ka",
-    "ل": "li",
-}
-
-future_prefixes = {
-    "سَ": "sa",
-}
-
-todo_prefixes = {
-    "ت": "ta",
-    "تَ": "ta",
-    # "": "la",
-    # "": "a"
-}
-
-article_prefixes = {
-    "ال": "al",
-    "الْ": "al",
-    "أَل": "al",
-    "أَلْ": "al",
-}
-
-# bil, lil
-preposition_article_prefixes = {
-    pre_a + art: pre_l + "l"
-    for pre_a, pre_l in preposition_prefixes.items()
-    for art in article_prefixes
-} | {"لِل": "lil"}
-
-if UNVOCALIZED_PREFIXES:
-    conjunction_prefixes.update(unvocalized_conjunction_prefixes)
-    preposition_prefixes.update(unvocalized_preposition_prefixes)
-    preposition_article_prefixes["لل"] = "lil"
-    future_prefixes["س"] = "sa"
-
-
-# fal, wal
-conjunction_article_prefixes = {
-    con1 + art1: con2 + "l"
-    for con1, con2 in conjunction_prefixes.items()
-    for art1 in article_prefixes
-}
-prefixes = (
-    conjunction_prefixes
-    | preposition_prefixes
-    | article_prefixes
-    | future_prefixes
-    | preposition_article_prefixes
-    | conjunction_article_prefixes
-)
-
-unvocalized_prefix_pattern = f"({waw}|ف{fatha}?)?\
-(?=(سَ?)|\
-(?=(\
-(?=لِ)?|\
-(?=بِ)?|\
-(?=ك)?)\
-({alif}{fatha}?ل{sukun}?)))?"
 
 sentence_stop_marks = ".!?\n"
 after_map = {
@@ -559,13 +501,14 @@ unvocalized_verb_stems_7_to_10 = [
     for p in unvocalized_verb_stems_7_to_10_verbs | unvocalized_verb_stems_7_to_10_nouns
 ]
 
-case_mapping = {
-    fatha: "marfou3",
-    damma: "mansoub",
-    kasra: "majrour",
-    fathatan: "tanwin_marfou3",
-    dammatan: "tanwin_mansoub",
-    kasratan: "tanwin_majrour",
+# case + definiteness
+case_mapping: dict[str, tuple[Case, bool]] = {
+    fatha: ("a", True),
+    damma: ("n", True),
+    kasra: ("g", True),
+    fathatan: ("a", False),
+    dammatan: ("n", False),
+    kasratan: ("g", False),
 }
 
 special_words = {
@@ -581,15 +524,6 @@ special_words = {
     "هم",
     "هن",
     "نحن",
-    # names
-    "محمد",
-    "علي",
-    "عمر",
-    "عبدالله",
-    "عبدالرحمن",
-    # ibrahim 2x
-    "إبرهيم",
-    "إبراهيم",
     # allah
     "الله",
     # rahman

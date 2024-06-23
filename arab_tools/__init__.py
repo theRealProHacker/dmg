@@ -17,7 +17,7 @@ The files in this module are licensed under the GPL-3.0 License.
 
 from functools import cache
 import itertools
-from typing import Callable, Literal
+from typing import Callable, Generator, Literal
 
 import asmai.semdictionary
 import naftawayh.wordtag
@@ -33,7 +33,7 @@ from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
 
 import data
-from data_types import Sentence, Token
+from data_types import Case, Pos, Sentence, Token
 
 from .nounstemmer import stem_noun
 
@@ -213,7 +213,7 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     return [StemmedWord(w) for w in result]
 
 
-def check_sentence(sentence: Sentence):
+def check_sentence(sentence: Sentence)->Generator[tuple[str, Pos, Case, bool, str, str], None, None]:
     """
     Analyzes Arabic tokens
 
@@ -230,62 +230,93 @@ def check_sentence(sentence: Sentence):
 
     for token, tag in zip(sentence, guessed_tags):
         preliminary_result = check_word(token.arab, tag)
-
-        def return_result(result):
-            node = stemnode.StemNode(result, True)
-            # print(token.arab, node.get_affix().split("-"))
-            return (
-                *node.get_lemma(return_pos=True),
-                node.get_affix().split("-")[0],
-                node.syntax_mark,
-            )
-
+        # lemma, pos, case, is_definite, prefix, suffix
         if not preliminary_result:
             print(token.arab, "not found")
-            # lemma, pos, prefix, sm
-            cases = {
-                "marfou3": [],
-                "mansoub": [],
-                "majrour": [],
-                "majzoum": [],
-                "tanwin_marfou3": [],
-                "tanwin_mansoub": [],
-                "tanwin_majrour": [],
-            }
-            if case := data.case_mapping.get(token.arab[-1]):
-                cases[case].append(0)
             yield (
                 araby.strip_diacritics(token.arab),
                 "noun",
+                *data.case_mapping.get(token.arab[-1], ("n", True)),
                 "",
-                cases,
+                ""
             )
-            continue
-        yield return_result(preliminary_result)
+        else:
+            result = preliminary_result
+            node = stemnode.StemNode(result, True)
+            sm = node.syntax_mark
+            cases: dict[Case, int] = {
+                "n": len(sm["marfou3"]) + len(sm["tanwin_marfou3"]),
+                "a": len(sm["mansoub"]) + len(sm["tanwin_mansoub"]),
+                "g": len(sm["majrour"]) + len(sm["tanwin_majrour"]),
+                "j": len(sm["majzoum"]),
+            }
+            sorted_cases = sorted(cases, key=cases.get, reverse=True)
+            print(cases, sorted_cases)
+            gram_case = (
+                ""
+                if cases[sorted_cases[0]] == cases[sorted_cases[1]]
+                else sorted_cases[0]
+            )
+            is_definite = len(sm["marfou3"]) + len(sm["mansoub"]) + len(
+                sm["majrour"]
+            ) > len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
+                sm["tanwin_majrour"]
+            )
+            # print(node.get_affix())
+            # print((
+            #     *node.get_lemma(return_pos=True),
+            #     gram_case,
+            #     is_definite,
+            #     *node.get_affix().split("-")[::3],
+            # ))
+
+            yield (
+                *node.get_lemma(return_pos=True),
+                gram_case,
+                is_definite,
+                *node.get_affix().split("-")[::3],
+            )
 
 
 def is_hamzatul_wasl(token: Token) -> bool:
     """
     Checks if a word starts with hamzatul wasl
 
-    Assumes the word starts with a hamza
+    Assumes the word starts with an alif
     """
-    assert token.arab[0] == data.hamza or token.arab[0] == data.alif
+    assert token.arab[0] == data.alif
     test_word = token.arab[1:]
-    return False and test_word
+    raise NotImplementedError
 
 def separate(word: str) -> tuple[list[str], list[str]]:
     """
     Splits a word into the rasm and the harakat
     """
-    rasm, harakat = araby.separate(word)
-    return list(rasm), ["" if h == araby.NOT_DEF_HARAKA else h for h in harakat]
+    pos = -1
+    rasm = []
+    harakat = []
+    for c in word:
+        if c in data.harakat:
+            harakat[pos] += c
+        else:
+            pos += 1
+            rasm.append(c)
+            harakat.append("")
+    return rasm, harakat
 
 def join(rasm: list[str], harakat: list[str]) -> str:
     """
     Joins the rasm and the harakat into a word
     """
     return "".join(itertools.chain(*zip(rasm, harakat)))
+
+def inject(injection: str, word: str, pos: int):
+    """
+    Inject a string into a word at a specific (rasm) position
+    """
+    _, harakat = separate(word)
+    actual_pos = pos + sum(len(r) for r in harakat[:pos])
+    return word[:actual_pos] + injection + word[actual_pos:]
 
 def gen_arab_pattern_match(word: str) -> Callable[[str], bool]:
     """
@@ -304,3 +335,6 @@ def gen_arab_pattern_match(word: str) -> Callable[[str], bool]:
 
 hum_pattern = gen_arab_pattern_match("هُمْ")
 antum_pattern = gen_arab_pattern_match("أَنْتُمْ")
+
+allah_pattern = gen_arab_pattern_match("الله")
+lillah_pattern = gen_arab_pattern_match("لله")

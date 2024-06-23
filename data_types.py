@@ -22,6 +22,8 @@ class Profile:
     diphthongs: bool = False
     double_vowels: bool = True
     begin_hamza: bool = False
+    hu_hi: bool = True
+    nisba: bool = True
     orth: bool = False
 
     # skip_i3rab: bool = False
@@ -65,6 +67,18 @@ class Profile:
             "amr",
             "ʾamr",
         ),
+        "hu_hi": (
+            "-hu und -hi",
+            "Ob die Pronomen -hu und -hi ihrer Aussprache entsprechend wiedergegeben werden sollen",
+            "baituhu, abūhu",
+            "baituhū, abūhu",
+        ),
+        "nisba": (
+            "Nisba",
+            "Ob die Nisba als langes ī wiedergegeben werden soll",
+            "nabiyy o. nabīy",
+            "nabī",
+        ),
         "orth": (
             "Orthographie",
             "Ob die Orthographie des Arabischen beachtet werden soll",
@@ -88,6 +102,7 @@ class Token:
     gram_case: Case = ""
     is_definite: bool = False
     prefix: str = ""
+    suffix: str = ""
     is_pausa: bool = False
     is_end_of_sentence: bool = False
     is_idafah: bool = False

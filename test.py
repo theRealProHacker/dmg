@@ -1,13 +1,32 @@
+import arab_tools
 import data
 from trans import Profile, ner_available, transliterate
-
 
 profile_pausa = Profile(pausa=True)
 
 
-def test_tokenization():
-    ...
-    # TODO: find difficult edge cases
+def test_separate_join():
+    assert arab_tools.separate("مَدِينَة") == (
+        ["م", "د", "ي", "ن", "ة"],
+        [data.fatha, data.kasra, "", data.fatha, ""],
+    )
+    assert (
+        arab_tools.join(
+            ["م", "د", "ي", "ن", "ة"], [data.fatha, data.kasra, "", data.fatha, ""]
+        )
+        == "مَدِينَة"
+    )
+    # muhammad
+    muhammad = "مُحَمَّد"
+    assert muhammad == arab_tools.join(
+        *arab_tools.separate(muhammad)
+    ), arab_tools.separate(muhammad)
+    assert arab_tools.inject("ا", "الله", 3) == "اللاه"
+
+
+# def test_tokenization():
+#     ...
+#     # TODO: find difficult edge cases
 
 
 def test_transliteration_robustness():
@@ -19,7 +38,6 @@ def test_transliteration_robustness():
     assert transliterate("أَ") in ("ʾ", "a")
     assert transliterate("آ") == "ā"
     assert transliterate("ذَهَبَ إِ") in ("ḏahaba ʾ", "ḏahaba i")
-    assert transliterate("اسْتِشْرَاق") == "istišrāq"
 
 
 def test_half_vowels():
@@ -31,11 +49,13 @@ def test_half_vowels():
 
 
 def test_prefixes():
-    ...
+    # sa
+    # assert transliterate("سَأَكون")
     # lil
-    # assert transliterate("للامتحان") == "lil-imtiḥān"
+    assert transliterate("للامتِحان") == "li-l-imtiḥān"
     # ka
-    # assert transliterate("كَتَبَ كَمُعَلِّم") == "kataba ka-muʿallim"
+    assert transliterate("كَتَبَ كَمُعَلِّم") == "kataba ka-muʿallim"
+    assert transliterate("كاليوم")
     # bil
 
 
@@ -76,10 +96,10 @@ def test_ta_marbutah():
     profile_pausa_tm = Profile(pausa=True, ta_marbutah=True)
     assert transliterate("المَدِينَة") == "al-madīna"
     assert transliterate("المَدِينَة", profile_tm) == "al-madīnah"
-    # assert (
-    #     transliterate("الشَجَرَةُ في الحَديقَةِ كَبيرَةٌ")
-    #     == "aš-šaǧaratu fī l-ḥadīqati kabīratun"
-    # )
+    assert (
+        transliterate("الشَجَرَةُ في الحَديقَةِ كَبيرَةٌ")
+        == "aš-šaǧaratu fī l-ḥadīqati kabīratun"
+    )
     if ner_available:
         assert transliterate("مَدِينَةُ القَاهِرَةِ") == "madīnatu l-Qāhirati"
         assert transliterate("مَدِينَةُ القَاهِرَةِ", profile_pausa) == "madīnat al-Qāhira"
@@ -119,7 +139,10 @@ def test_hamzatul_wasl():
     assert transliterate("اِنْكَسَرَ") == "inkasara"
     assert transliterate("انْكَسَرَ") == "inkasara"
     assert transliterate("ٱِنْكَسَرَ") == "inkasara"
+    assert transliterate("اسْتِشْرَاق") == "istišrāq"
     assert transliterate("فَانتَقَلَ") == "fa-ntaqala"
+    assert transliterate("اخرُج") == "uḫruǧ"
+    assert transliterate("هُم الكُتّاب") == "hum ul-kuttāb"
     # this looks like it ends in a vowel, but it doesn't
     assert transliterate("الشَّاشَةُ اِنْكَسَرَتْ", profile_pausa) == "aš-šāša inkasarat"
     assert transliterate("هَذَا احْتِمَالٌ عَظِيمٌ", profile_pausa) == "haḏā ḥtimāl ʿaẓīm"
@@ -149,18 +172,37 @@ def test_pronouns_and_prepositions():
 
 
 def test_endings():
-    # shukran
-    assert transliterate("", profile_pausa) == ""
-    # nisba
+    # shukran und taqriban
+    assert transliterate("شُكْرًا", profile_pausa) == "šukran"
+    assert transliterate("تَقْرِيباً", profile_pausa) == "taqrīban"
 
+    # nisba
+    # nabiyy
+    assert transliterate("نَبِيٌّ", profile_pausa) == "nabī"
+    assert transliterate("نَبِيٌّ", Profile(pausa=True, double_vowels=False)) == "nabī"
+    assert transliterate("نَبِيٌّ", Profile(pausa=True, nisba=False)) == "nabiyy"
+    assert (
+        transliterate("نَبِيٌّ", Profile(pausa=True, nisba=False, double_vowels=False))
+        == "nabīy"
+    )
     # waw + alif -> waw
+
+
+def test_hu_hi():
+    # abuhu
+    assert transliterate("لِأَبُوهُ") == "li-abūhu"
+    assert transliterate("لِأَبُوهُ", Profile(hu_hi=False)) == "li-abūhu"
+    # baytuhu
+    assert transliterate("بَيْتُهُ") == "baytuhū"
+    assert transliterate("بَيْتُهُ", Profile(hu_hi=False)) == "baytuhu"
 
 
 def test_special_words():
     # Allah
     assert transliterate("ﷲ") == "Allāh"  # ligature
     assert transliterate("الله") == "Allāh"
-    assert transliterate("لله") == "li-llāh"
+    assert transliterate("لله", profile_pausa) == "li-llāh"
+    assert transliterate("عَبد الله")
 
 
 if ner_available:
