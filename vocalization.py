@@ -7,6 +7,7 @@ Module for vocalization of Arabic text
 
 # import json
 
+from contextlib import suppress
 import mishkal.tashkeel
 
 # import requests
@@ -36,18 +37,17 @@ def vocalize(text: str) -> str:
 def vocalize(text: str) -> str:
     from gradio_client import Client
 
-    client = Client(
-        "https://testingdoang-shakkala-arabic-tashkeel.hf.space/--replicas/1eim7/"
-    )
+    client = Client("https://testingdoang-shakkala-arabic-tashkeel.hf.space/")
     return client.predict(text, api_name="/predict")
 
 
 # fix asmai from here
 
-import asmai.semdictionary  # noqa
+with suppress(ImportError):
+    import asmai.semdictionary  # noqa
 
-asmai.semdictionary.SemanticDictionary.lookup_rule = (
-    lambda self, primate_word, second_word: data.sem_relations.get(
-        (primate_word, second_word), False
+    asmai.semdictionary.SemanticDictionary.lookup_rule = (
+        lambda self, primate_word, second_word: data.sem_relations.get(
+            (primate_word, second_word), False
+        )
     )
-)
