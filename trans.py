@@ -184,7 +184,9 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 token.arab = "أَنَ"
             elif allah_pattern(token.arab):
                 token.arab = arab_tools.inject("ا", token.arab, 3)
-                token.is_name = not apply_hamzatul_wasl and not token.prefix and not next_wasl
+                token.is_name = (
+                    not apply_hamzatul_wasl and not token.prefix and not next_wasl
+                )
             elif lillah_pattern(token.arab):
                 token.prefix = "لِ"
                 token.latin_prefix = "li-"
