@@ -4,6 +4,7 @@ naftawayh
 qalsadi
 
 # vocalization
+asmai
 mishkal
 gradio_client
 
