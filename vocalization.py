@@ -12,6 +12,7 @@ import mishkal.tashkeel
 
 # import requests
 import data
+from arab_tools import separate, join
 
 vocalizer = mishkal.tashkeel.TashkeelClass("")
 
@@ -34,11 +35,27 @@ def vocalize(text: str) -> str:
 #     return json.loads(response.text)["text"]
 
 
+def _find_haraka(word: str):
+    for c in word:
+        if c in data.harakat_wo_shaddah:
+            return c
+    return ""
+
+
 def vocalize(text: str) -> str:
     from gradio_client import Client
 
     client = Client("https://testingdoang-shakkala-arabic-tashkeel.hf.space/")
-    return client.predict(text, api_name="/predict")
+    new_text = client.predict(text, api_name="/predict")
+    rasm, old = separate(text)
+    _, new = separate(new_text)
+    # assert rasm == _
+    s = data.shaddah
+    joint_harakat = [
+        (s if s in o or s in n else "") + (_find_haraka(o) or _find_haraka(n))
+        for o, n in zip(old, new)
+    ]
+    return join(rasm, joint_harakat)
 
 
 # fix asmai from here
