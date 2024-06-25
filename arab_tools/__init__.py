@@ -15,7 +15,6 @@ The files in this module are licensed under the GPL-3.0 License.
 
 """
 
-from contextlib import contextmanager
 from functools import cache
 import itertools
 from typing import Callable, Generator, Literal
@@ -30,6 +29,7 @@ import qalsadi.stem_verb
 import qalsadi.stopwords
 from pyarabic import araby
 from qalsadi import stemnode
+from qalsadi import stem_stopwords_const as ssconst
 from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
 
@@ -121,7 +121,137 @@ class UnknownStemmer(qalsadi.stem_unknown.UnknownStemmer):
         return result
 
 
-class StopWordStemmer(qalsadi.stem_stop.StopWordStemmer): ...
+class StopWordStemmer(qalsadi.stem_stop.StopWordStemmer):
+    def steming_second_level(self, stop, stop2, procletic, encletic_nm):
+        """
+        Analyze word morphologically by stemming the conjugation affixes.
+        @param stop: the input stop.
+        @type stop: unicode.
+        @param stop2: the stop stemed from syntaxic affixes.
+        @type stop2: unicode.
+        @param procletic: the syntaxic prefixe extracted in the fisrt stage.
+        @type procletic: unicode.
+        @param encletic_nm: the syntaxic suffixe extracted in the
+        first stage (not vocalized).
+        @type encletic_nm: unicode.
+        @return: list of dictionaries of analyzed words with tags.
+        @rtype: list.
+        """
+        detailed_result = []
+        #segment the coinjugated verb
+        list_seg_conj = self.conj_stemmer.segment(stop2)
+        # verify affix compatibility
+        list_seg_conj = self.verify_affix(stop2, list_seg_conj,
+                                     ssconst.STOPWORDS_CONJUGATION_AFFIX)
+        # add vocalized forms of suffixes
+        # and create the real affixes from the word
+        #~list_seg_conj_voc = []
+        for seg_conj in list_seg_conj:
+            stem_conj = stop2[seg_conj[0]:seg_conj[1]]
+            suffix_conj_nm = stop2[seg_conj[1]:]
+
+            # noirmalize hamza before gessing  differents origines
+            #~stem_conj = araby.normalize_hamza(stem_conj)
+
+            # generate possible stems
+            # add stripped letters to the stem to constitute possible stop list
+            possible_stop_list = self.get_stem_variants(stem_conj, suffix_conj_nm)
+
+            # search the stop in the dictionary
+            # we can return the tashkeel
+            infstop_form_list = []
+            for infstop in set(possible_stop_list):
+                # get the stop and get all its forms from the dict
+                # if the stop has plural suffix, don't look up in
+                #broken plural dictionary
+                if infstop not in self.cache_dict_search:
+                    infstop_foundlist = data.stopword_dict.get(infstop, [])
+                    # _infstop_foundlist = list(map(dict, self.stop_dictionary.lookup(infstop)))
+                    # for x in _infstop_foundlist:
+                    #     x.pop("ID")
+                    # assert _infstop_foundlist == infstop_foundlist, (
+                    #     infstop, _infstop_foundlist, infstop_foundlist
+                    # )
+                    self.cache_dict_search[infstop] = self.create_dict_word(
+                        infstop_foundlist)
+                else:
+                    infstop_foundlist = self.cache_dict_search[infstop]
+                infstop_form_list.extend(infstop_foundlist)
+            for stop_tuple in infstop_form_list:
+                # stop_tuple = self.stop_dictionary.getEntryById(id)
+                original = stop_tuple['vocalized']
+
+                #test if the  given word from dictionary accept those
+                # tags given by affixes
+                # دراسة توافق الزوائد مع خصائص الاسم،
+                # مثلا هل يقبل الاسم التأنيث.
+                #~if validate_tags(stop_tuple, affix_tags, procletic, encletic_nm, suffix_conj_nm):
+                for vocalized_encletic in ssconst.COMP_SUFFIX_LIST_TAGS[
+                        encletic_nm]['vocalized']:
+                    for vocalized_suffix in ssconst.CONJ_SUFFIX_LIST_TAGS[
+                            suffix_conj_nm]['vocalized']:
+                        # affixes tags contains prefixes and suffixes tags
+                        affix_tags = ssconst.COMP_PREFIX_LIST_TAGS[procletic]['tags'] \
+                                  +ssconst.COMP_SUFFIX_LIST_TAGS[vocalized_encletic]['tags'] \
+                                  +ssconst.CONJ_SUFFIX_LIST_TAGS[vocalized_suffix]['tags']
+                        ## verify compatibility between procletics and affix
+                        valid = self.validate_tags(stop_tuple, affix_tags, procletic, encletic_nm)
+                        compatible = self.is_compatible_proaffix_affix(
+                            stop_tuple, procletic, vocalized_encletic,
+                            vocalized_suffix)
+                        if valid and compatible:
+                            vocalized_list = self.vocalize(
+                                original, procletic, vocalized_suffix,
+                                vocalized_encletic)
+                            vocalized, semi_vocalized =   vocalized_list[0][0],  vocalized_list[0][1]                              
+                            vocalized = self.ajust_vocalization(vocalized)
+                            #ToDo:
+                            # if the stop word is inflected or not
+                            is_inflected = u"مبني" if stop_tuple[
+                                'is_inflected'] == 0 else u"معرب"
+                            #add some tags from dictionary entry as
+                            # use action and object_type
+                            original_tags = u":".join([
+                                stop_tuple['word_type'],
+                                stop_tuple['word_class'],
+                                is_inflected,
+                                stop_tuple['action'],
+                            ])
+                            #~print "STOP_TUPEL[action]:", stop_tuple['action'].encode("utf8")
+                            # generate word case
+                            detailed_result.append(
+                                WordCase({
+                                    'word':
+                                    stop,
+                                    'affix': (procletic, '', vocalized_suffix,
+                                              vocalized_encletic),
+                                    'stem':
+                                    stem_conj,
+                                    'original':
+                                    original,
+                                    'vocalized':
+                                    vocalized,
+                                    'semivocalized':
+                                    semi_vocalized,                                     
+                                    'tags':
+                                    u':'.join(affix_tags),
+                                    'type':
+                                    u':'.join(
+                                        ['STOPWORD', stop_tuple['word_type']]),
+                                    'freq':
+                                    'freqstopword',  # to note the frequency type
+                                    'originaltags':
+                                    original_tags,
+                                    "action":
+                                    stop_tuple['action'],
+                                    "object_type":
+                                    stop_tuple['object_type'],
+                                    "need":
+                                    stop_tuple['need'],
+                                    'syntax':
+                                    '',
+                                }))
+        return detailed_result
 
 
 class SemanticDictionary(asmai.semdictionary.SemanticDictionary):

@@ -70,6 +70,11 @@ for entry in read("./data/verbs.json"):
 #     stopword_dict[(entry["vocalized"], entry["word_type"])] = entry
 #     stopword_dict[(entry["unvocalized"], entry["word_type"])] = entry
 
+stopword_dict: dict[str, list] = defaultdict(list)
+
+for entry in read("./data/cstopwords.json"):
+    stopword_dict[entry["WORD"]].append(entry)
+
 sem_derivations: dict[str, tuple[str, str]] = {}
 
 for entry in read("./data/semantic_derivations.json"):

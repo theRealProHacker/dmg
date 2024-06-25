@@ -46,6 +46,15 @@ def stopwords():
     )
 
 
+def cstopwords():
+    sqlite2json(
+        venv_path + r"\Lib\site-packages\arramooz\data\stopwords.sqlite",
+        "classedstopwords",
+        "./data/cstopwords.json",
+        id="ID",
+    )
+
+
 def q_nouns():
     sqlite2json(
         venv_path + r"\Lib\site-packages\qalsadi\data\custom_dictionary.sqlite",
@@ -87,6 +96,8 @@ if __name__ == "__main__":
             verbs()
         case ["ar", "stopwords"]:
             stopwords()
+        case ["ar", "cstopwords"]:
+            cstopwords()
         case ["qalsadi", "nouns"]:
             q_nouns()
         case ["asmai", "derivations"]:
