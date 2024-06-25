@@ -15,6 +15,7 @@ The files in this module are licensed under the GPL-3.0 License.
 
 """
 
+from contextlib import contextmanager
 from functools import cache
 import itertools
 from typing import Callable, Generator, Literal
@@ -213,7 +214,7 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     return [StemmedWord(w) for w in result]
 
 
-def check_sentence(sentence: Sentence)->Generator[tuple[str, Pos, Case, bool, str, str], None, None]:
+def check_sentence(sentence: Sentence)->Generator[tuple[str, Pos, Case, bool, str, str, str], None, None]:
     """
     Analyzes Arabic tokens
 
@@ -230,13 +231,14 @@ def check_sentence(sentence: Sentence)->Generator[tuple[str, Pos, Case, bool, st
 
     for token, tag in zip(sentence, guessed_tags):
         preliminary_result = check_word(token.arab, tag)
-        # lemma, pos, case, is_definite, prefix, suffix
+        # lemma, pos, case, is_definite, prefix, verb ending, suffix
         if not preliminary_result:
             print(token.arab, "not found")
             yield (
                 araby.strip_diacritics(token.arab),
                 "noun",
                 *data.case_mapping.get(token.arab[-1], ("n", True)),
+                "",
                 "",
                 ""
             )
@@ -251,30 +253,32 @@ def check_sentence(sentence: Sentence)->Generator[tuple[str, Pos, Case, bool, st
                 "j": len(sm["majzoum"]),
             }
             sorted_cases = sorted(cases, key=cases.get, reverse=True)
-            print(cases, sorted_cases)
             gram_case = (
                 ""
                 if cases[sorted_cases[0]] == cases[sorted_cases[1]]
                 else sorted_cases[0]
             )
+            # give preference
             is_definite = len(sm["marfou3"]) + len(sm["mansoub"]) + len(
                 sm["majrour"]
-            ) > len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
+            ) >= len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
                 sm["tanwin_majrour"]
             )
-            # print(node.get_affix())
-            # print((
-            #     *node.get_lemma(return_pos=True),
-            #     gram_case,
-            #     is_definite,
-            #     *node.get_affix().split("-")[::3],
-            # ))
-
+            affix = node.get_affix().split("-")
+            print(affix)
+            print((
+                *node.get_lemma(return_pos=True),
+                gram_case,
+                is_definite,
+                affix[0],
+                *affix[2:4]
+            ))
             yield (
                 *node.get_lemma(return_pos=True),
                 gram_case,
                 is_definite,
-                *node.get_affix().split("-")[::3],
+                affix[0],
+                *affix[2:4]
             )
 
 
@@ -297,6 +301,10 @@ def separate(word: str) -> tuple[list[str], list[str]]:
     harakat = []
     for c in word:
         if c in data.harakat:
+            if not rasm:
+                rasm.append("")
+                harakat.append("")
+                pos += 1
             harakat[pos] += c
         else:
             pos += 1
@@ -318,23 +326,21 @@ def inject(injection: str, word: str, pos: int):
     actual_pos = pos + sum(len(r) for r in harakat[:pos])
     return word[:actual_pos] + injection + word[actual_pos:]
 
+def remove_rasm(word: str, pos: int):
+    rasm, harakat = separate(word)
+    return join(rasm[:pos]+rasm[pos+1:], harakat[:pos]+harakat[pos+1:])
+
+
 def gen_arab_pattern_match(word: str) -> Callable[[str], bool]:
     """
-    Matches a pattern to a word excluding the flexion endings
+    Generates a pattern for a word
     """
-    rasm, harakat = separate(araby.strip_lastharaka(word))
+    rasm, harakat = separate(word)
 
     def match_pattern(word: str) -> bool:
-        test_rasm, test_harakat = separate(araby.strip_lastharaka(word))
+        test_rasm, test_harakat = separate(word)
         return test_rasm == rasm and all(
             not t or not h or h == t for h, t in zip(harakat, test_harakat)
         )
 
     return match_pattern
-
-
-hum_pattern = gen_arab_pattern_match("هُمْ")
-antum_pattern = gen_arab_pattern_match("أَنْتُمْ")
-
-allah_pattern = gen_arab_pattern_match("الله")
-lillah_pattern = gen_arab_pattern_match("لله")

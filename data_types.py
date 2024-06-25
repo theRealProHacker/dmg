@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal
 
-import data
-
 Pos = Literal["stopword", "noun", "verb", ""]
 
 Case = Literal["n", "g", "a", "j", ""]
@@ -14,6 +12,58 @@ For nouns: nominative,  genetive,       accusative,     no application, unknown
 For verbs: indicative,  no application, subjunctive,    jussive,        unknown
 """
 
+profile_descriptions = {
+    # id, title, description, off, on
+    "pausa": (
+        "Pausa",
+        "Ob der Text in Pausa gelesen werden soll",
+        "al-kalbu",
+        "al-kalb",
+    ),
+    "ta_marbutah": (
+        "Ta marbuta",
+        "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
+        "al-madina",
+        "al-madinah",
+    ),
+    "diphthongs": (
+        "Diphthonge",
+        "Ob Diphthonge wiedergegeben werden sollen",
+        "nawm",
+        "naum",
+    ),
+    "double_vowels": (
+        "Geminierte Halbvokale konsonantisch",
+        "Ob Halbvokale mit Shaddah als doppelte Konsonanten wiedergegeben werden sollen",
+        "nīya",
+        "niyya",
+    ),
+    "begin_hamza": (
+        "Anlautendes Hamza",
+        "Ob ein anlautendes Hamza wiedergegeben werden soll",
+        "amr",
+        "ʾamr",
+    ),
+    "hu_hi": (
+        "-hu und -hi",
+        "Ob die Pronomen -hu und -hi ihrer Aussprache entsprechend wiedergegeben werden sollen",
+        "baituhu, abūhu",
+        "baituhū, abūhu",
+    ),
+    "nisba": (
+        "Nisba",
+        "Ob die Nisba als langes ī wiedergegeben werden soll",
+        "nabiyy o. nabīy",
+        "nabī",
+    ),
+    # "orth": (
+    #     "Orthographie",
+    #     "Ob die Orthographie des Arabischen beachtet werden soll",
+    #     "anā",
+    #     "ana",
+    # ),
+}
+
 
 @dataclass
 class Profile:
@@ -24,73 +74,17 @@ class Profile:
     begin_hamza: bool = False
     hu_hi: bool = True
     nisba: bool = True
-    orth: bool = False
 
-    # skip_i3rab: bool = False
-    # """Whether i3rab (flexion endings) should be skipped"""
-    # full_vocalisation: bool = False
-    # """ Full vocalised transcription"""
     # TODO: imalah, ishmam
     # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
     # TODO: alif maqsura mit Unterpunkt
-    # IDEA: Capitalize beginning of each sentence
-
-    descriptions = {
-        # id, title, description, off, on
-        "pausa": (
-            "Pausa",
-            "Ob der Text in Pausa gelesen werden soll",
-            "al-kalbu",
-            "al-kalb",
-        ),
-        "ta_marbutah": (
-            "Ta marbuta",
-            "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
-            "al-madina",
-            "al-madinah",
-        ),
-        "diphthongs": (
-            "Diphthonge",
-            "Ob Diphthonge wiedergegeben werden sollen",
-            "nawm",
-            "naum",
-        ),
-        "double_vowels": (
-            "Geminierte Halbvokale konsonantisch",
-            "Ob Halbvokale mit Shaddah als doppelte Konsonanten wiedergegeben werden sollen",
-            "nīya",
-            "niyya",
-        ),
-        "begin_hamza": (
-            "Anlautendes Hamza",
-            "Ob ein anlautendes Hamza wiedergegeben werden soll",
-            "amr",
-            "ʾamr",
-        ),
-        "hu_hi": (
-            "-hu und -hi",
-            "Ob die Pronomen -hu und -hi ihrer Aussprache entsprechend wiedergegeben werden sollen",
-            "baituhu, abūhu",
-            "baituhū, abūhu",
-        ),
-        "nisba": (
-            "Nisba",
-            "Ob die Nisba als langes ī wiedergegeben werden soll",
-            "nabiyy o. nabīy",
-            "nabī",
-        ),
-        "orth": (
-            "Orthographie",
-            "Ob die Orthographie des Arabischen beachtet werden soll",
-            "anā",
-            "ana",
-        ),
-    }
 
 
 @dataclass
 class Token:
     def __post_init__(self):
+        import data
+
         self.latin_after = data.sub_after(self.after)
         self.original = self.arab
 
@@ -128,3 +122,12 @@ class Token:
 
 
 Sentence = list[Token]
+
+
+@dataclass
+class NameProfile:
+    is_book: bool = False
+    ta_marbutah: bool = False
+    diphthongs: bool = False
+    double_vowels: bool = True
+    begin_hamza: bool = False

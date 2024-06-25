@@ -22,6 +22,11 @@ def test_separate_join():
         *arab_tools.separate(muhammad)
     ), arab_tools.separate(muhammad)
     assert arab_tools.inject("ا", "الله", 3) == "اللاه"
+    rasm, harakat = arab_tools.separate("أَنا")
+    rasm.pop(-1)
+    harakat.pop(-1)
+    harakat[-1] = data.fatha
+    assert arab_tools.join(rasm, harakat) == "أَنَ"
 
 
 # def test_tokenization():
@@ -38,6 +43,11 @@ def test_transliteration_robustness():
     assert transliterate("أَ") in ("ʾ", "a")
     assert transliterate("آ") == "ā"
     assert transliterate("ذَهَبَ إِ") in ("ḏahaba ʾ", "ḏahaba i")
+    assert transliterate(" َكبَر") == "akbar"
+
+
+def test_alif():
+    assert transliterate("قُرآن") == "qurʾān"
 
 
 def test_half_vowels():
@@ -55,8 +65,9 @@ def test_prefixes():
     assert transliterate("للامتِحان") == "li-l-imtiḥān"
     # ka
     assert transliterate("كَتَبَ كَمُعَلِّم") == "kataba ka-muʿallim"
-    assert transliterate("كاليوم")
+    assert transliterate("كاليَوم") == "ka-l-yawm"
     # bil
+    assert transliterate("بِالْبَيت") == "bi-l-bayt"
 
 
 def test_sun_assimilation():
@@ -66,7 +77,7 @@ def test_sun_assimilation():
         "الثَورَة": "aṯ-ṯawra",
         "الدَولَة": "ad-dawla",
         "الذَرَّة": "aḏ-ḏarra",
-        # "الرَإِيس": "ar-raʾīs",  # doesn't work, rais is not recognized
+        "الرَئيس": "ar-raʾīs",
         "الزَيت": "az-zayt",
         "السُكَّر": "as-sukkar",
         "الشَمس": "aš-šams",
@@ -140,18 +151,23 @@ def test_hamzatul_wasl():
     assert transliterate("انْكَسَرَ") == "inkasara"
     assert transliterate("ٱِنْكَسَرَ") == "inkasara"
     assert transliterate("اسْتِشْرَاق") == "istišrāq"
-    assert transliterate("فَانتَقَلَ") == "fa-ntaqala"
+    assert transliterate("فَانتَقَلَ") == "fa-ntaqala"  # with prefix
     assert transliterate("اخرُج") == "uḫruǧ"
     assert transliterate("هُم الكُتّاب") == "hum ul-kuttāb"
+    assert transliterate("عَن الْكِتابُ", profile_pausa) == "ʿan il-kitāb"
+    assert transliterate("مِنْ البَيت") == "min al-bayt"
+
     # this looks like it ends in a vowel, but it doesn't
     assert transliterate("الشَّاشَةُ اِنْكَسَرَتْ", profile_pausa) == "aš-šāša inkasarat"
-    assert transliterate("هَذَا احْتِمَالٌ عَظِيمٌ", profile_pausa) == "haḏā ḥtimāl ʿaẓīm"
+    assert transliterate("هَذَا احْتِمَالٌ عَظِيمٌ", profile_pausa) == "hāḏā ḥtimāl ʿaẓīm"
 
     assert transliterate("الْمَكْتَبَةُ الْكَبِيرَةُ") == "al-maktabatu l-kabīratu"
 
+    assert transliterate("الجُندِيّ العَرَبِيّ") == "al-ǧundī al-ʿarabī"
+    assert transliterate("ﻓﻲ اﻟﺒَﻴﺖ") == "fī l-bayt"
+
 
 def test_pronouns_and_prepositions():
-    assert transliterate("أَنَا") == "anā"
     assert transliterate("أَنْتَ") == "anta"
     assert transliterate("أَنْتِ") == "anti"
     assert transliterate("هُوَ") == "huwa"
@@ -177,7 +193,6 @@ def test_endings():
     assert transliterate("تَقْرِيباً", profile_pausa) == "taqrīban"
 
     # nisba
-    # nabiyy
     assert transliterate("نَبِيٌّ", profile_pausa) == "nabī"
     assert transliterate("نَبِيٌّ", Profile(pausa=True, double_vowels=False)) == "nabī"
     assert transliterate("نَبِيٌّ", Profile(pausa=True, nisba=False)) == "nabiyy"
@@ -185,7 +200,11 @@ def test_endings():
         transliterate("نَبِيٌّ", Profile(pausa=True, nisba=False, double_vowels=False))
         == "nabīy"
     )
+
     # waw + alif -> waw
+    assert transliterate("ﻗﺎﻟﻮا") == "qālū"
+    assert transliterate("رَأَوا") == "raʾaw"
+    assert transliterate("رَأَوا", Profile(diphthongs=True)) == "raʾau"
 
 
 def test_hu_hi():
@@ -195,20 +214,46 @@ def test_hu_hi():
     # baytuhu
     assert transliterate("بَيْتُهُ") == "baytuhū"
     assert transliterate("بَيْتُهُ", Profile(hu_hi=False)) == "baytuhu"
+    # dhahaba ilayhi
+    assert transliterate("ذَهَبَ إِلَيْهِ", Profile(hu_hi=False)) == "ḏahaba ilayhi"
+    assert transliterate("ذَهَبَ إِلَيْهِ") == "ḏahaba ilayhi"
 
 
 def test_special_words():
     # Allah
     assert transliterate("ﷲ") == "Allāh"  # ligature
     assert transliterate("الله") == "Allāh"
+    assert transliterate("والله") == "wa-llāh"
     assert transliterate("لله", profile_pausa) == "li-llāh"
-    assert transliterate("عَبد الله")
-
-
-if ner_available:
-
-    def test_names():
-        assert transliterate("مُحَمَّد") == "Muḥammad"
+    assert transliterate("عَبد الله") == "ʿabd Allāh"
+    assert transliterate("عَبدُ الله") == "ʿabdu llāh"
+    assert transliterate("هُم الله") == "hum ullāh"
+    # ilah
+    assert transliterate("إِلَه") == "ilāh"
+    # rahman
+    assert transliterate("رَحْمَن") == "raḥmān"
+    # ana
+    assert transliterate("أَنَا") == "ana"
+    # hadha
+    assert transliterate("هَذَا") == "hāḏā"
+    assert transliterate("هَذِهِ") == "hāḏihi"
+    # dhalika
+    assert transliterate("ذَلِكَ") == "ḏālika"
+    assert transliterate("كَذَلِكَ") == "kaḏālika"
+    # hakadha
+    assert transliterate("هَكَذَا") == "hākaḏā"
+    # lakin
+    assert transliterate("لَكِن") == "lākin"
+    assert transliterate("لَكِنَّ") == "lākinna"
+    # ulaika
+    assert transliterate("أُولَئِكَ") == "ulāʾika"
+    assert transliterate("أُولَٰئِكَ") == "ulāʾika"
+    # Taha
+    assert transliterate("طَهَ") == "Ṭāhā"
+    # Ibrahim
+    assert transliterate("إِبْرَاهِيم") == "Ibrāhīm"
+    # Amr
+    assert transliterate("عَمرَو") == "ʿAmr"
 
 
 def _test_ibrahim_text():

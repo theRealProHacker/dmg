@@ -39,6 +39,10 @@ known_names: set[str] = {
     # ibrahim 2x
     "إبرهيم",
     "إبراهيم",
+    # yasin
+    "ياسين",
+    # 3amr
+    "عمرو",
 }
 
 
@@ -371,8 +375,6 @@ double_vowels_map = {
 
 # if nisba
 nisba_map = {
-    "uww$": "ū",
-    "ūw$": "ū",
     "iyy$": "ī",
     "īy$": "ī",
 }
@@ -502,7 +504,7 @@ unvocalized_verb_stems_7_to_10 = [
 ]
 
 # case + definiteness
-case_mapping: dict[str, tuple[Case, bool]] = {
+case_mapping: dict[str, tuple["Case", bool]] = {
     fatha: ("a", True),
     damma: ("n", True),
     kasra: ("g", True),
@@ -524,17 +526,24 @@ special_words = {
     "هم",
     "هن",
     "نحن",
-    # allah
-    "الله",
+}
+
+add_alif_words = {
+    # ilah
+    "إِلَه": 2,
     # rahman
-    "رحمن",
+    "رَحْمَن": 3,
     # hadha
-    "هذا",
-    "هذه",
+    "هَذَا": 1,
+    "هَذِهِ": 1,
     # dhalika
-    "ذلك",
+    "ذَلِكَ": 1,
+    "كَذَلِكَ": 2,
     # hakadha
-    "هكذا",
+    "هَكَذَا": 1,
     # lakin
-    "لكن",
+    "لَكِنْ": 1,
+    "لَكِنَّ": 1,
+    # taha
+    "طَهَ": (1, 3),  # 3 after the first has been inserted
 }

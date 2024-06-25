@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+
+{% block main_pre_text %}
+Transliterieren Sie einen arabischen Namen in DMG. <br>
+Mit dem Zauberstab-Button können Sie Ihren Text automatisch vokalisieren lassen.
+{% endblock %}
+
+{% block trans_url %}
+const trans_url = '/transliterate-names';
+{% endblock %}
