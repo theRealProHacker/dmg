@@ -363,7 +363,7 @@ def check_sentence(sentence: Sentence)->Generator[tuple[str, Pos, Case, bool, st
         preliminary_result = check_word(token.arab, tag)
         # lemma, pos, case, is_definite, prefix, verb ending, suffix
         if not preliminary_result:
-            print(token.arab, "not found")
+            # print(token.arab, "not found")
             yield (
                 araby.strip_diacritics(token.arab),
                 "noun",
@@ -395,14 +395,14 @@ def check_sentence(sentence: Sentence)->Generator[tuple[str, Pos, Case, bool, st
                 sm["tanwin_majrour"]
             )
             affix = node.get_affix().split("-")
-            print(affix)
-            print((
-                *node.get_lemma(return_pos=True),
-                gram_case,
-                is_definite,
-                affix[0],
-                *affix[2:4]
-            ))
+            # print(affix)
+            # print((
+            #     *node.get_lemma(return_pos=True),
+            #     gram_case,
+            #     is_definite,
+            #     affix[0],
+            #     *affix[2:4]
+            # ))
             yield (
                 *node.get_lemma(return_pos=True),
                 gram_case,
