@@ -108,7 +108,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             if (
                 token.is_pausa
                 and token.pos == "noun"
-                and not token.gram_case == "a"
+                and not (token.gram_case == "a" and not token.is_definite)
                 and not token.suffix
             ):
                 token.arab = araby.strip_lastharaka(token.arab)
@@ -326,6 +326,9 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
 
     return beginning_non_token + "".join(token.result for token in tokens)
 
+ibn_pattern = gen_arab_pattern_match("ابْن")
+bin_pattern = gen_arab_pattern_match("بِنْ")
+kitab_pattern = gen_arab_pattern_match("كتاب")
 
 def transliterate_names(text: str, profile: NameProfile = NameProfile()):
     text = text.strip()
@@ -350,7 +353,6 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
     ]
     stemmed_words = [*arab_tools.check_sentence(tokens)]
     for i, (token, stemming) in enumerate(zip(tokens, stemmed_words)):
-        token.is_name = True
         (
             token.lemma,
             token.pos,
@@ -360,8 +362,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
             _,
             token.suffix,
         ) = stemming
-        assert token.pos in ("noun", "verb", "stopword", "")
-        stripped_prefix = araby.strip_harakat(token.prefix)
+        stripped_prefix = araby.strip_harakat(prefix_suggestion)
         stripped_suffix = araby.strip_harakat(token.suffix)
 
         # applying pausa
@@ -376,24 +377,11 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
 
         token.prefix = arab_tools.join(rasm[:i], harakat[:i])
         token.arab = arab_tools.join(rasm[i:], harakat[i:])
-        arab_wo_suffix = arab_tools.join(
-            rasm[i : len(rasm) - len(stripped_suffix)],
-            harakat[i : len(rasm) - len(stripped_suffix)],
-        )
 
         # special cases
         if allah_pattern(token.arab):
             token.arab = arab_tools.inject("ا", token.arab, 3)
-        elif lillah_pattern(token.arab):
-            token.prefix = "لِ"
-            token.latin_prefix = "li-"
-            token.arab = "للاهِ" if not token.is_pausa else "للاه"
-        else:
-            for pattern, inserts in add_alif_patterns:
-                if pattern(arab_wo_suffix):
-                    for insert in inserts:
-                        token.arab = arab_tools.inject("ا", token.arab, insert)
-                    break
+
         # idafah
         for token, next_token in zip(tokens, tokens[1:]):
             token.is_idafah = (
@@ -457,6 +445,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
 
 if __name__ == "__main__":
     text = "يَكْتُبُ الكَلْبُ"
+    text = "هذا الكتاب الجديد الطالب. هو يقرأ الكتاب الجديد."
     text = "هذا الكتابُ الجديدُ الطالبِ. هو يقرأ الكتابَ الجديدَ."
     text = "هَذَا الكِتَابُ الْجَدِيدُ الطَالِبِ۔ هُوَ يَقْرَأُ الْكِتَابَ الْجَدِيدَ۔"
     print(transliterate(text))
