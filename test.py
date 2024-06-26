@@ -1,6 +1,7 @@
 import arab_tools
 import data
-from trans import Profile, ner_available, transliterate
+from data_types import NameProfile
+from trans import Profile, ner_available, transliterate, transliterate_names
 
 profile_pausa = Profile(pausa=True)
 
@@ -272,6 +273,30 @@ def _test_ibrahim_text():
     # Ibrahim is not capitalized
 
     assert transliterate("براون آند كو", Profile(diphthongs=True)) == "brāun ānd kū"
+
+
+def test_names():
+    tests = {
+        # "عَيْنُ التَّابْغَةِ": "ʿAyn at-Tābġa",
+        "النِّيلُ": "an-Nīl",
+        "ابْنُ بَطّوطَةَ": "Ibn Baṭṭūṭa",
+        "أَبُو عَبْدِ الله مُحَمَّدٌ ابْنُ بَطّوطَةَ": "Abū ʿAbdallāh Muḥammad ibn Baṭṭūṭa",
+        "أَبو حامِد مُحَمَّد الغَزّالِي": "Abū Ḥāmid Muḥammad al-Ġazzālī",
+    }
+    for arab, latin in tests.items():
+        assert transliterate_names(arab) == latin
+
+    assert transliterate_names("أَبُو بَكْر") == "Abū Bakr"
+    assert (
+        transliterate_names(
+            "أَبُو عَبْدِ الله مُحَمَّدٌ ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=True)
+        )
+        == "Abū ʿAbdallāh Muḥammad b. Baṭṭūṭa"
+    )
+    assert (
+        transliterate_names("ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=True))
+        == "Ibn Baṭṭūṭa"
+    )
 
 
 if __name__ == "__main__":

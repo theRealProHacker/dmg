@@ -127,7 +127,10 @@ Sentence = list[Token]
 @dataclass
 class NameProfile:
     is_book: bool = False
+    short_ibn: bool = False
     ta_marbutah: bool = False
     diphthongs: bool = False
     double_vowels: bool = True
     begin_hamza: bool = False
+    hu_hi: bool = True
+    nisba: bool = True
