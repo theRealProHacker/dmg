@@ -195,7 +195,14 @@ def test_endings():
     assert transliterate("شُكْرًا", profile_pausa) == "šukran"
     assert transliterate("تَقْرِيباً", profile_pausa) == "taqrīban"
 
-    # nisba
+    # waw + alif -> waw
+    assert transliterate("ﻗﺎﻟﻮا") == "qālū"
+    assert transliterate("رَأَوا") == "raʾaw"
+    assert transliterate("رَأَوا", Profile(diphthongs=True)) == "raʾau"
+
+
+def test_nisba():
+    # nabi
     assert transliterate("نَبِيٌّ", profile_pausa) == "nabī"
     assert transliterate("نَبِيٌّ", Profile(pausa=True, double_vowels=False)) == "nabī"
     assert transliterate("نَبِيٌّ", Profile(pausa=True, nisba=False)) == "nabiyy"
@@ -203,11 +210,16 @@ def test_endings():
         transliterate("نَبِيٌّ", Profile(pausa=True, nisba=False, double_vowels=False))
         == "nabīy"
     )
-
-    # waw + alif -> waw
-    assert transliterate("ﻗﺎﻟﻮا") == "qālū"
-    assert transliterate("رَأَوا") == "raʾaw"
-    assert transliterate("رَأَوا", Profile(diphthongs=True)) == "raʾau"
+    # al-arabi
+    assert transliterate("العَرَبِيّ", profile_pausa) == "al-ʿarabī"
+    assert (
+        transliterate("العَرَبِيّ", Profile(pausa=True, double_vowels=False)) == "al-ʿarabī"
+    )
+    assert transliterate("العَرَبِيّ", Profile(pausa=True, nisba=False)) == "al-ʿarabī"
+    assert (
+        transliterate("العَرَبِيّ", Profile(pausa=True, nisba=False, double_vowels=False))
+        == "al-ʿarabī"
+    )
 
 
 def test_hu_hi():

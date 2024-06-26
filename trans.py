@@ -166,10 +166,10 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                     token.latin_prefix += "al-" if not i else "l-"
                     i += 2
 
-            # with suppress(IndexError): 
+            # with suppress(IndexError):
             #     def check_haraka(i: int, haraka: str) -> bool:
             #         return (not harakat[i] or harakat[i] == haraka)
-                
+
             #     if (
             #         not token.latin_prefix.endswith("l-")
             #         and rasm[i] == "ا"
@@ -182,12 +182,21 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             #     ):
             #         token.latin_prefix += "al-" if not i else "l-"
             #         i += 2
-            
+
             token.prefix = arab_tools.join(rasm[:i], harakat[:i])
             token.arab = arab_tools.join(rasm[i:], harakat[i:])
             arab_wo_suffix = arab_tools.join(
                 rasm[i : len(rasm) - len(stripped_suffix)],
                 harakat[i : len(rasm) - len(stripped_suffix)],
+            )
+
+            # nisba
+            arab_rasm = araby.strip_diacritics(token.arab)
+            lemma_rasm = araby.strip_diacritics(token.lemma)
+            token.is_nisba = (
+                token.pos == "noun"
+                and data.shaddah in harakat[-1]
+                and lemma_rasm + data.ya == arab_rasm
             )
 
             # special cases
@@ -223,6 +232,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                             token.arab = arab_tools.inject("ا", token.arab, insert)
                         break
 
+            # hu & hi
             if (
                 profile.hu_hi
                 and stripped_suffix == "ه"
@@ -257,6 +267,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             if len(araby.strip_diacritics(arab)) <= 2:
                 continue
 
+            # hamzatul wasl for this token
             if token.prefix:
                 if prev_ended_vowel and token.latin_prefix == "al-":
                     token.latin_prefix = "l-"
@@ -317,7 +328,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             char_map |= data.diphthong_map
         if not profile.double_vowels:
             char_map |= data.double_vowels_map
-        if profile.nisba:
+        if profile.nisba or token.is_nisba:
             char_map |= data.nisba_map
         # if token.is_pausa:
         #     char_map = data.pausa_map | char_map | data.pausa_map
@@ -353,6 +364,7 @@ bin_pattern = gen_arab_pattern_match("بِنْ")
 bint_pattern = gen_arab_pattern_match("بِنْت")
 kitab_pattern = gen_arab_pattern_match("كتاب")
 
+
 def transliterate_names(text: str, profile: NameProfile = NameProfile()):
     text = text.strip()
     text = araby.strip_tatweel(text)
@@ -376,9 +388,11 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
     ]
     # names specific: no sentences
     names = (
-        [*ner.find_names([
-            [araby.strip_diacritics(token.original) for token in tokens]
-        ])][0]
+        [
+            *ner.find_names(
+                [[araby.strip_diacritics(token.original) for token in tokens]]
+            )
+        ][0]
         if ner_available
         else ([False] * len(tokens))
     )
@@ -395,7 +409,9 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
     apply_hamzatul_wasl = False
     next_wasl: str = ""
     # name specific: token index for ibn, no sentences
-    for token_i, (token, is_name, stemming) in enumerate(zip(tokens, names, stemmed_words)):
+    for token_i, (token, is_name, stemming) in enumerate(
+        zip(tokens, names, stemmed_words)
+    ):
         (
             token.is_name,
             token.lemma,
@@ -428,7 +444,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
             return (not harakat[i] or harakat[i] == haraka) and (
                 not sug_harakat[i] or sug_harakat[i] == haraka
             )
-        
+
         with suppress(IndexError):
             # wa- and fa- prefix
             if (conjunction := get_rasm(i)) in "فو" and check_haraka(i, data.fatha):
@@ -464,11 +480,11 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
             ):
                 token.latin_prefix += "al-" if not i else "l-"
                 i += 2
-           
-        # with suppress(IndexError): 
+
+        # with suppress(IndexError):
         #     def check_haraka(i: int, haraka: str) -> bool:
         #         return (not harakat[i] or harakat[i] == haraka)
-            
+
         #     if (
         #         not token.latin_prefix.endswith("l-")
         #         and rasm[i] == "ا"
@@ -482,12 +498,20 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
         #         token.latin_prefix += "al-" if not i else "l-"
         #         i += 2
 
-
         token.prefix = arab_tools.join(rasm[:i], harakat[:i])
         token.arab = arab_tools.join(rasm[i:], harakat[i:])
         arab_wo_suffix = arab_tools.join(
             rasm[i : len(rasm) - len(stripped_suffix)],
             harakat[i : len(rasm) - len(stripped_suffix)],
+        )
+
+        # nisba
+        arab_rasm = araby.strip_diacritics(token.arab)
+        lemma_rasm = araby.strip_diacritics(token.lemma)
+        token.is_nisba = (
+            token.pos == "noun"
+            and data.shaddah in harakat[-1]
+            and lemma_rasm + data.ya == arab_rasm
         )
 
         # special cases
@@ -541,6 +565,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
                         token.arab = arab_tools.inject("ا", token.arab, insert)
                     break
 
+        # hu & hi
         if (
             profile.hu_hi
             and stripped_suffix == "ه"
@@ -575,6 +600,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
         if len(araby.strip_diacritics(arab)) <= 2:
             continue
 
+        # hamzatul wasl for this token
         if token.prefix:
             if prev_ended_vowel and token.latin_prefix == "al-":
                 token.latin_prefix = "l-"
@@ -615,16 +641,15 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
             and next_token.latin_prefix in ("al-", "l-", "")
         )
         if (
-            abd_pattern(token.arab) and processed_allah_pattern(next_token.arab) 
-            and not token.suffix and not next_token.suffix
-            and not token.prefix and not next_token.prefix
+            abd_pattern(token.arab)
+            and processed_allah_pattern(next_token.arab)
+            and not token.suffix
+            and not next_token.suffix
+            and not token.prefix
+            and not next_token.prefix
         ):
             token.latin_after = ""
             next_token.is_name = False
-        # else:
-        #     print(token.arab, next_token.arab, 
-        #           abd_pattern(token.arab), processed_allah_pattern(next_token.arab),
-        #           token.suffix, next_token.suffix, token.prefix, next_token.prefix)
 
     # transliteration
     for token in tokens:
@@ -648,7 +673,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
             char_map |= data.diphthong_map
         if not profile.double_vowels:
             char_map |= data.double_vowels_map
-        if profile.nisba:
+        if profile.nisba or token.is_nisba:
             char_map |= data.nisba_map
         # if token.is_pausa:
         #     char_map = data.pausa_map | char_map | data.pausa_map

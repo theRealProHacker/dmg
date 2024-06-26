@@ -51,10 +51,10 @@ profile_descriptions = {
         "baituhū, abūhu",
     ),
     "nisba": (
-        "Nisba",
-        "Ob die Nisba als langes ī wiedergegeben werden soll",
-        "nabiyy o. nabīy",
-        "nabī",
+        "-ī und -ū",
+        "Ob am Ende eines Wortes immer -ī statt -iyy/-īy wiedergegeben soll (genauso mit ū). Die Nisba ist davon nicht beeinflusst",
+        "nabiyy o. nabīy, al-ʿarabī",
+        "nabī, al-ʿarabī",
     ),
     # "orth": (
     #     "Orthographie",
@@ -101,6 +101,7 @@ class Token:
     is_end_of_sentence: bool = False
     is_idafah: bool = False
     is_name: bool = False
+    is_nisba: bool = False
 
     latin: str = ""
     latin_after: str = ""

@@ -382,6 +382,8 @@ double_vowels_map = {
 nisba_map = {
     "iyy$": "ī",
     "īy$": "ī",
+    "uww$": "ū",
+    "ūw$": "ū",
 }
 
 # if not begin_hamza
