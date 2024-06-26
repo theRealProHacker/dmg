@@ -208,11 +208,11 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             if (
                 profile.hu_hi
                 and stripped_suffix == "ه"
-                and (haraka := token.arab[-1]) in (data.damma, data.kasra)
+                and (h_haraka := token.arab[-1]) in (data.damma, data.kasra)
                 and len(token.arab) >= 3
                 and rasm[-2] not in data.long_vowels
             ):
-                token.arab += data.waw if haraka == data.damma else data.ya
+                token.arab += data.waw if h_haraka == data.damma else data.ya
 
             # hamzatul wasl
             # applying hamzatul wasl for next token
@@ -251,18 +251,18 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 data.alif_wasl,
             ):
                 token.arab = token.arab[1:]
-                haraka = token.arab[0] in data.short_vowels
+                has_haraka = token.arab[0] in data.short_vowels
                 if prev_ended_vowel:
-                    if haraka:
+                    if has_haraka:
                         token.arab = token.arab[1:]
-                elif not haraka:
-                    if token.arab[0] == "ل":  # TODO: and not matches something else
-                        haraka = "a"
-                    elif araby.separate(token.arab)[1][1] == data.damma:
-                        haraka = "u"
+                elif not has_haraka:
+                    if araby.separate(token.arab)[1][1] == data.damma:
+                        has_haraka = "u"
+                    elif token.arab[0] == "ل":  # TODO: and not matches something else
+                        has_haraka = "a"
                     else:
-                        haraka = "i"
-                    token.arab = (prev_wasl or haraka) + token.arab
+                        has_haraka = "i"
+                    token.arab = (prev_wasl or has_haraka) + token.arab
 
         # idafah
         for token, next_token in zip(sentence, sentence[1:]):
@@ -326,9 +326,11 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
 
     return beginning_non_token + "".join(token.result for token in tokens)
 
+
 ibn_pattern = gen_arab_pattern_match("ابْن")
 bin_pattern = gen_arab_pattern_match("بِنْ")
 kitab_pattern = gen_arab_pattern_match("كتاب")
+
 
 def transliterate_names(text: str, profile: NameProfile = NameProfile()):
     text = text.strip()
