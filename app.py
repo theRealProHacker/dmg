@@ -2,7 +2,8 @@ import json
 
 from flask import Flask, render_template, request
 
-from trans import Profile, transliterate
+from data_types import Profile, NameProfile, profile_descriptions
+from trans import transliterate, transliterate_names
 from vocalization import vocalize
 
 app = Flask(__name__)
@@ -16,13 +17,29 @@ def index():
             name,
             field.default,
             field.type.__name__,
-            *Profile.descriptions.get(
+            *profile_descriptions.get(
                 name, (" ".join(name.split("_")).capitalize(), "", "", "")
             ),
         )
         for (name, field) in Profile.__dataclass_fields__.items()
     ]
     return render_template("index.html", profile=profile)
+
+
+@app.route("/names")
+def names():
+    profile = [
+        (
+            name,
+            field.default,
+            field.type.__name__,
+            *profile_descriptions.get(
+                name, (" ".join(name.split("_")).capitalize(), "", "", "")
+            ),
+        )
+        for (name, field) in NameProfile.__dataclass_fields__.items()
+    ]
+    return render_template("names.html", profile=profile)
 
 
 @app.route("/transliterate", methods=["POST"])
@@ -34,6 +51,14 @@ def trans():
     text = data["text"]
     profile = Profile(**data["profile"])
     return transliterate(text, profile)
+
+
+@app.route("/transliterate-names", methods=["POST"])
+def trans_names():
+    data = json.loads(request.data)
+    text = data["text"]
+    profile = NameProfile(**data["profile"])
+    return transliterate_names(text, profile)
 
 
 @app.route("/vocalize", methods=["POST"])

@@ -10,9 +10,12 @@ def sqlite2json(db_path, table_name, json_path, id="id"):
         )
 
 
+venv_path = "venv"
+
+
 def wordfreq():
     sqlite2json(
-        r"..\.venv\Lib\site-packages\arramooz\data\wordfreq.sqlite",
+        venv_path + r"\Lib\site-packages\arramooz\data\wordfreq.sqlite",
         "wordfreq",
         "./data/wordfreq.json",
     )
@@ -20,7 +23,7 @@ def wordfreq():
 
 def nouns():
     sqlite2json(
-        r"..\.venv\Lib\site-packages\arramooz\data\arabicdictionary.sqlite",
+        venv_path + r"\Lib\site-packages\arramooz\data\arabicdictionary.sqlite",
         "nouns",
         "./data/nouns.json",
     )
@@ -28,7 +31,7 @@ def nouns():
 
 def verbs():
     sqlite2json(
-        r"..\.venv\Lib\site-packages\arramooz\data\arabicdictionary.sqlite",
+        venv_path + r"\Lib\site-packages\arramooz\data\arabicdictionary.sqlite",
         "verbs",
         "./data/verbs.json",
     )
@@ -36,16 +39,25 @@ def verbs():
 
 def stopwords():
     sqlite2json(
-        r"..\.venv\Lib\site-packages\arramooz\data\stopwords.sqlite",
+        venv_path + r"\Lib\site-packages\arramooz\data\stopwords.sqlite",
         "stopwords",
         "./data/stopwords.json",
         id="ID",
     )
 
 
+def cstopwords():
+    sqlite2json(
+        venv_path + r"\Lib\site-packages\arramooz\data\stopwords.sqlite",
+        "classedstopwords",
+        "./data/cstopwords.json",
+        id="ID",
+    )
+
+
 def q_nouns():
     sqlite2json(
-        r"..\.venv\Lib\site-packages\qalsadi\data\custom_dictionary.sqlite",
+        venv_path + r"\Lib\site-packages\qalsadi\data\custom_dictionary.sqlite",
         "nouns",
         "./data/qalsadi_nouns.json",
     )
@@ -53,9 +65,17 @@ def q_nouns():
 
 def sem_derivations():
     sqlite2json(
-        r"..\.venv\Lib\site-packages\asmai\data\semantic.sqlite",
+        venv_path + r"\Lib\site-packages\asmai\data\semantic.sqlite",
         "derivations",
         "./data/semantic_derivations.json",
+    )
+
+
+def sem_relations():
+    sqlite2json(
+        venv_path + r"\Lib\site-packages\asmai\data\semantic.sqlite",
+        "relations",
+        "./data/semantic_relations.json",
     )
 
 
@@ -76,10 +96,14 @@ if __name__ == "__main__":
             verbs()
         case ["ar", "stopwords"]:
             stopwords()
+        case ["ar", "cstopwords"]:
+            cstopwords()
         case ["qalsadi", "nouns"]:
             q_nouns()
         case ["asmai", "derivations"]:
             sem_derivations()
+        case ["asmai", "relations"]:
+            sem_relations()
         case _:
             print("Invalid arguments")
             print(

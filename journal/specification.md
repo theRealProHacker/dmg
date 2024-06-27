@@ -80,6 +80,33 @@ If a word start with a hamzatul wasl it is transliterated as "(i)" except if it 
 
 For a starting alif, we need to check whether the word fits into one of the words that have a hamzatul wasl. If that is the case, the alif is transliterated as "(i)" else as "ā". 
 
+```py
+# Pseudo code
+# All of the below only makes sense when we are dealing with a real arabic word (rasm is >= 3)
+
+# assume it is given whether the word before ended on a vowel or not
+last_token_ended_in_vowel = ...
+
+if prefix:
+    if prefix is article:
+        remove the a
+    if prefix has article:
+        last_token_ended_in_vowel = False
+    else:
+        last_token_ended_in_vowel = True
+
+if startswith alif or alif wasl:
+    remove alif or alif wasl
+    if last_token_ended_in_vowel
+        remove any first haraka
+    else:
+        if there is no haraka:
+            if rasm without suffixes matches alladhee(na):
+                haraka = a
+            elif rasm without suffixes matches one of the nouns or one of the verb forms:
+                haraka = i
+```
+
 ## Special words
 
 - alladhee, alladheena

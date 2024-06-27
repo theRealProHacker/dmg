@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal
 
-import data
-
 Pos = Literal["stopword", "noun", "verb", ""]
 
 Case = Literal["n", "g", "a", "j", ""]
@@ -14,6 +12,58 @@ For nouns: nominative,  genetive,       accusative,     no application, unknown
 For verbs: indicative,  no application, subjunctive,    jussive,        unknown
 """
 
+profile_descriptions = {
+    # id, title, description, off, on
+    "pausa": (
+        "Pausa",
+        "Ob der Text in Pausa gelesen werden soll",
+        "al-kalbu",
+        "al-kalb",
+    ),
+    "ta_marbutah": (
+        "Ta marbuta",
+        "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
+        "al-madina",
+        "al-madinah",
+    ),
+    "diphthongs": (
+        "Diphthonge",
+        "Ob Diphthonge wiedergegeben werden sollen",
+        "nawm",
+        "naum",
+    ),
+    "double_vowels": (
+        "Geminierte Halbvokale konsonantisch",
+        "Ob Halbvokale mit Shaddah als doppelte Konsonanten wiedergegeben werden sollen",
+        "nīya",
+        "niyya",
+    ),
+    "begin_hamza": (
+        "Anlautendes Hamza",
+        "Ob ein anlautendes Hamza wiedergegeben werden soll",
+        "amr",
+        "ʾamr",
+    ),
+    "hu_hi": (
+        "-hu und -hi",
+        "Ob die Pronomen -hu und -hi ihrer Aussprache entsprechend wiedergegeben werden sollen",
+        "baituhu, abūhu",
+        "baituhū, abūhu",
+    ),
+    "nisba": (
+        "-ī und -ū",
+        "Ob am Ende eines Wortes immer -ī statt -iyy/-īy wiedergegeben soll (genauso mit ū). Die Nisba ist davon nicht beeinflusst",
+        "nabiyy o. nabīy, al-ʿarabī",
+        "nabī, al-ʿarabī",
+    ),
+    # "orth": (
+    #     "Orthographie",
+    #     "Ob die Orthographie des Arabischen beachtet werden soll",
+    #     "anā",
+    #     "ana",
+    # ),
+}
+
 
 @dataclass
 class Profile:
@@ -21,62 +71,37 @@ class Profile:
     ta_marbutah: bool = False
     diphthongs: bool = False
     double_vowels: bool = True
-    # skip_i3rab: bool = False
-    # """Whether i3rab (flexion endings) should be skipped"""
-    # full_vocalisation: bool = False
-    # """ Full vocalised transcription"""
+    begin_hamza: bool = False
+    hu_hi: bool = True
+    nisba: bool = True
+
     # TODO: imalah, ishmam
-    # TODO: alif maqsura to ya
     # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
     # TODO: alif maqsura mit Unterpunkt
-    # IDEA: Capitalize beginning of each sentence
-
-    descriptions = {
-        # id, title, description, off, on
-        "pausa": (
-            "Pausa",
-            "Ob der Text in Pausa gelesen werden soll",
-            "al-kalbu",
-            "al-kalb",
-        ),
-        "ta_marbutah": (
-            "Ta marbuta",
-            "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
-            "al-madina",
-            "al-madinah",
-        ),
-        "diphthongs": (
-            "Diphthonge",
-            "Ob Diphthonge wiedergegeben werden sollen",
-            "nawm",
-            "naum",
-        ),
-        "double_vowels": (
-            "Doppelte Halbvokale",
-            "Ob Halbvokale mit Shaddah als verdoppelte Konsonanten wiedergegeben werden sollen",
-            "nīya",
-            "niyya",
-        ),
-    }
 
 
 @dataclass
 class Token:
     def __post_init__(self):
+        import data
+
         self.latin_after = data.sub_after(self.after)
+        self.original = self.arab
 
     arab: str
     after: str = ""
+    original: str = ""
     lemma: str = ""
     pos: Pos = ""
     gram_case: Case = ""
     is_definite: bool = False
     prefix: str = ""
+    suffix: str = ""
     is_pausa: bool = False
     is_end_of_sentence: bool = False
     is_idafah: bool = False
     is_name: bool = False
-    hamzatul_wasl_short_vowel: str = ""
+    is_nisba: bool = False
 
     latin: str = ""
     latin_after: str = ""
@@ -90,21 +115,23 @@ class Token:
     def result(self) -> str:
         latin = self.latin
         if self.is_name:
-            if len(latin) >= 2 and latin[0] == "ʿ" and latin[1] in "aui":
-                latin = "ʿ" + latin[1:].capitalize()
+            if len(latin) >= 2 and latin[0] in "ʿʾ" and latin[1] in "aui":
+                latin = latin[0] + latin[1:].capitalize()
             else:
                 latin = self.latin.capitalize()
-        return (
-            (self.latin_prefix + "-" if self.prefix else "")
-            + self.hamzatul_wasl_short_vowel
-            + latin
-            + self.latin_after
-        )
-
-    @property
-    def original(self) -> str:
-        # This is not true for a short amount of time after the prefix is set, but has not yet been deducted from arab
-        return self.prefix + self.arab + self.after
+        return self.latin_prefix + latin + self.latin_after
 
 
 Sentence = list[Token]
+
+
+@dataclass
+class NameProfile:
+    is_book: bool = False
+    short_ibn: bool = False
+    ta_marbutah: bool = False
+    diphthongs: bool = False
+    double_vowels: bool = True
+    begin_hamza: bool = False
+    hu_hi: bool = True
+    nisba: bool = True

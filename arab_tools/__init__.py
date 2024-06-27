@@ -16,7 +16,8 @@ The files in this module are licensed under the GPL-3.0 License.
 """
 
 from functools import cache
-from typing import Literal
+import itertools
+from typing import Callable, Generator, Literal
 
 import asmai.semdictionary
 import naftawayh.wordtag
@@ -28,11 +29,12 @@ import qalsadi.stem_verb
 import qalsadi.stopwords
 from pyarabic import araby
 from qalsadi import stemnode
+from qalsadi import stem_stopwords_const as ssconst
 from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
 
 import data
-from data_types import Sentence, Token
+from data_types import Case, Pos, Sentence, Token
 
 from .nounstemmer import stem_noun
 
@@ -119,7 +121,137 @@ class UnknownStemmer(qalsadi.stem_unknown.UnknownStemmer):
         return result
 
 
-class StopWordStemmer(qalsadi.stem_stop.StopWordStemmer): ...
+class StopWordStemmer(qalsadi.stem_stop.StopWordStemmer):
+    def steming_second_level(self, stop, stop2, procletic, encletic_nm):
+        """
+        Analyze word morphologically by stemming the conjugation affixes.
+        @param stop: the input stop.
+        @type stop: unicode.
+        @param stop2: the stop stemed from syntaxic affixes.
+        @type stop2: unicode.
+        @param procletic: the syntaxic prefixe extracted in the fisrt stage.
+        @type procletic: unicode.
+        @param encletic_nm: the syntaxic suffixe extracted in the
+        first stage (not vocalized).
+        @type encletic_nm: unicode.
+        @return: list of dictionaries of analyzed words with tags.
+        @rtype: list.
+        """
+        detailed_result = []
+        #segment the coinjugated verb
+        list_seg_conj = self.conj_stemmer.segment(stop2)
+        # verify affix compatibility
+        list_seg_conj = self.verify_affix(stop2, list_seg_conj,
+                                     ssconst.STOPWORDS_CONJUGATION_AFFIX)
+        # add vocalized forms of suffixes
+        # and create the real affixes from the word
+        #~list_seg_conj_voc = []
+        for seg_conj in list_seg_conj:
+            stem_conj = stop2[seg_conj[0]:seg_conj[1]]
+            suffix_conj_nm = stop2[seg_conj[1]:]
+
+            # noirmalize hamza before gessing  differents origines
+            #~stem_conj = araby.normalize_hamza(stem_conj)
+
+            # generate possible stems
+            # add stripped letters to the stem to constitute possible stop list
+            possible_stop_list = self.get_stem_variants(stem_conj, suffix_conj_nm)
+
+            # search the stop in the dictionary
+            # we can return the tashkeel
+            infstop_form_list = []
+            for infstop in set(possible_stop_list):
+                # get the stop and get all its forms from the dict
+                # if the stop has plural suffix, don't look up in
+                #broken plural dictionary
+                if infstop not in self.cache_dict_search:
+                    infstop_foundlist = data.stopword_dict.get(infstop, [])
+                    # _infstop_foundlist = list(map(dict, self.stop_dictionary.lookup(infstop)))
+                    # for x in _infstop_foundlist:
+                    #     x.pop("ID")
+                    # assert _infstop_foundlist == infstop_foundlist, (
+                    #     infstop, _infstop_foundlist, infstop_foundlist
+                    # )
+                    self.cache_dict_search[infstop] = self.create_dict_word(
+                        infstop_foundlist)
+                else:
+                    infstop_foundlist = self.cache_dict_search[infstop]
+                infstop_form_list.extend(infstop_foundlist)
+            for stop_tuple in infstop_form_list:
+                # stop_tuple = self.stop_dictionary.getEntryById(id)
+                original = stop_tuple['vocalized']
+
+                #test if the  given word from dictionary accept those
+                # tags given by affixes
+                # دراسة توافق الزوائد مع خصائص الاسم،
+                # مثلا هل يقبل الاسم التأنيث.
+                #~if validate_tags(stop_tuple, affix_tags, procletic, encletic_nm, suffix_conj_nm):
+                for vocalized_encletic in ssconst.COMP_SUFFIX_LIST_TAGS[
+                        encletic_nm]['vocalized']:
+                    for vocalized_suffix in ssconst.CONJ_SUFFIX_LIST_TAGS[
+                            suffix_conj_nm]['vocalized']:
+                        # affixes tags contains prefixes and suffixes tags
+                        affix_tags = ssconst.COMP_PREFIX_LIST_TAGS[procletic]['tags'] \
+                                  +ssconst.COMP_SUFFIX_LIST_TAGS[vocalized_encletic]['tags'] \
+                                  +ssconst.CONJ_SUFFIX_LIST_TAGS[vocalized_suffix]['tags']
+                        ## verify compatibility between procletics and affix
+                        valid = self.validate_tags(stop_tuple, affix_tags, procletic, encletic_nm)
+                        compatible = self.is_compatible_proaffix_affix(
+                            stop_tuple, procletic, vocalized_encletic,
+                            vocalized_suffix)
+                        if valid and compatible:
+                            vocalized_list = self.vocalize(
+                                original, procletic, vocalized_suffix,
+                                vocalized_encletic)
+                            vocalized, semi_vocalized =   vocalized_list[0][0],  vocalized_list[0][1]                              
+                            vocalized = self.ajust_vocalization(vocalized)
+                            #ToDo:
+                            # if the stop word is inflected or not
+                            is_inflected = u"مبني" if stop_tuple[
+                                'is_inflected'] == 0 else u"معرب"
+                            #add some tags from dictionary entry as
+                            # use action and object_type
+                            original_tags = u":".join([
+                                stop_tuple['word_type'],
+                                stop_tuple['word_class'],
+                                is_inflected,
+                                stop_tuple['action'],
+                            ])
+                            #~print "STOP_TUPEL[action]:", stop_tuple['action'].encode("utf8")
+                            # generate word case
+                            detailed_result.append(
+                                WordCase({
+                                    'word':
+                                    stop,
+                                    'affix': (procletic, '', vocalized_suffix,
+                                              vocalized_encletic),
+                                    'stem':
+                                    stem_conj,
+                                    'original':
+                                    original,
+                                    'vocalized':
+                                    vocalized,
+                                    'semivocalized':
+                                    semi_vocalized,                                     
+                                    'tags':
+                                    u':'.join(affix_tags),
+                                    'type':
+                                    u':'.join(
+                                        ['STOPWORD', stop_tuple['word_type']]),
+                                    'freq':
+                                    'freqstopword',  # to note the frequency type
+                                    'originaltags':
+                                    original_tags,
+                                    "action":
+                                    stop_tuple['action'],
+                                    "object_type":
+                                    stop_tuple['object_type'],
+                                    "need":
+                                    stop_tuple['need'],
+                                    'syntax':
+                                    '',
+                                }))
+        return detailed_result
 
 
 class SemanticDictionary(asmai.semdictionary.SemanticDictionary):
@@ -180,7 +312,6 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     """
     word_nm = araby.strip_tashkeel(word)
     word_nm_shadda = araby.strip_harakat(word)
-    print("Checking", word, word_nm, tag)
 
     result = []
 
@@ -193,7 +324,6 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
             result += verbstemmer.stemming_verb(word_nm)
         if tagger.has_noun_tag(tag) or tagger.is_stopword_tag(tag):
             result += stem_noun(word_nm)
-        print(result)
 
     if not result:
         result = unknownstemmer.stemming_noun(word_nm)
@@ -214,7 +344,7 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     return [StemmedWord(w) for w in result]
 
 
-def check_sentence(sentence: Sentence):
+def check_sentence(sentence: Sentence)->Generator[tuple[str, Pos, Case, bool, str, str, str], None, None]:
     """
     Analyzes Arabic tokens
 
@@ -231,46 +361,116 @@ def check_sentence(sentence: Sentence):
 
     for token, tag in zip(sentence, guessed_tags):
         preliminary_result = check_word(token.arab, tag)
-
-        def return_result(result):
-            node = stemnode.StemNode(result, True)
-            # print(token.arab, node.get_affix().split("-"))
-            return (
-                *node.get_lemma(return_pos=True),
-                node.get_affix().split("-")[0],
-                node.syntax_mark,
-            )
-
+        # lemma, pos, case, is_definite, prefix, verb ending, suffix
         if not preliminary_result:
-            print(token.arab, "not found")
-            # lemma, pos, prefix, sm
-            cases = {
-                "marfou3": [],
-                "mansoub": [],
-                "majrour": [],
-                "majzoum": [],
-                "tanwin_marfou3": [],
-                "tanwin_mansoub": [],
-                "tanwin_majrour": [],
-            }
-            if case := data.case_mapping.get(token.arab[-1]):
-                cases[case].append(0)
+            # print(token.arab, "not found")
             yield (
                 araby.strip_diacritics(token.arab),
                 "noun",
+                *data.case_mapping.get(token.arab[-1], ("n", True)),
                 "",
-                cases,
+                "",
+                ""
             )
-            continue
-        yield return_result(preliminary_result)
+        else:
+            result = preliminary_result
+            node = stemnode.StemNode(result, True)
+            sm = node.syntax_mark
+            cases: dict[Case, int] = {
+                "n": len(sm["marfou3"]) + len(sm["tanwin_marfou3"]),
+                "a": len(sm["mansoub"]) + len(sm["tanwin_mansoub"]),
+                "g": len(sm["majrour"]) + len(sm["tanwin_majrour"]),
+                "j": len(sm["majzoum"]),
+            }
+            sorted_cases = sorted(cases, key=cases.get, reverse=True)
+            gram_case = (
+                ""
+                if cases[sorted_cases[0]] == cases[sorted_cases[1]]
+                else sorted_cases[0]
+            )
+            # give preference
+            is_definite = len(sm["marfou3"]) + len(sm["mansoub"]) + len(
+                sm["majrour"]
+            ) >= len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
+                sm["tanwin_majrour"]
+            )
+            affix = node.get_affix().split("-")
+            # print(affix)
+            # print((
+            #     *node.get_lemma(return_pos=True),
+            #     gram_case,
+            #     is_definite,
+            #     affix[0],
+            #     *affix[2:4]
+            # ))
+            yield (
+                *node.get_lemma(return_pos=True),
+                gram_case,
+                is_definite,
+                affix[0],
+                *affix[2:4]
+            )
 
 
 def is_hamzatul_wasl(token: Token) -> bool:
     """
     Checks if a word starts with hamzatul wasl
 
-    Assumes the word starts with a hamza
+    Assumes the word starts with an alif
     """
-    assert token.arab[0] == data.hamza or token.arab[0] == data.alif
+    assert token.arab[0] == data.alif
     test_word = token.arab[1:]
-    return False and test_word
+    raise NotImplementedError
+
+def separate(word: str) -> tuple[list[str], list[str]]:
+    """
+    Splits a word into the rasm and the harakat
+    """
+    pos = -1
+    rasm = []
+    harakat = []
+    for c in word:
+        if c in data.harakat:
+            if not rasm:
+                rasm.append("")
+                harakat.append("")
+                pos += 1
+            harakat[pos] += c
+        else:
+            pos += 1
+            rasm.append(c)
+            harakat.append("")
+    return rasm, harakat
+
+def join(rasm: list[str], harakat: list[str]) -> str:
+    """
+    Joins the rasm and the harakat into a word
+    """
+    return "".join(itertools.chain(*zip(rasm, harakat)))
+
+def inject(injection: str, word: str, pos: int):
+    """
+    Inject a string into a word at a specific (rasm) position
+    """
+    _, harakat = separate(word)
+    actual_pos = pos + sum(len(r) for r in harakat[:pos])
+    return word[:actual_pos] + injection + word[actual_pos:]
+
+def remove_rasm(word: str, pos: int):
+    rasm, harakat = separate(word)
+    return join(rasm[:pos]+rasm[pos+1:], harakat[:pos]+harakat[pos+1:])
+
+
+def gen_arab_pattern_match(word: str) -> Callable[[str], bool]:
+    """
+    Generates a pattern for a word
+    """
+    rasm, harakat = separate(word)
+
+    def match_pattern(word: str) -> bool:
+        test_rasm, test_harakat = separate(word)
+        return test_rasm == rasm and all(
+            not t or not h or h == t for h, t in zip(harakat, test_harakat)
+        )
+
+    return match_pattern

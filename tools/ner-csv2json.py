@@ -1,6 +1,7 @@
 wiki_input = "data/ner-gold-standard/wiki.txt"
 ner_output = "data/ner.json"
 
+
 def gen_ner_json():
     names = set()
     non_names = set()
