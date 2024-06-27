@@ -2,6 +2,36 @@
 # https://de.wikipedia.org/wiki/Kairo
 مصر:Miṣr
 القاهرة:al-Qāhira
+# https://de.wikipedia.org/wiki/Taschd%C4%ABd
+شَدَّة:Šadda
+تَخْفِيف:taḫfīf
+فَه‍ﱢ‍مْ:fahhim
+# https://de.wikipedia.org/wiki/Suk%C5%ABn
+سُكُون:Sukūn
 # https://www.aai.uni-hamburg.de/voror/medien/dmg.pdf
 إِسحَاق:Isḥāq
-# TODO: scrape more
+# http://orientasia.de/cgi-data/downloads/arab_trans.pdf
+استشراق:istišrāq
+صلاة:ṣalāh
+هواء:hawāʾ
+# https://dmg-web.de/page/transliteration_de/ergaenzungen_arabisch-transliteration_de.pdf
+خرج:ḫaraǧa
+الشمس:aš-šams
+اسلام:islām
+سَيّارَتونَ:sayyāratunā
+بيت:bayt
+موت:mawt
+الأُمّ:al-ʾumm
+بالبيت:bi-l-bayt
+ولالصديق:wa-li-ṣ-ṣadīq
+فصحى:fuṣḥā
+حديث:ḥadīṯ
+كتاب سيرت النبيّ:kitāb sīrat an-nabī
+من يطلب يجد:man yaṭlub yaǧid
+مدينت السلام:Madīnat as-Salām
+ابوه:ʾabūhu
+كتابه:kitābuhū
+فيه:fīhi
+به:bihī
+عنه:ʿanhu
+باسم ﷲ الرحمن الرحيم:bi-smi llāhi r-raḥmāni raḥīmi
