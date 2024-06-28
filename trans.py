@@ -286,12 +286,12 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                         token.arab = token.arab[1:]
                 elif not has_haraka:
                     if araby.separate(araby.strip_lastharaka(token.arab))[1][1] == data.damma:
-                        has_haraka = "u"
+                        haraka = "u"
                     elif token.arab[0] == "ل":  # TODO: and not matches something else
-                        has_haraka = "a"
+                        haraka = "a"
                     else:
-                        has_haraka = "i"
-                    token.arab = (prev_wasl or has_haraka) + token.arab
+                        haraka = "i"
+                    token.arab = (prev_wasl or haraka) + token.arab
 
         # idafah
         for token, next_token in zip(sentence, sentence[1:]):
@@ -618,14 +618,13 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
                 if has_haraka:
                     token.arab = token.arab[1:]
             elif not has_haraka:
-                # TODO: and not matches something else
-                if araby.separate(token.arab)[1][1] == data.damma:
-                    has_haraka = "u"
-                elif token.arab[0] == "ل":
-                    has_haraka = "a"
+                if araby.separate(araby.strip_lastharaka(token.arab))[1][1] == data.damma:
+                    haraka = "u"
+                elif token.arab[0] == "ل":  # TODO: and not matches something else
+                    haraka = "a"
                 else:
-                    has_haraka = "i"
-                token.arab = (prev_wasl or has_haraka) + token.arab
+                    haraka = "i"
+                token.arab = (prev_wasl or haraka) + token.arab
 
     # idafah
     # and name specific: name joining
