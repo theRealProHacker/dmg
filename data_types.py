@@ -28,15 +28,21 @@ profile_descriptions = {
     ),
     "diphthongs": (
         "Diphthonge",
-        "Ob Diphthonge wiedergegeben werden sollen",
+        "Ob Diphthonge ai/au wiedergegeben werden sollen",
         "nawm",
         "naum",
     ),
     "double_vowels": (
-        "Geminierte Halbvokale konsonantisch",
+        "Geminierte Halbvokale",
         "Ob Halbvokale mit Shaddah als doppelte Konsonanten wiedergegeben werden sollen",
         "nīya",
         "niyya",
+    ),
+    "nisba": (
+        "-ī und -ū",
+        "Ob am Ende eines Wortes immer -ī/-ū statt -iyy/-uww wiedergegeben soll",
+        "nabiyy o. nabīy, al-ʿarabī",
+        "nabī, al-ʿarabī",
     ),
     "begin_hamza": (
         "Anlautendes Hamza",
@@ -49,12 +55,6 @@ profile_descriptions = {
         "Ob die Pronomen -hu und -hi ihrer Aussprache entsprechend wiedergegeben werden sollen",
         "baituhu, abūhu",
         "baituhū, abūhu",
-    ),
-    "nisba": (
-        "-ī und -ū",
-        "Ob am Ende eines Wortes immer -ī statt -iyy/-īy wiedergegeben soll (genauso mit ū). Die Nisba ist davon nicht beeinflusst",
-        "nabiyy o. nabīy, al-ʿarabī",
-        "nabī, al-ʿarabī",
     ),
     # "orth": (
     #     "Orthographie",
@@ -71,9 +71,9 @@ class Profile:
     ta_marbutah: bool = False
     diphthongs: bool = False
     double_vowels: bool = True
+    nisba: bool = True
     begin_hamza: bool = False
     hu_hi: bool = True
-    nisba: bool = True
 
     # TODO: imalah, ishmam
     # TODO: Zwei Doppelpunkte bei emphatischen Konsonanten
