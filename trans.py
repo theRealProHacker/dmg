@@ -285,7 +285,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                     if has_haraka:
                         token.arab = token.arab[1:]
                 elif not has_haraka:
-                    if araby.separate(token.arab)[1][1] == data.damma:
+                    if araby.separate(araby.strip_lastharaka(token.arab))[1][1] == data.damma:
                         has_haraka = "u"
                     elif token.arab[0] == "ل":  # TODO: and not matches something else
                         has_haraka = "a"

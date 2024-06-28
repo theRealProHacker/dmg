@@ -148,7 +148,9 @@ def test_double_vowels():
 
 def test_hamzatul_wasl():
     assert transliterate("ابن") == "ibn"
+    assert transliterate("ابنُ") == "ibnu"
     assert transliterate("اسم") == "ism"
+    assert transliterate("اسمُ") == "ismu"
     assert transliterate("الَّذينَ") == "allaḏīna"
     assert transliterate("اِنْكَسَرَ") == "inkasara"
     assert transliterate("انْكَسَرَ") == "inkasara"
