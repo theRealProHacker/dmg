@@ -403,7 +403,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
     # and the second if the first is "kitab"
     if profile.is_book:
         tokens[0].is_name = True
-        if len(tokens) > 1 and kitab_pattern(tokens[1].arab):
+        if len(tokens) > 1 and kitab_pattern(tokens[0].arab):
             tokens[1].is_name = True
 
     apply_hamzatul_wasl = False
