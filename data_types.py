@@ -16,52 +16,59 @@ profile_descriptions = {
     # id, title, description, off, on
     "pausa": (
         "Pausa",
-        "Ob der Text in Pausa gelesen werden soll",
+        "Ob der Text in Pausa gelesen wird",
         "al-kalbu",
         "al-kalb",
     ),
     "ta_marbutah": (
         "Ta marbuta",
-        "Ob die Ta marbuta am Ende eines Wortes wiedergegeben werden soll",
+        "Ob die Ta marbuta am Ende eines Wortes wiedergegeben wird",
         "al-madina",
         "al-madinah",
     ),
     "diphthongs": (
         "Diphthonge",
-        "Ob Diphthonge ai/au wiedergegeben werden sollen",
+        "Ob Diphthonge ai/au wiedergegeben werden",
         "nawm",
         "naum",
     ),
     "double_vowels": (
         "Geminierte Halbvokale",
-        "Ob Halbvokale mit Shaddah als doppelte Konsonanten wiedergegeben werden sollen",
+        "Ob Halbvokale mit Shaddah als doppelte Konsonanten wiedergegeben werden",
         "nīya",
         "niyya",
     ),
     "nisba": (
         "-ī und -ū",
-        "Ob am Ende eines Wortes immer -ī/-ū statt -iyy/-uww wiedergegeben soll",
+        "Ob am Ende eines Wortes immer -ī/-ū statt -iyy/-uww wiedergegeben wird",
         "nabiyy o. nabīy, al-ʿarabī",
         "nabī, al-ʿarabī",
     ),
     "begin_hamza": (
         "Anlautendes Hamza",
-        "Ob ein anlautendes Hamza wiedergegeben werden soll",
+        "Ob ein anlautendes Hamza wiedergegeben wird",
         "amr",
         "ʾamr",
     ),
     "hu_hi": (
         "-hu und -hi",
-        "Ob die Pronomen -hu und -hi ihrer Aussprache entsprechend wiedergegeben werden sollen",
+        "Ob die Pronomen -hu und -hi ihrer Aussprache entsprechend wiedergegeben werden",
         "baituhu, abūhu",
         "baituhū, abūhu",
     ),
-    # "orth": (
-    #     "Orthographie",
-    #     "Ob die Orthographie des Arabischen beachtet werden soll",
-    #     "anā",
-    #     "ana",
-    # ),
+    # for names
+    "is_book": (
+        "Buchtitel",
+        "Ob ein Buchtitel wiedergegeben wird",
+        "Kitāb al-Aġānī li-l-Imām Abī l-Faraǧ",
+        "Kitāb al-Aġānī li-l-imām abī l-faraǧ",
+    ),
+    "short_ibn": (
+        "ibn, bin und bint abkürzen",
+        "Ob ibn/bin und bint als b. und bt. abgekürzt werden",
+        "Muḥammad ibn ʿAbdallāh",
+        "Muḥammad b. ʿAbdallāh",
+    ),
 }
 
 

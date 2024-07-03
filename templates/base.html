@@ -230,8 +230,9 @@
             max-width: 60px;
             font-size: 2rem;
         }
-
     </style>
+    {% block head %}
+    {% endblock %}
 </head>
 <body>
     <template id="title-toast-template">
@@ -275,11 +276,13 @@
     <div id="grid-wrapper">
         <nav class="navbar navbar-expand">
             <div class="container-fluid">
-                <a class="navbar-brand" href="">
-                    <img src="/static/logo.svg" width="50" height="30" class="d-inline-block align-text-top me-2" alt="DMG icon">
-                    DMG Transliteration
-                </a>
-                <!-- <a class="active nav-item justify-start" href="/names">für Namen</a> -->
+                <ul class="navbar-nav">
+                    <a class="navbar-brand" href="">
+                        <img src="/static/logo.svg" width="50" height="30" class="d-inline-block align-text-top me-2" alt="DMG icon">
+                        DMG Transliteration
+                    </a>
+                    <a class="{% block names_active %}{% endblock %} nav-link" href="/names">für Namen</a>
+                </ul>
                 <ul class="navbar-nav justify-content-end">
                     <li class="nav-item mx-2">
                         <button class="btn" type="button" data-bs-toggle="modal" data-bs-target="#feedback-modal" aria-controls="feedback-modal" title="Feedback" style="vertical-align: text-top;">
@@ -328,11 +331,10 @@
         </nav>
         <main>
             <div id="main">
+                {% block main %}
                 <div class="col-12 mb-3">
-                    {% block main_pre_text %}
                     Transliterieren Sie Ihren arabischen Text in DMG. <br>
                     Mit dem Zauberstab-Button können Sie Ihren Text automatisch vokalisieren lassen.
-                    {% endblock %}
                 </div>
                 <div id="input-output" class="row">
                     <div class="col-12 col-lg-6 mb-3">
@@ -368,6 +370,7 @@
                         </div>
                     </div>
                 </div>
+                {% endblock %}
                 <div id="keyboard" class="my-3 collapse"> 
                     <div class="simple-keyboard"></div>
                 </div>
@@ -482,6 +485,7 @@
 
         // Main stuff
         let timeoutId;
+        let processing = false;
         {% block trans_url %}
         const trans_url = '/transliterate';
         {% endblock %}
@@ -540,15 +544,27 @@
 
         input.addEventListener('input', (e) => {
             clearTimeout(timeoutId); 
+            if (!input.value) {
+                output.value = ""
+                return false
+            } else if (processing) {
+                return false
+            }
+            processing = true;
             // when the event was triggered by manual input map the input
             if (e.inputType === 'insertText') {
                 document.execCommand("delete")
                 document.execCommand("insertText", false, process_input(e.data))
             }
-            timeoutId = setTimeout(send_request, e.inputType === 'insertFromPaste' ? 0 : 1000); 
+            processing = false;
+            timeoutId = setTimeout(send_request, e.inputType === 'insertFromPaste' ? 0 : 1000);
         });
 
-        input.addEventListener('change', send_request);
+        input.addEventListener('change', ()=>{
+            console.log("change")
+            clearTimeout(timeoutId)
+            send_request()
+        });
 
         let last_copied_interval = null;
         let last_copied = '';
@@ -577,7 +593,7 @@
             const current_output = output.value;
             fetch('/feedback', { 
                 method: 'POST', 
-                body: JSON.stringify({email, text, current_input, current_output}) 
+                body: JSON.stringify({email, text, current_input, current_output, trans_url, profile}) 
             })
             .then(response => {
                 if (response.ok)

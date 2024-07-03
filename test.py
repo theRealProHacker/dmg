@@ -296,6 +296,7 @@ def test_names():
         "ابْنُ بَطّوطَةَ": "Ibn Baṭṭūṭa",
         "أَبُو عَبْدِ الله مُحَمَّدٌ ابْنُ بَطّوطَةَ": "Abū ʿAbdallāh Muḥammad ibn Baṭṭūṭa",
         "أَبو حامِد مُحَمَّد الغَزّالِي": "Abū Ḥāmid Muḥammad al-Ġazzālī",
+        "كِتاب الأَغاني لِلإِمام أَبي الفَرَج":"Kitāb al-Aġānī li-l-Imām Abī l-Faraǧ"
     }
     for arab, latin in tests.items():
         assert transliterate_names(arab) == latin
@@ -311,6 +312,11 @@ def test_names():
         transliterate_names("ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=True))
         == "Ibn Baṭṭūṭa"
     )
+
+    assert transliterate_names(
+        "كِتاب الأَغاني لِلإِمام أَبي الفَرَج", 
+        profile=NameProfile(is_book=True)
+    ) == "Kitāb al-Aġānī li-l-imām abī l-faraǧ"
 
 
 if __name__ == "__main__":
