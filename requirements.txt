@@ -8,6 +8,10 @@ asmai
 mishkal
 gradio_client
 
+# book
+mistune
+# python-slugify[unidecode]
+
 # AI
 # torch
 # transformers

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
-{% block head %}
+{% block style %}
+{{ super() }}
 <style>
     #magic {
-        bottom: 0.9rem;
-        left: 0.75rem;
+        bottom: 5px;
+        left: 5px;
     }
 </style>
 {% endblock %}
@@ -14,12 +15,10 @@ active
 {% endblock %}
 
 
-{% block main %}
+{% block main_content %}
+<div class="col-12 mb-3"></div>
 
-<div class="col-12 mb-3">
-</div>
-
-<div id="input-output" class="form-input row">
+<div id="input-output" class="row">
     <div class="col-12 mb-4">
         <div id="textarea-magic-wrapper" style="position:relative;">
             <input id="input-text" class="form-control" dir="rtl" placeholder="مُحَمَّد بِن عَبد الله" autofocus>

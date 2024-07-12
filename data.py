@@ -101,7 +101,7 @@ def sub_map_pattern(pattern, d: dict[str, str], s: str) -> str:
 
 alif = "\u0627"
 waw = "\u0648"
-alif_maksurah = "\u0649"
+alif_maqsurah = "\u0649"
 ya = "\u064a"
 fathatan = "\u064b"
 dammatan = "\u064c"
@@ -268,7 +268,7 @@ unicode_cleanup_map = {
     **{harakah + shaddah: shaddah + harakah for harakah in harakat_wo_shaddah},
     # put fathatan before alif always (to protect it from pausa)
     alif + fathatan: fathatan + alif,
-    alif_maddah + fathatan: fathatan + alif_maddah,
+    # alif_maddah + fathatan: fathatan + alif_maddah,
     # remove left to right marker
     "\u200e": "",
     # replace alif wasl with alif because they are treated the same
@@ -318,7 +318,7 @@ vowel_map = {
     },
     # alif variants
     alif_maddah: hamza + alif,
-    alif_maksurah: alif,
+    alif_maqsurah: alif,
     # harakat + long vowel
     fathatan + alif + "$": "an",
     fatha + alif: "ā",
@@ -554,3 +554,72 @@ add_alif_words = {
     # taha
     "طَهَ": (1, 3),  # 3 after the first has been inserted
 }
+
+input_conversion_map = {
+    "A": "\u0627",
+    "b": "ب",
+    "t": "ت",
+    "^": "ث",
+    "j": "ج",
+    "H": "ح",
+    "x": "خ",
+    "d": "د",
+    "J": "ذ",
+    "r": "ر",
+    "z": "ز",
+    "s": "س",
+    "#": "ش",
+    "S": "ص",
+    "D": "ض",
+    "T": "ط",
+    "Z": "ظ",
+    "e": "ع",
+    "³": "ع",
+    "g": "غ",
+    "f": "ف",
+    "q": "ق",
+    "k": "ك",
+    "l": "ل",
+    "m": "م",
+    "n": "ن",
+    "h": "ه",
+    "w": "و",
+    "U": "\u0648",
+    "y": "ي",
+    "I": "\u064a",
+    "'": "ء",
+    "²": "ء",
+    "ö": "ة",
+    # harakat
+    "a": "\u064e",
+    "u": "\u064f",
+    "i": "\u0650",
+    "+": "\u0651",
+    "o": "\u0652",
+    "°": "\u0652",
+    "ä": "\u064b",
+    "ü": "\u064c",
+    "=": "\u064d",
+    # special characters
+    "~": "\u0622",
+    "_": "\u0649",
+    # numbers
+    "0": "٠",
+    "1": "١",
+    "2": "٢",
+    "3": "٣",
+    "4": "٤",
+    "5": "٥",
+    "6": "٦",
+    "7": "٧",
+    "8": "٨",
+    "9": "٩",
+    # punctuation
+    "?": "؟",
+}
+
+# input_conversion_map |= {
+#     key: v
+#     for k, v in input_conversion_map.items()
+#     if (key := k.upper()) not in input_conversion_map
+# }
