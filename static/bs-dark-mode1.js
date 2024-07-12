@@ -30,10 +30,7 @@ let currentTheme = getPreferredTheme()
 setTheme(currentTheme)
 
 window.onload = () => {
-    const themeSwitcher = document.querySelector('#theme-switcher')
-
-
-    // TODO: set themeSwitcher based on user's preference
+    // const themeSwitcher = document.querySelector('#theme-switcher')
     // themeSwitcher.checked = currentTheme === 'dark'
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

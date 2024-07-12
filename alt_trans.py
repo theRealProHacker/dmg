@@ -5,12 +5,12 @@ from pyarabic import araby
 
 import arab_tools
 import data
+from arab_tools import gen_arab_pattern_match
 from data import (
     sentence_stop_marks,
     token_pattern,
 )
-from data_types import Profile, NameProfile, Token
-from arab_tools import gen_arab_pattern_match
+from data_types import NameProfile, Profile, Token
 
 try:
     import ner
@@ -47,7 +47,7 @@ bint_pattern = gen_arab_pattern_match("بِنْت")
 kitab_pattern = gen_arab_pattern_match("كتاب")
 
 
-def transliterate(text: str, profile: Profile|NameProfile = Profile()) -> str:
+def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
     """ """
     profile_is_name = isinstance(profile, NameProfile)
     # We try to separate the step of gathering information
@@ -271,7 +271,7 @@ def transliterate(text: str, profile: Profile|NameProfile = Profile()) -> str:
             prev_ended_vowel = apply_hamzatul_wasl
             prev_wasl = next_wasl
             apply_hamzatul_wasl = (
-                arab[-1] in (data.alif, data.alif_maksurah)
+                arab[-1] in (data.alif, data.alif_maqsurah)
                 and (len(arab) == 1 or arab[-2] != data.fathatan)
                 or arab[-1] in data.half_vowels
                 and data.half_vowel_is_long(arab, len(arab) - 1)
@@ -308,7 +308,10 @@ def transliterate(text: str, profile: Profile|NameProfile = Profile()) -> str:
                     if has_haraka:
                         token.arab = token.arab[1:]
                 elif not has_haraka:
-                    if araby.separate(araby.strip_lastharaka(token.arab))[1][1] == data.damma:
+                    if (
+                        araby.separate(araby.strip_lastharaka(token.arab))[1][1]
+                        == data.damma
+                    ):
                         haraka = "u"
                     elif token.arab[0] == "ل":  # TODO: and not matches something else
                         haraka = "a"
@@ -377,4 +380,3 @@ def transliterate(text: str, profile: Profile|NameProfile = Profile()) -> str:
         token.latin = word
 
     return beginning_non_token + "".join(token.result for token in tokens)
-

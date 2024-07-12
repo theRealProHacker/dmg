@@ -8,19 +8,20 @@ Module for vocalization of Arabic text
 # import json
 
 from contextlib import suppress
+
 import mishkal.tashkeel
 
 # import requests
 import data
-from arab_tools import separate, join
+from arab_tools import join, separate
 
 vocalizer = mishkal.tashkeel.TashkeelClass("")
 
 
-def vocalize(text: str) -> str:
-    o = vocalizer.tashkeel(text)
-    o = "".join(c if c.isprintable() else " " for c in o).strip()
-    return o
+# def vocalize(text: str) -> str:
+#     o = vocalizer.tashkeel(text)
+#     o = "".join(c if c.isprintable() else " " for c in o).strip()
+#     return o
 
 
 # This doesn't work
