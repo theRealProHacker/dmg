@@ -6,7 +6,7 @@ Dies ist ein Tool, dass Ihnen bei der Transliteration des Arabischen nach dem St
 
 Das UI ist einfach gehalten, um den Fokus auf die Transliteration zu legen. Hier eine Übersicht
 
-<div class="p-1 bg-white">
+<div class="col-11 p-1 bg-white">
     <div class="ratio ratio-16x9">
         <img src="/static/ui.png" alt="UI Übersicht">
     </div>
@@ -19,9 +19,13 @@ Die **Aktionsleiste**/das **Aktionsmenü** stellt einige wichtige Funktionen ber
 - Außerdem können Sie **Feedback** zum Tool geben. Jedes Feedback ist willkommen und wird zur Verbesserung des Tools verwendet. Beachten Sie jedoch [die bekannten Fehler](#bekannte-fehler)
 - Es gibt auch eine digitale arabische **Tastatur** zur [Eingabe](#eingabe)
 - Natürlich darf auch ein **Dark-Mode** nicht fehlen
-- Um die Transliteration flexibel zu gestalten und die vielen verschiedenen Standards zu berücksichtigen, gibt es einige **[Einstellungen]**(#einstellungen)
+- Um die Transliteration flexibel zu gestalten und die vielen verschiedenen Standards zu berücksichtigen, gibt es einige **[Einstellungen]**(#einstellungen), die in einer Side Bar angezeigt werden
 
-Im **Eingabefeld** kann ein arabischer Text eingegeben werden. Dieser wird dann automatisch transliteriert und die Transliteration wird im **Ausgabefeld** angezeigt. Durch einfaches Klicken, kann diese dann in die Zwischenablage kopiert werden. Beachten Sie bitte, dass der arabische Text nicht vokalisiert wird. Das müssen Sie entweder manuell tun, oder Sie lassen den Text durch eine KI automatisch vokalisieren, indem sie auf den magischen **Vokalisation**sknopf drücken. Das braucht zwar oft ziemlich lange, also so um die 10 Sekunden, aber die KI wird zu 90 % korrekte Ergebnisse liefern. Falls Sie im Aktionsmenü die virtuelle arabische **Tastatur** ausgeklappt haben, dann wird diese unterhalb der beiden Textfelder angezeigt und kann sehr intuitiv benutzt werden. Die Tastatur enthält alle gängigen Zeichen hat aber keine Shift ⇧-Taste
+Im **Eingabefeld** kann ein arabischer Text eingegeben werden. Dieser wird dann automatisch transliteriert und die Transliteration wird im **Ausgabefeld** angezeigt. Durch Klicken kann das Ergebnis in die Zwischenablage kopiert werden. Unterhalb des Ausgabefeldes können Sie angeben, ob Sie mit dem Ergebnis zufrieden sind. Diese Angaben werden verwendet, um das Tool zu verbessern. 
+
+Beachten Sie bitte, dass der arabische Text nicht vokalisiert wird. Das müssen Sie entweder manuell tun, oder Sie lassen den Text durch eine KI automatisch vokalisieren, indem sie auf den "magischen" **Vokalisation**sknopf drücken. Das braucht zwar oft ziemlich lange, also so um die 10 Sekunden, aber die KI wird zu 90 % korrekte Ergebnisse liefern. 
+
+Falls Sie im Aktionsmenü die virtuelle arabische **Tastatur** ausgeklappt haben, dann wird diese unterhalb der beiden Textfelder angezeigt und kann sehr intuitiv benutzt werden. Die Tastatur enthält alle gängigen Zeichen. 
 
 ## Eingabe
 
@@ -42,16 +46,45 @@ input_map
 
 # Bekannte Fehler
 
-> Es gilt im Allgemeinen: Je besser Sie die Eingabe vokalisieren, desto besser wird die Ausgabe Ihren Vorstellungen entsprechen. 
+> Es gilt im Allgemeinen: Je genauer Sie die Eingabe vokalisieren, desto besser wird die Ausgabe Ihren Vorstellungen entsprechen. 
 
-1. Die KI zur **Vokalisation** gleicht architektonisch LLMs wie ChatGPT und ist daher immer anfällig für sogenannte Halluzinationen, also völlig schwachsinnigen, nicht-nachvollziehbaren Ausgaben
-2. Die Erkennung der Präfixe und Genetivkonstruktionen sheitert teilweise. Dann ist es meist das Beste die fehlenden Zeichen (t bzw. -) einfach später selbst nachzutragen. Oft ist es aber auch hilfreich, noch spezifischer zu werden und zum Beispiel eine weitere *ḥaraka* einzufügen:
+1. Die KI zur **Vokalisation** gleicht architektonisch LLMs wie ChatGPT und ist daher immer anfällig für sogenannte Halluzinationen, also völlig schwachsinnige, nicht-nachvollziehbare Ausgaben
+2. Die Erkennung der Präfixe und Genetivkonstruktionen scheitert teilweise. Dann ist es meist das Beste die fehlenden Zeichen (t bzw. -) einfach später selbst nachzutragen. Oft ist es aber auch hilfreich, noch spezifischer zu werden und zum Beispiel eine weitere *ḥaraka* einzufügen:
     - الكِتاب → alkitāb, aber الكِتَاب → al-kitāb
     - هَمزَة الوَصل → hamza al-waṣl, aber هَمزَة الوَصلِ → hamzat al-waṣl. Die *kasra* macht dem Programm klar, dass "al-waṣl" im Genetiv steht
-3. Wenn ein Imperativ mit *hamzat al-waṣl* beginnt, auf das ein *lām* folgt auf das ein Konsonant folgt, welcher keine *ḍamma* trägt, wird das *hamzat al-waṣl* als "a" nicht als "i" wiedergegeben. In solchen Fällen, kann der Kurzvokal auf dem *hamzat al-waṣl* explizit gesetzt werden: العَب (Spiel!) → alʿab, aber اِلعَب → ilʿab
-4. ...
+3. Wenn ein Imperativ mit *hamzat al-waṣl* beginnt, auf das ein *lām* folgt, auf das ein Konsonant folgt, welcher keine *ḍamma* trägt, wird das *hamzat al-waṣl* als "a" nicht als "i" wiedergegeben. In solchen Fällen, kann der Kurzvokal auf dem *hamzat al-waṣl* explizit gesetzt werden: العَب (Spiel!) → alʿab, aber اِلعَب → ilʿab
+4. Außer einige wenige Ausahmen, wie Allāh, werden Namen nicht großgeschrieben. Für Namen gibt es stattdessen ein [dediziertes Tool](/names), welches über die Navigationsleiste erreicht werden kann. 
 
 # Einstellungen
 
-Die Einstellungen sind einfache boolesche Switches, können also entweder an oder aus sein. Durch Klicken kann man zwischen den beiden Zuständen hin- und herwechseln. Durch Hovern kann man für jede Einstellung eine kurze Beschreibung und jeweils ein Beispiel für den An- und Aus-Zustand sehen. Im Weiteren ist es mein Ziel jede Einstellung genauer zu erklären und auch mit Quellen zu hinterlegen
+Die Einstellungen sind einfache boolesche Switches, können also entweder an oder aus sein. Durch Klicken kann man zwischen den beiden Zuständen hin- und herwechseln. Durch Hovern kann man für jede Einstellung eine kurze Beschreibung und jeweils ein Beispiel für den An- und Aus-Zustand sehen. 
 
+## Allgemeine Einstellungen
+- **Pausa** (aus)  
+    Bei der Transliteration gibt es zwei grundlegend verschiedene Arten zu transliterieren: die Pausal- und die voll vokalisierte Form. Bei der gebräuchlicheren Pausalform werden die Flexionsendungen weggelassen, außer bei: 
+    - Verben
+    - Präpositionen
+    - Pronomen, auch suffigiert
+    - Konjunktionen
+    - Akkusativendungen
+- **Tāʾ marbutah** (aus)  
+    Das *tāʾ marbutah* kann, falls keine Flexionsendungen folgen, kein langer Vokal davorsteht und keine Genetivverbindung besteht, entweder als h oder gar nicht wiedergegeben werden. Die Einstellung gibt an, ob das *tāʾ marbutah* wiedergegeben wird.
+- **Diphthonge** (aus)  
+    Diese Einstellung bestimmt, ob Diphthonge vokalisch wiedergegeben werden. Also ai/au statt ay/aw. 
+- **Geminierte Halbvokale** (an)  
+    Diese Einstellung bestimmt, ob Halbvokale mit Shaddah als doppelte Konsonanten wiedergegeben werden. Also iyy/uww statt īy/īw
+- **-ī und -ū** (an)  
+    Diese Einstellung bestimmt, ob die gerade in **Geminierte Halbvokale** erwähnten Halbvokale am Ende von Wörtern unabhängig von der oben gesetzten Einstellung immer als -ī/-ū wiedergegeben werden. Beachten Sie, dass die männliche Nisbaendung immer so wiedergegeben wird. 
+- **Anlautendes Hamza** (aus)  
+    Diese Einstellung bestimmt, ob ein anlautendes *hamzat al-qaṭ* wiedergegeben wird. Ein *hamzat al-waṣl* wird nie wiedergegeben
+- **-hu und -hi** (an)  
+    Diese Einstellung bestimmt, ob das suffigierte Personalpronomen der 3. Pers. Sing. Masc. nach einer kurzen Silbe verlängert wird. 
+
+## Einstellungen für Namen
+
+Namen werden grundsätzlich in Pausa wiedergegeben
+
+- **Buchtitel**  
+    Bei Namen kann man zwischen Personen- und Ortsnamen sowie Buchtiteln unterscheiden. Bei Buchtiteln wird nur das erste Wort großgeschrieben, außer das erste Wort ist *Kitāb*, dann wird auch das nächste großgeschrieben. Personen und Ortsnamen werden bis auf die Abstammungspartikel *ibn*, *bin* und *bint* grundsätzlich vollständig großgeschrieben. 
+- **b. und bt.**  
+    Bei Personennamen können die gerade erwähnten Abstammungspartikel *ibn*, *bin* und *bint* mit b. und bt. abgekürzt werden. 

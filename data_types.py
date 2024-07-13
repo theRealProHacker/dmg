@@ -64,7 +64,7 @@ profile_descriptions = {
         "Kitāb al-Aġānī li-l-imām abī l-faraǧ",
     ),
     "short_ibn": (
-        "ibn, bin und bint abkürzen",
+        "b. und bt.",
         "Ob ibn/bin und bint als b. und bt. abgekürzt werden",
         "Muḥammad ibn ʿAbdallāh",
         "Muḥammad b. ʿAbdallāh",
@@ -135,7 +135,7 @@ Sentence = list[Token]
 @dataclass
 class NameProfile:
     is_book: bool = False
-    short_ibn: bool = False
+    short_ibn: bool = True
     ta_marbutah: bool = False
     diphthongs: bool = False
     double_vowels: bool = True
