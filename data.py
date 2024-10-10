@@ -367,7 +367,7 @@ diphthong_map = {
     for half_vowel, short_vowel in zip(half_vowels, half_vowels_as_short_vowels)
 }
 diphthong_map = {
-    f"(?<=[aā]){l_hw}(?!a|u|i)": short_vowel
+    f"(?<=[aā]){l_hw}(?![auiāūī])": short_vowel
     for l_hw, short_vowel in zip(half_vowels_as_consonants, half_vowels_as_short_vowels)
 }
 
