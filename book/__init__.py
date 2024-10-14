@@ -5,7 +5,6 @@ from mistune.toc import render_toc_ul
 
 from data import input_conversion_map
 
-
 input_map = (
     '<ul id="con-list">'
     + "".join(f"<li>{k} → {v}</li>" for k, v in input_conversion_map.items())
