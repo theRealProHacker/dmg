@@ -118,7 +118,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
             sug_rasm, sug_harakat = arab_tools.separate(prefix_suggestion)
             i = 0  # the index in the rasm
 
-            def get_rasm(i: int) -> bool:
+            def get_rasm(i: int) -> str:
                 return sug_rasm[i] if sug_rasm[i] == rasm[i] else "___"
 
             def check_haraka(i: int, haraka: str) -> bool:
@@ -439,7 +439,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
         sug_rasm, sug_harakat = arab_tools.separate(prefix_suggestion)
         i = 0  # the index in the rasm
 
-        def get_rasm(i: int) -> bool:
+        def get_rasm(i: int) -> str:
             return sug_rasm[i] if sug_rasm[i] == rasm[i] else "___"
 
         def check_haraka(i: int, haraka: str) -> bool:
