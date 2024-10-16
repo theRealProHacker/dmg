@@ -15,8 +15,8 @@ The files in this module are licensed under the GPL-3.0 License.
 
 """
 
-from functools import cache
 import itertools
+from functools import cache
 from typing import Callable, Generator, Literal
 
 import asmai.semdictionary
@@ -28,8 +28,8 @@ import qalsadi.stem_unknown
 import qalsadi.stem_verb
 import qalsadi.stopwords
 from pyarabic import araby
-from qalsadi import stemnode
 from qalsadi import stem_stopwords_const as ssconst
+from qalsadi import stemnode
 from qalsadi.stemmedword import StemmedWord
 from qalsadi.wordcase import WordCase
 
@@ -311,8 +311,7 @@ def check_partially_vocalized(word: str, data: list[WordCase]) -> list[WordCase]
     return filtered
 
 
-@cache
-def check_word(word: str, tag: str) -> list[StemmedWord]:
+def _check_word(word: str, tag: str) -> list[StemmedWord]:
     """
     Analyzes an Arabic word by going through all possible cases
     (number, punctuation, stopword, verb, noun and unknown)
@@ -356,6 +355,119 @@ def check_word(word: str, tag: str) -> list[StemmedWord]:
     return [StemmedWord(w) for w in result]
 
 
+@cache
+def check_word(word: str, tag: str) -> tuple[str, Pos, Case, bool, str, str, str]:
+    result = _check_word(word, tag)
+    # lemma, pos, case, is_definite, prefix, verb ending, suffix, success
+    if not result:
+        default_return = (
+            araby.strip_diacritics(word),
+            "noun",
+            *data.case_mapping.get(word[-1], ("n", True)),
+            "",
+            "",
+            "",
+            False,
+        )
+        rasm, harakat = separate(word)
+        if len(rasm) < 3:  # assuming the word after the prefix is at least 2 letters
+            return default_return
+        letter = rasm[0]
+        haraka = harakat[0]
+
+        def prepend_prefix(result, prefix):
+            return (
+                *result[:4],
+                prefix + result[4],
+                *result[5:],
+            )
+
+        # wa- and fa- prefix
+        if letter in "فو" and (not haraka or haraka == data.fatha):
+            result = check_word(join(rasm[1:], harakat[1:]), tag)
+            if result[-1]:  # success
+                return prepend_prefix(result, letter + data.fatha)
+            # return (
+            #     *result[:4],
+            #     next_letter+harakat[0]+result[4],
+            #     *result[5:],
+            # )
+        # sa- prefix
+        elif letter == "س" and (not haraka or haraka == data.fatha):
+            result = check_word(join(rasm[1:], harakat[1:]), tag)
+            if result[-1] and result[1] == "verb":
+                return prepend_prefix(result, letter + data.fatha)
+        # li-, bi-, ka- and then al- prefix
+        elif letter in "لبك":
+            if letter in "لب" and (not haraka or haraka == data.kasra):
+                prefix = letter + data.kasra
+                i = 1
+                if (
+                    letter == "ل"
+                    and rasm[1] == "ل"
+                    and (not harakat[1] or harakat[1] == data.sukun)
+                ):
+                    prefix += "لْ"
+                    i += 1
+                result = check_word(join(rasm[i:], harakat[i:]), tag)
+                if result[-1] and (i == 1 or result[1] == "noun"):
+                    return prepend_prefix(result, prefix)
+            elif letter == "ك" and (not harakat[i] or harakat[i] == data.fatha):
+                result = check_word(join(rasm[1:], harakat[1:]), tag)
+                if result[-1]:
+                    return prepend_prefix(result, letter + data.fatha)
+        elif (
+            len(word) >= 5
+            and letter == "ا"
+            and harakat[0] == ""
+            and rasm[1] == "ل"
+            and harakat[1] in " " + data.sukun
+        ):
+            result = check_word(join(rasm[2:], harakat[2:]), tag)
+            if result[-1] and result[1] == "noun":
+                return prepend_prefix(result, letter + data.fatha)
+        # debug
+        print(word, "not found")
+        return default_return
+    else:
+        node = stemnode.StemNode(result, True)
+        sm = node.syntax_mark
+        cases: dict[Case, int] = {
+            "n": len(sm["marfou3"]) + len(sm["tanwin_marfou3"]),
+            "a": len(sm["mansoub"]) + len(sm["tanwin_mansoub"]),
+            "g": len(sm["majrour"]) + len(sm["tanwin_majrour"]),
+            "j": len(sm["majzoum"]),
+        }
+        sorted_cases = sorted(cases, key=cases.get, reverse=True)
+        gram_case = (
+            "" if cases[sorted_cases[0]] == cases[sorted_cases[1]] else sorted_cases[0]
+        )
+        # give preference
+        is_definite = len(sm["marfou3"]) + len(sm["mansoub"]) + len(
+            sm["majrour"]
+        ) >= len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
+            sm["tanwin_majrour"]
+        )
+        affix = node.get_affix().split("-")
+        # debug info
+        # print(affix)
+        # print((
+        #     *node.get_lemma(return_pos=True),
+        #     gram_case,
+        #     is_definite,
+        #     affix[0],
+        #     *affix[2:4]
+        # ))
+        return (
+            *node.get_lemma(return_pos=True),
+            gram_case,
+            is_definite,
+            affix[0],
+            *affix[2:4],
+            True,
+        )
+
+
 def check_sentence(
     sentence: Sentence,
 ) -> Generator[tuple[str, Pos, Case, bool, str, str, str], None, None]:
@@ -374,56 +486,7 @@ def check_sentence(
     ]
 
     for token, tag in zip(sentence, guessed_tags):
-        preliminary_result = check_word(token.arab, tag)
-        # lemma, pos, case, is_definite, prefix, verb ending, suffix
-        if not preliminary_result:
-            # print(token.arab, "not found")
-            yield (
-                araby.strip_diacritics(token.arab),
-                "noun",
-                *data.case_mapping.get(token.arab[-1], ("n", True)),
-                "",
-                "",
-                "",
-            )
-        else:
-            result = preliminary_result
-            node = stemnode.StemNode(result, True)
-            sm = node.syntax_mark
-            cases: dict[Case, int] = {
-                "n": len(sm["marfou3"]) + len(sm["tanwin_marfou3"]),
-                "a": len(sm["mansoub"]) + len(sm["tanwin_mansoub"]),
-                "g": len(sm["majrour"]) + len(sm["tanwin_majrour"]),
-                "j": len(sm["majzoum"]),
-            }
-            sorted_cases = sorted(cases, key=cases.get, reverse=True)
-            gram_case = (
-                ""
-                if cases[sorted_cases[0]] == cases[sorted_cases[1]]
-                else sorted_cases[0]
-            )
-            # give preference
-            is_definite = len(sm["marfou3"]) + len(sm["mansoub"]) + len(
-                sm["majrour"]
-            ) >= len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
-                sm["tanwin_majrour"]
-            )
-            affix = node.get_affix().split("-")
-            # print(affix)
-            # print((
-            #     *node.get_lemma(return_pos=True),
-            #     gram_case,
-            #     is_definite,
-            #     affix[0],
-            #     *affix[2:4]
-            # ))
-            yield (
-                *node.get_lemma(return_pos=True),
-                gram_case,
-                is_definite,
-                affix[0],
-                *affix[2:4],
-            )
+        yield check_word(token.arab, tag)
 
 
 def is_hamzatul_wasl(token: Token) -> bool:
@@ -433,7 +496,7 @@ def is_hamzatul_wasl(token: Token) -> bool:
     Assumes the word starts with an alif
     """
     assert token.arab[0] == data.alif
-    test_word = token.arab[1:]
+    # test_word = token.arab[1:]
     raise NotImplementedError
 
 

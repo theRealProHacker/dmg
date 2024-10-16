@@ -65,7 +65,7 @@ def test_prefixes():
     # bil
     assert transliterate("بِالْبَيت") == "bi-l-bayt"
     # wa-lil
-    # assert transliterate("وَلِالاستِشراق") == "wa-li-l-istišrāq"
+    assert transliterate("وَلِالاستِشراق") == "wa-li-l-istišrāq"
 
 
 def test_sun_assimilation():

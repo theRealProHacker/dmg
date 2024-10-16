@@ -100,6 +100,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                 prefix_suggestion,
                 verb_ending,
                 token.suffix,
+                _,  # success
             ) = is_name, *stemming
             assert token.pos in ("noun", "verb", "stopword", "")
             stripped_suffix = araby.strip_harakat(token.suffix)
@@ -137,7 +138,7 @@ def transliterate(text: str, profile: Profile = Profile()) -> str:
                     token.latin_prefix += "sa-"
                     i += 1
                 # li-, bi-, ka- and then al- prefix
-                elif next_letter in "لباك":
+                elif next_letter in "لبك":
                     if next_letter in "لب" and (
                         not harakat[i] or harakat[i] == data.kasra
                     ):
@@ -423,6 +424,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
             prefix_suggestion,
             verb_ending,
             token.suffix,
+            _,  # success
         ) = stemming
         # names specific
         if not profile.is_book:
@@ -458,7 +460,7 @@ def transliterate_names(text: str, profile: NameProfile = NameProfile()):
                 token.latin_prefix += "sa-"
                 i += 1
             # li-, bi-, ka- and then al- prefix
-            elif next_letter in "لباك":
+            elif next_letter in "لبك":
                 if next_letter in "لب" and (not harakat[i] or harakat[i] == data.kasra):
                     token.latin_prefix += ("l" if next_letter == "ل" else "b") + "i-"
                     i += 1
