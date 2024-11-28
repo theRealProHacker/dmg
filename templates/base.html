@@ -269,6 +269,7 @@
         send_request();
     });
 
+    const profile = {};
     // let last_sent = "";
     const send_request = () => {
         const text = input.value;
@@ -277,7 +278,6 @@
             return false
         };
 
-        const profile = {};
         // XXX: This only works for booleans
         profile_inputs.forEach(input => {
             if (input.type === 'checkbox') {
@@ -359,6 +359,11 @@
         const email = email_input.value;
         const current_input = input.value;
         const current_output = output.value;
+        profile_inputs.forEach(input => {
+            if (input.type === 'checkbox') {
+                profile[input.name] = input.checked
+            }
+        });
         fetch('/feedback', { 
             method: 'POST', 
             body: JSON.stringify({email, text, current_input, current_output, trans_url, profile}) 
