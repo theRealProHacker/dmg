@@ -289,7 +289,7 @@ def test_names():
         # "عَيْنُ التَّابْغَةِ": "ʿAyn at-Tābġa",
         "النِّيلُ": "an-Nīl",
         "ابْنُ بَطّوطَةَ": "Ibn Baṭṭūṭa",
-        "أَبُو عَبْدِ الله مُحَمَّدٌ ابْنُ بَطّوطَةَ": "Abū ʿAbdallāh Muḥammad ibn Baṭṭūṭa",
+        "أَبُو عَبْدِ الله مُحَمَّدٌ ابْنُ بَطّوطَةَ": "Abū ʿAbdallāh Muḥammad b. Baṭṭūṭa",
         "أَبو حامِد مُحَمَّد الغَزّالِي": "Abū Ḥāmid Muḥammad al-Ġazzālī",
         "كِتاب الأَغاني لِلإِمام أَبي الفَرَج": "Kitāb al-Aġānī li-l-Imām Abī l-Faraǧ",
     }
@@ -299,9 +299,9 @@ def test_names():
     assert transliterate_names("أَبُو بَكْر") == "Abū Bakr"
     assert (
         transliterate_names(
-            "أَبُو عَبْدِ الله مُحَمَّدٌ ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=True)
+            "أَبُو عَبْدِ الله مُحَمَّدٌ ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=False)
         )
-        == "Abū ʿAbdallāh Muḥammad b. Baṭṭūṭa"
+        == "Abū ʿAbdallāh Muḥammad ibn Baṭṭūṭa"
     )
     assert (
         transliterate_names("ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=True))
