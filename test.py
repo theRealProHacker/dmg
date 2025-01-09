@@ -1,7 +1,7 @@
 import arab_tools
 import data
 from data_types import NameProfile
-from trans import Profile, ner_available, transliterate, transliterate_names
+from trans import Profile, ner_available, transliterate
 
 profile_pausa = Profile(pausa=True)
 
@@ -261,11 +261,11 @@ def test_special_words():
     assert transliterate("أُولَئِكَ") == "ulāʾika"
     assert transliterate("أُولَٰئِكَ") == "ulāʾika"
     # Taha
-    assert transliterate("طَهَ") == "Ṭāhā"
+    assert transliterate("طَهَ") == "ṭāhā"
     # Ibrahim
-    assert transliterate("إِبْرَاهِيم") == "Ibrāhīm"
+    assert transliterate("إِبْرَاهِيم") == "ibrāhīm"
     # Amr
-    assert transliterate("عَمرَو") == "ʿAmr"
+    assert transliterate("عَمرَو") == "ʿamr"
 
 
 def _test_ibrahim_text():
@@ -294,22 +294,22 @@ def test_names():
         "كِتاب الأَغاني لِلإِمام أَبي الفَرَج": "Kitāb al-Aġānī li-l-Imām Abī l-Faraǧ",
     }
     for arab, latin in tests.items():
-        assert transliterate_names(arab) == latin
+        assert transliterate(arab, NameProfile()) == latin
 
-    assert transliterate_names("أَبُو بَكْر") == "Abū Bakr"
+    assert transliterate("أَبُو بَكْر", NameProfile()) == "Abū Bakr"
     assert (
-        transliterate_names(
+        transliterate(
             "أَبُو عَبْدِ الله مُحَمَّدٌ ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=False)
         )
         == "Abū ʿAbdallāh Muḥammad ibn Baṭṭūṭa"
     )
     assert (
-        transliterate_names("ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=True))
+        transliterate("ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=True))
         == "Ibn Baṭṭūṭa"
     )
 
     assert (
-        transliterate_names(
+        transliterate(
             "كِتاب الأَغاني لِلإِمام أَبي الفَرَج", profile=NameProfile(is_book=True)
         )
         == "Kitāb al-Aġānī li-l-imām abī l-faraǧ"
