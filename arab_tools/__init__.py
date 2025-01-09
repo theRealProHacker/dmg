@@ -399,9 +399,9 @@ def check_word(word: str, tag: str) -> tuple[str, Pos, Case, bool, str, str, str
                 return prepend_prefix(result, letter + data.fatha)
         # li-, bi-, ka- and then al- prefix
         elif letter in "لبك":
+            i = 1
             if letter in "لب" and (not haraka or haraka == data.kasra):
                 prefix = letter + data.kasra
-                i = 1
                 if (
                     letter == "ل"
                     and rasm[1] == "ل"
