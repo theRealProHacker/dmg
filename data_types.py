@@ -142,3 +142,7 @@ class NameProfile:
     begin_hamza: bool = False
     hu_hi: bool = True
     nisba: bool = True
+
+@dataclass
+class IJMESProfile:
+    diphthongs: bool = False
