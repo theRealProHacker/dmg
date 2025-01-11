@@ -623,3 +623,35 @@ input_conversion_map = {
 #     for k, v in input_conversion_map.items()
 #     if (key := k.upper()) not in input_conversion_map
 # }
+
+# IJMES
+ijmes_con_map = {
+    "(.)" + shaddah: lambda match: match.group(1) * 2,
+    hamza: "ʾ",
+    "ب": "b",
+    "ت": "t",
+    "ة": "t",  # this is the default. Should be overriden
+    "ث": "th",
+    "ج": "j",
+    "ح": "ḥ",
+    "خ": "kh",
+    "د": "d",
+    "ذ": "dh",
+    "ر": "r",
+    "ز": "z",
+    "س": "s",
+    "ش": "sh",
+    "ص": "ṣ",
+    "ض": "ḍ",
+    "ط": "ṭ",
+    "ظ": "ẓ",
+    "ع": "ʿ",
+    "غ": "gh",
+    "ف": "f",
+    "ق": "q",
+    "ك": "k",
+    "ل": "l",
+    "م": "m",
+    "ن": "n",
+    "ه": "h",
+}
