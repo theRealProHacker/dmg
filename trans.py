@@ -688,10 +688,11 @@ def transliterate_ijmes(text: str, profile: IJMESProfile)->str:
         char_map = (
             data.subs
             | data.vowel_map
-            | ({"ة": ""} if not token.is_idafah else {})
             | data.begin_hamza_map
             | data.ijmes_con_map
         )
+        if not token.is_idafah:
+            char_map["ة"]=""
         if profile.diphthongs:
             char_map |= data.diphthong_map
         rules = [(re.compile(arab), latin) for arab, latin in char_map.items()]
