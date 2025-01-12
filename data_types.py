@@ -145,4 +145,5 @@ class NameProfile:
 
 @dataclass
 class IJMESProfile:
+    is_name: bool = False
     diphthongs: bool = False
