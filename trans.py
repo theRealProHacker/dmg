@@ -690,7 +690,7 @@ def transliterate_ijmes(text: str, profile: IJMESProfile)->str:
             | data.vowel_map
             | ({"ة": ""} if not token.is_idafah else {})
             | data.begin_hamza_map
-            | data.con_map
+            | data.ijmes_con_map
         )
         if profile.diphthongs:
             char_map |= data.diphthong_map
