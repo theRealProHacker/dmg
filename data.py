@@ -630,7 +630,7 @@ ijmes_con_map = {
     hamza: "ʾ",
     "ب": "b",
     "ت": "t",
-    "ة": "t",  # this is the default. Should be overriden
+    "ة": "t",
     "ث": "th",
     "ج": "j",
     "ح": "ḥ",
@@ -654,4 +654,15 @@ ijmes_con_map = {
     "م": "m",
     "ن": "n",
     "ه": "h",
+}
+
+ijmes_name_map = {
+    "ā":"a",
+    "ū":"u",
+    "ī":"i",
+    "ḥ":"h",
+    "ṣ":"s",
+    "ḍ":"d",
+    "ṭ":"t",
+    "ẓ":"z",
 }

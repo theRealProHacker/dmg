@@ -695,6 +695,8 @@ def transliterate_ijmes(text: str, profile: IJMESProfile)->str:
             char_map["ة"]=""
         if profile.diphthongs:
             char_map |= data.diphthong_map
+        if profile.is_name:
+            char_map |= data.ijmes_name_map
         rules = [(re.compile(arab), latin) for arab, latin in char_map.items()]
         cont: bool = True
         while cont:
