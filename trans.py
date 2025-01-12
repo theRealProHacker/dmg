@@ -433,14 +433,6 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
     for sentence in sentences:
         sentence[-1].is_end_of_sentence = True
 
-        # names specific:
-        # capitalize first word of book title
-        # and the second if the first is "kitab"
-        if profile.is_name and profile.is_book:
-            sentence[0].is_name = True
-            if len(sentence) > 1 and kitab_pattern(tokens[0].arab):
-                tokens[1].is_name = True
-
         # word analysis and stemming
         stemmed_words = [*arab_tools.check_sentence(sentence)]
         for token_i, (token, stemming) in enumerate(zip(sentence, stemmed_words)):
@@ -455,19 +447,14 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                 _,
             ) = stemming
             if profile.is_name:
-                if not profile.is_book:
-                    token.is_name = True
+                token.is_name = True
+                # TODO: unname stopwords
+
             assert token.pos in ("noun", "verb", "stopword", "")
             stripped_suffix = araby.strip_harakat(token.suffix)
 
             # applying pausa
-            if (
-                token.is_pausa
-                and token.pos == "noun"
-                and not (token.gram_case == "a" and not token.is_definite)
-                and not token.suffix
-            ):
-                token.arab = araby.strip_lastharaka(token.arab)
+            token.arab = araby.strip_lastharaka(token.arab)
 
             # getting the prefix
             rasm, harakat = arab_tools.separate(token.arab)
@@ -522,23 +509,6 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                     token.latin_prefix += "al-" if not i else "l-"
                     i += 2
 
-            # with suppress(IndexError):
-            #     def check_haraka(i: int, haraka: str) -> bool:
-            #         return (not harakat[i] or harakat[i] == haraka)
-
-            #     if (
-            #         not token.latin_prefix.endswith("l-")
-            #         and rasm[i] == "ا"
-            #         and token.pos == "noun"
-            #         and token.is_definite
-            #         and check_haraka(i, "")
-            #         and rasm[i + 1] == "ل"
-            #         and check_haraka(i + 1, data.sukun)
-            #         and data.shaddah in harakat[i + 2]
-            #     ):
-            #         token.latin_prefix += "al-" if not i else "l-"
-            #         i += 2
-
             token.prefix = arab_tools.join(rasm[:i], harakat[:i])
             token.arab = arab_tools.join(rasm[i:], harakat[i:])
             arab_wo_suffix = arab_tools.join(
@@ -581,29 +551,28 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                 token.arab = arab_tools.join(
                     rasm[:1] + rasm[2:], harakat[:1] + harakat[2:]
                 )
-            elif (
-                profile.is_name
-                and not profile.is_book
-                and (
-                    (bint := bint_pattern(token.arab))
-                    or ibn_pattern(token.arab)
-                    or bin_pattern(token.arab)
-                )
-            ):
-                # women first :)
-                if bint:
-                    if token_i:
-                        token.is_name = False
-                        if profile.short_ibn:
-                            token.arab = "بت"
-                            token.latin_after = "." + token.latin_after
-                else:
-                    token.arab = data.kasra + "بن"
-                    if token_i:
-                        token.is_name = False
-                        if profile.short_ibn:
-                            token.arab = "ب"
-                            token.latin_after = "." + token.latin_after
+            # elif (
+            #     profile.is_name
+            #     and (
+            #         (bint := bint_pattern(token.arab))
+            #         or ibn_pattern(token.arab)
+            #         or bin_pattern(token.arab)
+            #     )
+            # ):
+            # women first :)
+            # if bint:
+            #     if token_i:
+            #         token.is_name = False
+            #         if profile.short_ibn:
+            #             token.arab = "بت"
+            #             token.latin_after = "." + token.latin_after
+            # else:
+            #     token.arab = data.kasra + "بن"
+            #     if token_i:
+            #         token.is_name = False
+            #         if profile.short_ibn:
+            #             token.arab = "ب"
+            #             token.latin_after = "." + token.latin_after
             else:
                 for pattern, inserts in add_alif_patterns:
                     if pattern(arab_wo_suffix):

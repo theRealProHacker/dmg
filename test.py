@@ -1,7 +1,7 @@
 import arab_tools
 import data
-from data_types import NameProfile
-from trans import Profile, ner_available, transliterate
+from data_types import IJMESProfile, NameProfile
+from trans import Profile, ner_available, transliterate, transliterate_ijmes
 
 profile_pausa = Profile(pausa=True)
 
@@ -314,6 +314,45 @@ def test_names():
         )
         == "Kitāb al-Aġānī li-l-imām abī l-faraǧ"
     )
+
+
+def test_ijmes():
+    name_profile = IJMESProfile(is_name=True)
+
+    assert transliterate_ijmes("ثَورَة ١٤ تَمّوز") == "thawra 14 tammūz"
+    # Doesn't detect idafah with the number
+    assert transliterate_ijmes("ثَورَة ١٤ تَمّوز") != "thawrat 14 tammūz"
+
+    assert (
+        transliterate_ijmes("الإِخوَان المُسلِمون", name_profile) == "al-Ikhwan al-Muslimun"
+    )
+    assert (
+        transliterate_ijmes("فَيْسَل التَفْرِيق بَين الإِسلَام", name_profile)
+        == "Faysal al-Tafriq bayn al-Islam"
+    )
+    # doesn't recognize zandaqa and cuts of the a in Tafriqa
+    assert (
+        transliterate_ijmes("فَيْسَل التَفْرِيقَ بَين الإِسلَام وَالزَنْدَقَ", name_profile)
+        != "Faysal al-Tafriqa bayn al-Islam wa-l-Zandaqa"
+    )
+    assert (
+        transliterate_ijmes("النور أَخبَر القَرن العَشير", name_profile)
+        == "al-Nur Akhbar al-Qarn al-ʿAshir"
+    )
+    # doesn't recognize Safirʿan
+    assert (
+        transliterate_ijmes("النور السَافِرْعَن أَخبَر القَرن العَشير", name_profile)
+        != "al-Nur al-Safirʿan Akhbar al-Qarn al-ʿAshir"
+    )
+
+    assert transliterate_ijmes("في العِراق وَمِصر") == "fī al-ʿIraq wa-Misr"
+    assert transliterate_ijmes("في مِصر وَالعِراق", name_profile) == "fī miṣr wa-l-ʿirāq"
+
+    assert transliterate_ijmes("عَلِيّ ابن أَبي طَالِب", name_profile) == "ʿAli ibn Abi Talib"
+    assert transliterate_ijmes("أُسَامَة بِن لادِن", name_profile) == "Usama bin Ladin"
+    assert transliterate_ijmes("بِن لادِن", name_profile) == "Bin Ladin"
+    
+    assert transliterate_ijmes("الله", name_profile) == "Allah"
 
 
 if __name__ == "__main__":
