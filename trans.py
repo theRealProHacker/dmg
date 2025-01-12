@@ -396,7 +396,7 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
     return beginning_non_token + "".join(token.result for token in tokens)
 
 
-def transliterate_ijmes(text: str, profile: IJMESProfile) -> str:
+def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> str:
     text = text.strip()
     text = araby.strip_tatweel(text)
     text = data.unicode_cleanup(text)
