@@ -76,7 +76,7 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
             current_sentence = []
     if current_sentence:
         sentences.append(current_sentence)
-    
+
     apply_hamzatul_wasl = False
     next_wasl: str = ""
     for sentence in sentences:
@@ -230,10 +230,14 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
                 token.arab = arab_tools.join(
                     rasm[:1] + rasm[2:], harakat[:1] + harakat[2:]
                 )
-            elif profile_is_name and not profile.is_book and (
-                (bint := bint_pattern(token.arab))
-                or ibn_pattern(token.arab)
-                or bin_pattern(token.arab)
+            elif (
+                profile_is_name
+                and not profile.is_book
+                and (
+                    (bint := bint_pattern(token.arab))
+                    or ibn_pattern(token.arab)
+                    or bin_pattern(token.arab)
+                )
             ):
                 # women first :)
                 if bint:
@@ -392,7 +396,7 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
     return beginning_non_token + "".join(token.result for token in tokens)
 
 
-def transliterate_ijmes(text: str, profile: IJMESProfile)->str:
+def transliterate_ijmes(text: str, profile: IJMESProfile) -> str:
     text = text.strip()
     text = araby.strip_tatweel(text)
     text = data.unicode_cleanup(text)
@@ -423,7 +427,7 @@ def transliterate_ijmes(text: str, profile: IJMESProfile)->str:
             current_sentence = []
     if current_sentence:
         sentences.append(current_sentence)
-    
+
     apply_hamzatul_wasl = False
     next_wasl: str = ""
     for sentence in sentences:
@@ -577,10 +581,14 @@ def transliterate_ijmes(text: str, profile: IJMESProfile)->str:
                 token.arab = arab_tools.join(
                     rasm[:1] + rasm[2:], harakat[:1] + harakat[2:]
                 )
-            elif profile.is_name and not profile.is_book and (
-                (bint := bint_pattern(token.arab))
-                or ibn_pattern(token.arab)
-                or bin_pattern(token.arab)
+            elif (
+                profile.is_name
+                and not profile.is_book
+                and (
+                    (bint := bint_pattern(token.arab))
+                    or ibn_pattern(token.arab)
+                    or bin_pattern(token.arab)
+                )
             ):
                 # women first :)
                 if bint:
@@ -686,13 +694,10 @@ def transliterate_ijmes(text: str, profile: IJMESProfile)->str:
         word = token.arab
         # char mapping
         char_map = (
-            data.subs
-            | data.vowel_map
-            | data.begin_hamza_map
-            | data.ijmes_con_map
+            data.subs | data.vowel_map | data.begin_hamza_map | data.ijmes_con_map
         )
         if not token.is_idafah:
-            char_map["ة"]=""
+            char_map["ة"] = ""
         if profile.diphthongs:
             char_map |= data.diphthong_map
         if profile.is_name:

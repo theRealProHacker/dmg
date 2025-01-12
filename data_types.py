@@ -143,6 +143,7 @@ class NameProfile:
     hu_hi: bool = True
     nisba: bool = True
 
+
 @dataclass
 class IJMESProfile:
     is_name: bool = False

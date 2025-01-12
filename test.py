@@ -304,8 +304,7 @@ def test_names():
         == "Abū ʿAbdallāh Muḥammad ibn Baṭṭūṭa"
     )
     assert (
-        transliterate("ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=True))
-        == "Ibn Baṭṭūṭa"
+        transliterate("ابْنُ بَطّوطَةَ", profile=NameProfile(short_ibn=True)) == "Ibn Baṭṭūṭa"
     )
 
     assert (
