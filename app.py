@@ -5,7 +5,7 @@ from flask import Flask, render_template, request
 import book
 import data
 from data_types import NameProfile, Profile, profile_descriptions
-from trans import transliterate, transliterate_names
+from trans import transliterate
 from vocalization import vocalize
 
 app = Flask(__name__)
@@ -75,7 +75,7 @@ def trans_names():
     data = json.loads(request.data)
     text = data["text"]
     profile = NameProfile(**data["profile"])
-    return transliterate_names(text, profile)
+    return transliterate(text, profile)
 
 
 @app.route("/vocalize", methods=["POST"])
