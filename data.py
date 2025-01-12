@@ -420,6 +420,12 @@ con_map = {
     "ه": "h",
 }
 
+sun_letters = {"ت", "ث", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ن"}
+sun_letters = set("tṯdḏrzsšṣḍṭẓn")
+
+# Pattern to match an arabic word
+token_pattern = re.compile(f"[\u0621-\u0655{alif_wasl}]+")
+
 number_map = {
     # numbers
     **{chr(0x660 + i): str(i) for i in range(10)},
@@ -433,22 +439,6 @@ number_map = {
 number_map_pattern = compile_single_char_map_pattern(number_map)
 number_token_pattern = re.compile(f"[{''.join(number_map)}]+")
 
-# Not currently necessary
-# pausa_map = {
-#     "[" + fatha + damma + kasra + fathatan + dammatan + kasratan + shaddah + "]$": "",
-#     fathatan + alif + "$": alif,
-#     alif + fathatan + "$": alif,
-# }
-
-sun_letters = {"ت", "ث", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ن"}
-
-# latin sun letters
-sun_letters = set("tṯdḏrzsšṣḍṭẓn")
-
-# Pattern to match an arabic word
-token_pattern = re.compile(f"[\u0621-\u0655{alif_wasl}]+")
-
-
 sentence_stop_marks = ".!?\n"
 after_map = {
     "۔": ".",
@@ -459,7 +449,8 @@ after_map_pattern = compile_single_char_map_pattern(after_map)
 
 
 def sub_after(after):
-    return sub_map_pattern(after_map_pattern, after_map, after)
+    after = sub_map_pattern(after_map_pattern, after_map, after)
+    return sub_map_pattern(number_map_pattern, number_map, after)
 
 
 # hamzatul wasl

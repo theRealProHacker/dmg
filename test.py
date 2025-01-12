@@ -36,6 +36,7 @@ def test_transliteration_robustness():
     assert transliterate("?") == "?"
     assert transliterate("؟") == "?"
     assert transliterate("؟ \n") == "?"
+    assert transliterate("١٤") == "14"
     assert transliterate("أَ") in ("ʾ", "a")
     assert transliterate("آ") == "ā"
     assert transliterate("ذَهَبَ إِ") in ("ḏahaba ʾ", "ḏahaba i")
