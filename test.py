@@ -328,13 +328,8 @@ def test_ijmes():
         transliterate_ijmes("الإِخوَان المُسلِمون", name_profile) == "al-Ikhwan al-Muslimun"
     )
     assert (
-        transliterate_ijmes("فَيْسَل التَفْرِيق بَين الإِسلَام", name_profile)
-        == "Faysal al-Tafriq bayn al-Islam"
-    )
-    # doesn't recognize zandaqa and cuts of the a in Tafriqa
-    assert (
-        transliterate_ijmes("فَيْسَل التَفْرِيقَ بَين الإِسلَام وَالزَنْدَقَ", name_profile)
-        != "Faysal al-Tafriqa bayn al-Islam wa-l-Zandaqa"
+        transliterate_ijmes("فَيْسَل التَفْرِيقَة بَين الإِسلَام وَالزَنْدَقَة", name_profile)
+        == "Faysal al-Tafriqa bayn al-Islam wa-l-Zandaqa"
     )
     assert (
         transliterate_ijmes("النور أَخبَر القَرن العَشير", name_profile)
