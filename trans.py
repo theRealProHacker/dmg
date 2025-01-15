@@ -454,7 +454,7 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                 )
                 if is_name_connector:
                     token.is_name = not last_was_name
-                print(token.arab, last_was_name, is_name_connector, is_real_name)
+                # print(token.arab, last_was_name, is_name_connector, is_real_name)
                 last_was_name = is_real_name
 
             # applying pausa
