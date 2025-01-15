@@ -4,8 +4,8 @@ from flask import Flask, render_template, request
 
 import book
 import data
-from data_types import NameProfile, Profile, profile_descriptions
-from trans import transliterate
+from data_types import IJMESProfile, NameProfile, Profile, profile_descriptions
+from trans import transliterate, transliterate_ijmes
 from vocalization import vocalize
 
 app = Flask(__name__)
@@ -70,13 +70,20 @@ def trans():
     return transliterate(text, profile)
 
 
-@app.route("/transliterate-names", methods=["POST"])
+@app.route("/transliterate/names", methods=["POST"])
 def trans_names():
     data = json.loads(request.data)
     text = data["text"]
     profile = NameProfile(**data["profile"])
     return transliterate(text, profile)
 
+
+@app.route("/transliterate/ijmes")
+def trans_ijmes():
+    data = json.loads(request.data)
+    text = data["text"]
+    profile = IJMESProfile(**data["profile"])
+    return transliterate_ijmes(text, profile)
 
 @app.route("/vocalize", methods=["POST"])
 def vocalization():
