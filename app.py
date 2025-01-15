@@ -49,6 +49,11 @@ def names():
     )
 
 
+@app.route("/ijmes")
+def ijmes():
+    return render_template("ijmes.html", input_map=data.input_conversion_map)
+
+
 @app.route("/book")
 def _book():
     return render_template(
@@ -78,12 +83,13 @@ def trans_names():
     return transliterate(text, profile)
 
 
-@app.route("/transliterate/ijmes")
+@app.route("/transliterate/ijmes", methods=["POST"])
 def trans_ijmes():
     data = json.loads(request.data)
     text = data["text"]
     profile = IJMESProfile(**data["profile"])
     return transliterate_ijmes(text, profile)
+
 
 @app.route("/vocalize", methods=["POST"])
 def vocalization():
