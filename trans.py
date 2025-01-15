@@ -627,6 +627,11 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                 cont = cont or n
                 # if n:
                 #     print(word, pattern, replace)
+        prefix = token.latin_prefix
+
+        if (first_letter := word[0]) in data.sun_letters:
+            if len(word) >= 2 and word[1] == first_letter:
+                word = word[1:]
         token.latin = word
 
     return beginning_non_token + "".join(token.result for token in tokens)
