@@ -12,8 +12,6 @@ from data import (
 )
 from data_types import IJMESProfile, NameProfile, Profile, Token
 
-ner_available = False
-
 hum_pattern = gen_arab_pattern_match("هُمْ")
 antum_pattern = gen_arab_pattern_match("أَنْتُمْ")
 min_pattern = gen_arab_pattern_match("مِنْ")
@@ -103,11 +101,9 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
                 token.suffix,
                 _,
             ) = stemming
-            if profile_is_name:
-                if not profile.is_book:
-                    token.is_name = True
+            if profile_is_name and not profile.is_book:
+                token.is_name = True
             assert token.pos in ("noun", "verb", "stopword", "")
-            stripped_suffix = araby.strip_harakat(token.suffix)
 
             # applying pausa
             if (
@@ -143,9 +139,7 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
                     i += 1
                 # li-, bi-, ka- and then al- prefix
                 elif next_letter in "لبك":
-                    if next_letter in "لب" and (
-                        not harakat[i] or harakat[i] == data.kasra
-                    ):
+                    if next_letter in "لب" and check_haraka(i, data.kasra):
                         token.latin_prefix += (
                             "l" if next_letter == "ل" else "b"
                         ) + "i-"
@@ -153,13 +147,11 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
                         if (
                             next_letter == "ل"
                             and rasm[i] == "ل"
-                            and (not harakat[i] or harakat[i] == data.sukun)
+                            and check_haraka(i, data.sukun)
                         ):
                             token.latin_prefix += "l-"
                             i += 1
-                    elif next_letter == "ك" and (
-                        not harakat[i] or harakat[i] == data.fatha
-                    ):
+                    elif next_letter == "ك" and check_haraka(i, data.fatha):
                         token.latin_prefix += "ka-"
                         i += 1
                 if (
@@ -190,6 +182,7 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
 
             token.prefix = arab_tools.join(rasm[:i], harakat[:i])
             token.arab = arab_tools.join(rasm[i:], harakat[i:])
+            stripped_suffix = araby.strip_harakat(token.suffix)
             arab_wo_suffix = arab_tools.join(
                 rasm[i : len(rasm) - len(stripped_suffix)],
                 harakat[i : len(rasm) - len(stripped_suffix)],
@@ -396,6 +389,11 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
     return beginning_non_token + "".join(token.result for token in tokens)
 
 
+name_connector_patterns = [
+    gen_arab_pattern_match(word) for word in data.ijmes_name_connectors
+]
+
+
 def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> str:
     text = text.strip()
     text = araby.strip_tatweel(text)
@@ -428,14 +426,13 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
     if current_sentence:
         sentences.append(current_sentence)
 
-    apply_hamzatul_wasl = False
-    next_wasl: str = ""
+    last_was_name = False
     for sentence in sentences:
         sentence[-1].is_end_of_sentence = True
 
         # word analysis and stemming
         stemmed_words = [*arab_tools.check_sentence(sentence)]
-        for token_i, (token, stemming) in enumerate(zip(sentence, stemmed_words)):
+        for token, stemming in zip(sentence, stemmed_words):
             (
                 token.lemma,
                 token.pos,
@@ -446,12 +443,19 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                 token.suffix,
                 _,
             ) = stemming
-            if profile.is_name:
-                token.is_name = True
-                # TODO: unname stopwords
-
             assert token.pos in ("noun", "verb", "stopword", "")
-            stripped_suffix = araby.strip_harakat(token.suffix)
+
+            if profile.is_name:
+                is_name_connector = any(
+                    pattern(token.arab) for pattern in name_connector_patterns
+                )
+                is_real_name = token.is_name = (
+                    token.pos != "stopword" and not is_name_connector
+                )
+                if is_name_connector:
+                    token.is_name = not last_was_name
+                print(token.arab, last_was_name, is_name_connector, is_real_name)
+                last_was_name = is_real_name
 
             # applying pausa
             token.arab = araby.strip_lastharaka(token.arab)
@@ -488,6 +492,7 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                             "l" if next_letter == "ل" else "b"
                         ) + "i-"
                         i += 1
+                        # lil
                         if (
                             next_letter == "ل"
                             and rasm[i] == "ل"
@@ -511,6 +516,7 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
 
             token.prefix = arab_tools.join(rasm[:i], harakat[:i])
             token.arab = arab_tools.join(rasm[i:], harakat[i:])
+            stripped_suffix = araby.strip_harakat(token.suffix)
             arab_wo_suffix = arab_tools.join(
                 rasm[i : len(rasm) - len(stripped_suffix)],
                 harakat[i : len(rasm) - len(stripped_suffix)],
@@ -537,9 +543,7 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                 token.arab = "أَنَ"
             elif allah_pattern(token.arab):
                 token.arab = arab_tools.inject("ا", token.arab, 3)
-                token.is_name = (
-                    not apply_hamzatul_wasl and not token.prefix and not next_wasl
-                )
+                token.is_name = True
             elif lillah_pattern(token.arab):
                 token.prefix = "لِ"
                 token.latin_prefix = "li-"
@@ -551,28 +555,6 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                 token.arab = arab_tools.join(
                     rasm[:1] + rasm[2:], harakat[:1] + harakat[2:]
                 )
-            # elif (
-            #     profile.is_name
-            #     and (
-            #         (bint := bint_pattern(token.arab))
-            #         or ibn_pattern(token.arab)
-            #         or bin_pattern(token.arab)
-            #     )
-            # ):
-            # women first :)
-            # if bint:
-            #     if token_i:
-            #         token.is_name = False
-            #         if profile.short_ibn:
-            #             token.arab = "بت"
-            #             token.latin_after = "." + token.latin_after
-            # else:
-            #     token.arab = data.kasra + "بن"
-            #     if token_i:
-            #         token.is_name = False
-            #         if profile.short_ibn:
-            #             token.arab = "ب"
-            #             token.latin_after = "." + token.latin_after
             else:
                 for pattern, inserts in add_alif_patterns:
                     if pattern(arab_wo_suffix):
@@ -580,49 +562,13 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                             token.arab = arab_tools.inject("ا", token.arab, insert)
                         break
 
-            # hamzatul wasl
-            # applying hamzatul wasl for next token
-            arab = token.arab
-            prev_ended_vowel = apply_hamzatul_wasl
-            prev_wasl = next_wasl
-            apply_hamzatul_wasl = (
-                arab[-1] in (data.alif, data.alif_maqsurah)
-                and (len(arab) == 1 or arab[-2] != data.fathatan)
-                or arab[-1] in data.half_vowels
-                and data.half_vowel_is_long(arab, len(arab) - 1)
-                or arab[-1] in data.short_vowels
-            )
-            next_wasl = (
-                "u"
-                if hum_pattern(arab) or antum_pattern(arab) or hum_pattern(token.suffix)
-                else "i"
-                if token.pos == "stopword"
-                and token.lemma[-1] == data.sukun
-                and not min_pattern(arab)
-                else ""
-            )
-
-            if len(araby.strip_diacritics(arab)) <= 2:
-                continue
-
-            # hamzatul wasl for this token
-            if token.prefix:
-                if prev_ended_vowel and token.latin_prefix == "al-":
-                    token.latin_prefix = "l-"
-                elif token.latin_prefix == "al-" and prev_wasl:
-                    token.latin_prefix = prev_wasl + "l-"
-                # every other prefix ends on a short vowel
-                prev_ended_vowel = not token.latin_prefix.endswith("l-")
-            if token.arab[0] in (
+            if len(rasm) > 2 and token.arab[0] in (
                 data.alif,
                 data.alif_wasl,
             ):
                 token.arab = token.arab[1:]
                 has_haraka = token.arab[0] in data.short_vowels
-                if prev_ended_vowel:
-                    if has_haraka:
-                        token.arab = token.arab[1:]
-                elif not has_haraka:
+                if not has_haraka:
                     if (
                         araby.separate(araby.strip_lastharaka(token.arab))[1][1]
                         == data.damma
@@ -632,13 +578,12 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                         haraka = "a"
                     else:
                         haraka = "i"
-                    token.arab = (prev_wasl or haraka) + token.arab
+                    token.arab = haraka + token.arab
 
         # idafah
         for token, next_token in zip(sentence, sentence[1:]):
             token.is_idafah = (
                 token.pos == "noun"
-                # sun letter assimilation not executed yet
                 and not token.latin_prefix.endswith("l-")
                 and token.is_definite
                 and not token.suffix
@@ -667,6 +612,8 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
         )
         if not token.is_idafah:
             char_map["ة"] = ""
+        if token.is_nisba:
+            char_map["iyy$"] = "iyya"
         if profile.diphthongs:
             char_map |= data.diphthong_map
         if profile.is_name:

@@ -1,7 +1,7 @@
 import arab_tools
 import data
 from data_types import IJMESProfile, NameProfile
-from trans import Profile, ner_available, transliterate, transliterate_ijmes
+from trans import Profile, transliterate, transliterate_ijmes
 
 profile_pausa = Profile(pausa=True)
 
@@ -110,11 +110,10 @@ def test_ta_marbutah():
         transliterate("الشَجَرَةُ في الحَديقَةِ كَبيرَةٌ")
         == "aš-šaǧaratu fī l-ḥadīqati kabīratun"
     )
-    if ner_available:
-        assert transliterate("مَدِينَةُ القَاهِرَةِ") == "madīnatu l-Qāhirati"
-        assert transliterate("مَدِينَةُ القَاهِرَةِ", profile_pausa) == "madīnat al-Qāhira"
-        assert transliterate("مَدِينَةُ القَاهِرَةِ", profile_tm) == "madīnatu l-Qāhirati"
-        assert transliterate("مَدِينَةُ القَاهِرَةِ", profile_pausa_tm) == "madīnat al-Qāhirah"
+    assert transliterate("مَدِينَةُ القَاهِرَةِ") == "madīnatu l-qāhirati"
+    assert transliterate("مَدِينَةُ القَاهِرَةِ", profile_pausa) == "madīnat al-qāhira"
+    assert transliterate("مَدِينَةُ القَاهِرَةِ", profile_tm) == "madīnatu l-qāhirati"
+    assert transliterate("مَدِينَةُ القَاهِرَةِ", profile_pausa_tm) == "madīnat al-qāhirah"
     assert transliterate("صَلاة") == "ṣalāh"
     assert transliterate("ﻣِﺮﺁة") == "mirʾāh"
 
@@ -322,6 +321,8 @@ def test_ijmes():
     assert transliterate_ijmes("ثَورَة ١٤ تَمّوز") == "thawra 14 tammūz"
     # Doesn't detect idafah with the number
     assert transliterate_ijmes("ثَورَة ١٤ تَمّوز") != "thawrat 14 tammūz"
+    # Detects idafah without number
+    assert transliterate_ijmes("مَكتَبَةُ الجامِعَةِ") != "maktabat al-gāmiʿa"
 
     assert (
         transliterate_ijmes("الإِخوَان المُسلِمون", name_profile) == "al-Ikhwan al-Muslimun"
@@ -345,13 +346,16 @@ def test_ijmes():
         != "al-Nur al-Safirʿan Akhbar al-Qarn al-ʿAshir"
     )
 
-    assert transliterate_ijmes("في العِراق وَمِصر") == "fī al-ʿIraq wa-Misr"
-    assert transliterate_ijmes("في مِصر وَالعِراق", name_profile) == "fī miṣr wa-l-ʿirāq"
+    assert transliterate_ijmes("في العِراق وَمِصر", name_profile) == "fi al-ʿIraq wa-Misr"
+    assert transliterate_ijmes("في مِصر وَالعِراق") == "fī miṣr wa-l-ʿirāq"
+
+    assert transliterate_ijmes("مِصرِيّ") == "miṣriyya"
+    assert transliterate_ijmes("نَبِيٌّ") == "nabī"
 
     assert transliterate_ijmes("عَلِيّ ابن أَبي طَالِب", name_profile) == "ʿAli ibn Abi Talib"
     assert transliterate_ijmes("أُسَامَة بِن لادِن", name_profile) == "Usama bin Ladin"
     assert transliterate_ijmes("بِن لادِن", name_profile) == "Bin Ladin"
-    
+
     assert transliterate_ijmes("الله", name_profile) == "Allah"
 
 

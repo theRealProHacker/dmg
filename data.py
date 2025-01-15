@@ -645,6 +645,8 @@ ijmes_con_map = {
     "م": "m",
     "ن": "n",
     "ه": "h",
+    "iyy$": "ī",
+    "uww$": "ū",
 }
 
 ijmes_name_map = {
@@ -657,3 +659,5 @@ ijmes_name_map = {
     "ṭ": "t",
     "ẓ": "z",
 }
+
+ijmes_name_connectors = ["بِنْ", "اِبْن", "بَيْن", "أَبُو", "أَبِي"]
