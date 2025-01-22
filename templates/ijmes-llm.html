@@ -106,13 +106,27 @@
             padding: 10px;
         }
 
-        #magic {
+        .btn-outline-primary {
+            --bs-btn-color: var(--purple-accent);
+            --bs-btn-border-color: var(--purple-accent);
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: var(--purple-accent);
+            --bs-btn-hover-border-color: var(--purple-accent);
+            --bs-btn-focus-shadow-rgb: 124, 38, 167;
+            --bs-btn-active-color: #fff;
+            --bs-btn-active-bg: var(--purple-accent);
+            --bs-btn-active-border-color: var(--purple-accent);
+            --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+            --bs-btn-disabled-color: var(--purple-accent);
+            --bs-btn-disabled-bg: transparent;
+            --bs-btn-disabled-border-color: var(--purple-accent);
+            --bs-gradient: none;
+        }
+
+        #send-button {
             position: absolute;
             bottom: 0.9rem;
             right: 0.75rem;
-            width: 2rem;
-            padding: 0;
-            height: 2rem;
         }
 
         #input-text {
@@ -300,7 +314,7 @@
             <div class="col-12 mb-3">
                 Transliterate any Arabic text using an AI-based method.
                 
-                <div id="profile" class="col">
+                <!-- <div id="profile" class="col">
                     <div class="form-check form-switch mt-3">
                         <label class="form-check-label" for="is-name-profile-input" data-bs-toggle="tooltip">
                             Are you trying to transliterate a name?
@@ -313,16 +327,20 @@
                         </label>
                         <input id="diphthongs-profile-input" class="form-check-input" type="checkbox" role="switch" name="diphthongs">
                     </div>
-                </div>
+                </div> -->
             </div>
             <div id="input-output" class="row mb-lg-5">
                 <div class="col-12 col-lg-6 mb-3">
-                    <div id="textarea-magic-wrapper" style="position:relative;">
-                        <textarea id="input-text" dir="rtl" placeholder="كَلِيلَة وَدِمنَة"  autofocus></textarea>
+                    <div id="textarea-wrapper" style="position:relative;">
+                        <textarea id="input-text" dir="rtl" placeholder="كليلة ودمنة" autofocus></textarea>
+
+                        <button id="send-button" class="btn btn-outline-primary">
+                            Send
+                        </button>
                     </div>
                 </div>
                 <div class="col-12 col-lg-6">
-                    <textarea id="output-text" class="disabled" readonly placeholder="kalīla wa-dimna"></textarea>
+                    <textarea id="output-text" class="disabled" readonly placeholder="Kalīla wa Dimna"></textarea>
                     <div id="one-click-feedback">
                         <span>How do you find this transliteration?</span>
                         <button class="btn" data-bs-toggle="button" title="Positive Feedback" data-bs-toggle="tooltip">
@@ -442,6 +460,7 @@
         let timeoutId;
         const trans_url = '/transliterate/ijmes/llm';
         const input = document.getElementById('input-text');
+        const send_button = document.getElementById('send-button');
         const output = document.getElementById('output-text');
         const profile_inputs = document.querySelectorAll('#profile input[name]');
         const one_click_feedback_btns = [...document.querySelectorAll("#one-click-feedback>button")];
@@ -477,13 +496,18 @@
             }
         })
 
-        input.addEventListener('input', async (e) => {
-            clearTimeout(timeoutId); 
+        input.addEventListener('input', (e) => {
             if (!input.value) {
                 output.value = ""
                 return false
             }
-            // timeoutId = setTimeout(send_request, e.inputType === 'insertFromPaste' ? 0 : 1000);
+        })
+
+        send_button.addEventListener('click', async (e) => {
+            if (!input.value) {
+                output.value = ""
+                return false
+            }
             await transliterate()
         });
 
