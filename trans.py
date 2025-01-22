@@ -635,3 +635,30 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
         token.latin = word
 
     return beginning_non_token + "".join(token.result for token in tokens)
+
+def transliterate_llm(text: str):
+    from huggingface_hub import InferenceClient
+
+    # no special key
+    client = InferenceClient(api_key="...")
+
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a transliterator that transliterates according to the IJMES standard. Your task is to transliterate as quickly and succinctly as possible. Don't explain anything, keep your answers as short as possible. "
+        },
+        {
+            "role": "user",
+            "content": text
+        }
+    ]
+
+    completion = client.chat.completions.create(
+        model="Qwen/Qwen2.5-72B-Instruct", 
+        messages=messages, 
+        max_tokens=500,
+        temperature=0,
+
+    )
+
+    return completion.choices[0].message.content

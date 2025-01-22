@@ -5,7 +5,7 @@ from flask import Flask, render_template, request
 import book
 import data
 from data_types import IJMESProfile, NameProfile, Profile, profile_descriptions
-from trans import transliterate, transliterate_ijmes
+from trans import transliterate, transliterate_ijmes, transliterate_llm
 from vocalization import vocalize
 
 app = Flask(__name__)
@@ -54,6 +54,11 @@ def ijmes():
     return render_template("ijmes.html", input_map=data.input_conversion_map)
 
 
+@app.route("/ijmes/llm")
+def ijmes_llm():
+    return render_template("ijmes-llm.html", input_map=data.input_conversion_map)
+
+
 @app.route("/book")
 def _book():
     return render_template(
@@ -89,6 +94,13 @@ def trans_ijmes():
     text = data["text"]
     profile = IJMESProfile(**data["profile"])
     return transliterate_ijmes(text, profile)
+
+
+@app.route("/transliterate/ijmes/llm", methods=["POST"])
+def trans_ijmes_llm():
+    data = json.loads(request.data)
+    text = data["text"]
+    return transliterate_llm(text)
 
 
 @app.route("/vocalize", methods=["POST"])
