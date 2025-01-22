@@ -1,0 +1,477 @@
+Translate a given sentence according to the IJMES transliteration system provided below
+
+IJMES transliteration system for Arabic
+
+Consonants
+ء = ʾ
+ب = b
+ت = t
+ث = th
+ج = j
+ح = ḥ
+خ = kh
+د = d
+ذ = dh
+ر = r
+ز = z
+س = s
+ش = sh
+ص = ṣ
+ض = ḍ
+ط = ṭ
+ظ = ẓ
+ع = ʿ
+غ = gh
+ف = f
+ق = q
+ك = k
+ل = l
+م = m
+ن = n
+ه = h
+و = w
+ي = y
+ة = a (in construct state: at)
+ال = al (for the article, al- and -l-)
+
+Vowels
+
+Long: ا or يٰ = ā
+Long: و = ū
+Long: ي = ī
+Doubled: ِ-يّ = iyy (final form ī)
+Doubled: ُ-وّ = uww (final form ū)
+Diphthongs:
+    وَ = au or aw
+    یَ = ai or ay
+Short:
+    -َ = a
+    -ُ = u
+    -ِ = i
+
+All technical terms from Arabic must be fully transliterated with diacritical marks (macrons and dots), e.g., ʿashāʾ. A technical term is defined as a word for which there is no English equivalent and that is not found in Merriam–Webster’s Collegiate Dictionary, or a multi-word phrase, excluding names and titles as detailed in below.
+
+Words found in Merriam–Webster’s should be spelled as they appear there and not treated as technical terms. They should have no diacritics - for example, mufti, jihad, shaykh. See the IJMES Word List (PDF) for exceptions that preserve ʿayn and hamza, for example, Qurʾan, shariʿa, ʿulamaʾ, and Kaʿba.
+
+Diacritics should not be added to personal names, place names, names of political parties and organizations, or titles of books and articles. These words should be spelled in accordance with the IJMES transliteration system but without diacritics. However, ʿayn and hamza should be preserved in all these cases (except for initial hamza, which is dropped). Follow English capitalization rules: for example, al-Ikhwan al-Muslimun. IJMES follows "accepted English spellings" for names of prominent figures, places and organizations, historical or contemporary, e.g., Gamal Abdel Nasser, Faten Hamama, Ruhollah Khomeini, Benazir Bhutto, Maimonides.
+
+Follow English capitalization rules for transliterated titles. Capitalize all major terms, but not articles, prefixes, coordinating conjunctions, or prepositions (even when joined to pronouns). Do NOT include diacritical marks but do preserve ʿayn and hamza. For example: Faysal al-Tafriqa bayn al-Islam wa-l-Zandaqa; al-Nur al-Safirʿan Akhbar al-Qarn al-ʿAshir. 
+
+When in doubt, follow the spelling of the term in the script of the original language, not its oral pronunciation. There are only a few exceptions (e.g., iḍāfa constructions), which are detailed on this page.
+
+For colloquial transliterations, refer to an English-colloquial dictionary for that language. Use a consistent colloquial transliteration system, preferably one that is as close as possible to the IJMES system.
+
+The Arabic tāʾ marbūṭa is rendered a not ah. In Persian it is ih. In Arabic iḍāfa constructions, it is rendered at: for example, thawrat 14 Tammūz. The Persian izafat is rendered -i: for example, vilāyat-i faqīh.
+
+The nisba ending is rendered -iyya in Arabic (e.g., Misriyya) and -iyyih in Persian.
+
+Inseparable prepositions, conjunctions, and other prefixes are connected with what follows by a hyphen: bi-, wa-, li-, la-. Example: fī al-ʿIraq wa-Misr. (Note: the preposition fī is not an inseparable prefix in the Arabic script and thus is not treated as one by IJMES.)
+
+Ellision. When one of the above prepositions or conjunctions is followed by al, the a will elide, forming a contraction rendered as wa-l-, bi-l-, li-l-, and la-l-. Example: fī Miṣr wa-l-ʿIrāq.
+
+Initial hamza is always dropped.
+
+The definite article (e.g., the Arabic al-) is lowercase everywhere, except in the first word of a sentence or an endnote. 
+
+Connectors in names—such as bin, ben, abu, etc.—are lowercase only when preceded by a name, e.g., Ali ibn Abi Talib, Abu Ammar, Ibn Khaldun, Bint al-Shati.
+
+Persian must be transliterated using the IJMES system, not that of the Encyclopaedia Iranica, so i and u must be used, not e and o.
+
+Just as modern Turkish no longer uses hatted vowels (â), IJMES does not either.
+
+Webster’s Collegiate Dictionary IJMES and Cambridge University Press use Webster’s Collegiate Dictionary to determine whether a foreign-language word has an accepted English spelling. Except for words included in the IJMES Word List (above), any word that appears in Webster’s should be spelled as it appears there, without italicization or diacritical marks. Words that are neither in Webster’s nor the IJMES Word List are considered “technical terms” and must be transliterated, with diacritics, according to the IJMES Transliteration Guide and Transliteration Chart above, except in cases outlined in the Transliteration Guide (titles, names, etc). 
+
+For specifics and exceptions, see the evolving IJMES Word List (PDF):
+
+A
+
+abaya
+Abbasid
+ʿAbd al-ʿAziz
+ʿAbd al-Hamid (Arabic); Abdülhamit (Turkish)
+Aden Protectorate
+Afghan War
+agha
+ʿAʾisha
+Akkar
+al-Andalus
+ʿAlawites
+Al Saʿud (family)
+ʿAli
+ʿālim / pl. ʿulamaʾ
+aliyah (Hebrew)
+Allah
+ʿAmili (as in Jabal ʿAmil)
+amir
+Amman
+ancien regime
+anti-Semitic
+Arab renaissance
+Arabian peninsula
+Yasir Arafat
+arak
+archrival
+Hafiz al-Asad (Syrian pres.)
+Ashkenazi(m)
+ʿAshuraʾ
+Asia Minor
+Azerbaijan
+
+B
+
+Baalbek
+Baburnama
+Bahai (adj. + n.: s. + pl.)
+Baʿth Party
+bazaar, bāzārī
+bedouin (s. + pl.)
+Bekaa
+Belarus
+belles-lettres
+bey
+bilād al-makhzan
+Bilad al-Sham or bilād al-shām
+bilād al-sība
+Bint Jbeil
+black (people, studies, etc.)
+Bosporus
+businesspeople
+by-product
+
+C
+
+Camp David Accords
+caliphate
+Capitulations
+casbah
+Central Asia
+20th century (n.); 20th-century (adj.)
+city–state
+clientelism
+Cold War
+companions (to the Prophet)
+Constitutional Revolution (Iran, Turkey)
+co-opt
+counterbalance
+counterinsurgency
+Covenant of ʿUmar
+Crusades (historical)
+
+D
+
+Damascus
+daʿwa (call); al-Daʿwa (organization)
+the Delta
+dhimmī (Arabic); zimmi (Turkish)
+Diaspora (biblical Jews; else, diaspora)
+Dijarbakr (Arabic); Diyarbekir (Turkish)
+
+E
+
+Eastern Bloc
+East India (Company)
+effendi / effendiyya
+embassy; e.g. Russian embassy
+etatism
+
+F
+
+Faisal (Saudi king; otherwise Faysal)
+faqīh / pl. fuqahāʾ
+fatwa
+fellah / pl. fellahin
+Fertile Crescent
+firman
+firsthand
+follow-up
+
+G
+
+galabiya
+Gaza Strip
+GDP gross domestic product
+Geniza (Cairo)
+geopolitical
+global North/South
+GNP gross national product
+grassroots
+Great Power
+Great Seljuqs
+Great Syrian Revolution (1920s)
+Great Terror (Stalin)
+Greater Lebanon
+Greater Syria
+groundbreaking
+the Gulf (Persian or Arabian)
+Gulf War
+
+H
+
+Haaretz
+Habash (Ethiopia)
+hadith
+hajj
+hakim (ruler)
+ḥakīm (wise)
+halal
+halfhearted
+hammam
+Hashimite
+Hidden Imam
+hijab
+Hijaz
+hijra
+Hizbullah
+Holy Land
+houri
+Husayn (ibn ʿAli)
+Hussein (king of Iraq or Jordan)
+
+I
+
+ijtihād
+ikhwān (brothers); al-Ikhwan (al-Muslimun)
+Ilkhanid (dynasty, period)
+imam(ate) (Arabic); imaret (Turkish)
+Iran–Iraq War
+Iraq War
+Islamicate
+Islamic Revolution or Iranian Revolution (but 1979 revolution)
+Ismaʿili
+
+J
+
+al-Jamaʿa al-Islamiyya
+Janissaries
+jihad
+jinni / pl. jinn
+Judeo-Christian
+
+K
+
+Kaʿba
+kafir
+kaffiyeh
+khedive
+Khomeini
+Kifaya movement
+
+L
+
+Osama bin Laden (but Bin Laden)
+laissez faire
+Lebanese Civil War (but 1982 war)
+less-developed countries (LDC)
+Levant
+long durée
+long-standing
+long-term (adj.)
+longtime
+Lower Egypt
+lower-middle class
+
+M
+
+macronational
+madhhab / pl. madhāhib
+madrasa
+Maghrib(ian)
+Mahdi; Mahdist; Mahdiyya; al-mahdī al-
+muntaẓar
+Naguib Mahfouz
+majlis
+majlis al-shūrā
+Mamluk (dynasty)
+mamluk (slave/soldier)
+Mandate (n./adj., British or French)
+Mashriq
+masjid
+Mecca Protocol
+medina (indef.); Medina (in Saudi Arabia)
+Messiah; messianic
+metropole
+mid-1920s
+Middle East studies
+Middle Eastern
+midsummer
+mihrab
+millet (Turkish); milla/millat (Arabic)
+minbar
+minister of education (except when title
+preceding name)
+Ministry of Education
+Mizrahi(m)
+Mossadegh
+Husni Mubarak
+muezzin
+mufti
+Mughal
+Muhammad
+Muharram
+mujahidin
+mulla
+Muslim (muslim in Arabic phrases)
+Muslim Brothers
+Muʿtazila
+
+N
+
+-nama (suffix meaning book)
+Gamal Abdel Nasser
+nation–state
+neocolonial
+Night Journey
+nonelite
+nonnegotiable
+Nowruz
+
+O
+
+Old City (Jerusalem)
+ongoing
+Ottoman Empire
+
+P
+
+padishah
+Pan-Arabism
+Pan-Islam(ic)
+Peasant Revolt of 1919
+per se
+Persian (not Farsi)
+petite bourgeoisie
+petrodollar
+Pharaonic
+PhD
+PLO
+policymaker/making
+the (Sublime) Porte
+postcolonial
+post-Ottoman
+postwar
+post World War II
+Praetorian
+preempt
+preexisting
+pro-government
+the Prophet (Muhammad)
+
+Q
+
+Qaboos (sultan of Oman)
+Qaddafi (Muammar el)
+qadi
+al-Qaʿida
+Qizilbash
+quasi-state
+Qurʾan(ic)
+
+R
+raison d’être
+Ras al-Khaimah
+the Reconquest (of Spain)
+reexamine
+rentier state
+Republican (Party); republican (indef.)
+republican Turkey
+revisit
+rial
+
+S
+Safavids
+ṣaḥwa (awakening)
+al-Sahwa (Iraqi org)
+Salafi/Salafism or salafī/salafiyya
+salat (ṣalāa in Arabic phrases)
+salnames (Ottoman state registers)
+Sanaa
+Sasanian
+sayyid / pl. sāda
+secondhand
+security zone (Israel)
+self-interest
+Seljuq
+Shafiʿi
+shah; Reza Pahlavi Shah
+Shahnama (Book of Kings)
+shariʿa
+sharīf / pl. ashrāf
+shawarma
+shaykh
+shaykh al-Islam (Arabic); sheikh ül-Islam
+(Turkish)
+Shebʿa farms
+Shiʿi (n. + adj.); Shiʿa (pl.); Shiʿi Islam;
+Shiʿism
+[sic]
+Sinai Peninsula
+Six Day War (but 1967 war)
+smallholder (n) socioeconomic/sociopolitical
+South Lebanon
+Southwest Asia
+state capitalism
+state feminism
+State of Israel
+status quo
+sub-Sahara(n)
+subcontinent (India, Pakistan, Bangladesh, etc.)
+successors (to the Prophet)
+Sudan (not the Sudan)
+Suez Crisis/Suez War
+Sufi(sm)
+Süleiman (the Magnificent)
+sultan
+sunna
+Sunni
+suq
+sura
+
+T
+
+Tanzimat
+tarbush
+Tehran
+Third World
+Timurid
+Tobacco Protest (Iran)
+top-down
+trade-off
+Transjordan
+tsarist Russia
+Turkish War of Independence
+Turkmen (adj. + n.: s. + pl.)
+twelfth imam
+Twelver (Shiʿa)
+
+U
+
+ʿulamaʾ / s. ʿālim (Arabic); ulema (Turkish)
+ultranational
+umma
+underdeveloped
+Upper Egypt
+upper-middle-class status
+ʿUrabi revolt
+
+V
+
+vakıf (Turkish)
+vali (Turkish)
+vatan (Turkish)
+vilāyat-i faqīh (Persian)
+vilayet (Turkish)
+vizier (Turkish)
+
+W
+
+Wafd Party
+Wahhabism; Wahhabi
+wālī / pl. awliyāʾ (Arabic)
+waqf / pl. awqāf (Arabic);
+war on terror
+waṭan (Arabic)
+wazīr (Arabic)
+website
+white (people)
+World War I, II
+worldview
