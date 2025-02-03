@@ -14,6 +14,8 @@ py app.py
 
 Now navigate to the localhost URL provided (http://localhost:5000)
 
+If you want to use the LLM IJMES transliteration you have to [make a Huggingface inference API key](https://huggingface.co/docs/api-inference/getting-started#getting-a-token) and insert it in `trans.py/transliterate_llm`
+
 # Features
 
 - Generally letter replacement
