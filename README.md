@@ -51,6 +51,14 @@ Please don't hesitate to raise an issue or to make a pull request. More informat
 The software is licensed under CC BY-NC except for the directories `arab_tools` and `data` which are licensed under GPL v3. 
 However, the license for `data/ner-gold-standard` is in that directory. 
 
+# Reception
+
+> "The program seems almost perfect"
+
+> "Great work, congratulations!"
+
+> "I want to congratulate you and thank you. Many scientists and students of Islamic(-theologic) studies will profit greatly from your work"
+
 # Bachelor thesis
 
 This project is part of my bachelor thesis that will be published soon. 
