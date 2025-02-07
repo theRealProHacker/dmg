@@ -458,7 +458,8 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
                 last_was_name = is_real_name
 
             # applying pausa
-            token.arab = araby.strip_lastharaka(token.arab)
+            if token.pos == "noun" and not token.suffix:
+                token.arab = araby.strip_lastharaka(token.arab)
 
             # getting the prefix
             rasm, harakat = arab_tools.separate(token.arab)
