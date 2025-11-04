@@ -4,17 +4,20 @@ DMG is an application that aims to give ease to orientalists, arabists and Islam
 
 The app is currently deployed on PythonAnywhere (https://transliteration.eu.pythonanywhere.com). Try it out now!
 
-# Local deployment
+# Bachelor thesis
 
-```shell
-git clone https://github.com/theRealProHacker/dmg.git
-pip install -r requirements.txt
-py app.py
-```
+This project is part of my bachelor thesis that was published in German [here](https://www.inf.fu-berlin.de/inst/ag-se/theses/Harvey24-arabische-transliteration.pdf). 
 
-Now navigate to the localhost URL provided (http://localhost:5000)
 
-If you want to use the LLM IJMES transliteration you have to [make a Huggingface inference API key](https://huggingface.co/docs/api-inference/getting-started#getting-a-token) and insert it in `trans.py/transliterate_llm`
+# Reception
+
+The software is used by students and researchers from Freie Universität Berlin, Humboldt-Universität Berlin, Uni Wien, Uni Hamburg und Uni Bayreuth. 
+
+> "The program seems almost perfect"
+
+> "Great work, congratulations!"
+
+> "I want to congratulate you and thank you. Many scientists and students of Islamic(-theologic) studies will profit greatly from your work"
 
 # Features
 
@@ -44,6 +47,18 @@ If you want to use the LLM IJMES transliteration you have to [make a Huggingface
   - whether the personal suffixes **-hu and -hi** should be transliterated as they are pronounced
 - Automatic vocalization
 
+# Local deployment
+
+```shell
+git clone https://github.com/theRealProHacker/dmg.git
+pip install -r requirements.txt
+py app.py
+```
+
+Now navigate to the localhost URL provided (http://localhost:5000)
+
+If you want to use the LLM IJMES transliteration you have to [make a Huggingface inference API key](https://huggingface.co/docs/api-inference/getting-started#getting-a-token) and insert it in `.env` as `HF_TOKEN=...`
+
 # Contributing
 
 Please don't hesitate to raise an issue or to make a pull request. More information for contributing can be found [here](CONTRIBUTING.md)
@@ -52,15 +67,3 @@ Please don't hesitate to raise an issue or to make a pull request. More informat
 
 The software is licensed under CC BY-NC except for the directories `arab_tools` and `data` which are licensed under GPL v3. 
 However, the license for `data/ner-gold-standard` is in that directory. 
-
-# Reception
-
-> "The program seems almost perfect"
-
-> "Great work, congratulations!"
-
-> "I want to congratulate you and thank you. Many scientists and students of Islamic(-theologic) studies will profit greatly from your work"
-
-# Bachelor thesis
-
-This project is part of my bachelor thesis that will be published soon. 
