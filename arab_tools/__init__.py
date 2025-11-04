@@ -354,10 +354,8 @@ def _check_word(word: str, tag: str) -> list[StemmedWord]:
 
     return [StemmedWord(w) for w in result]
 
-type Stemming = tuple[str, Pos, Case, bool, str, str, str, bool]
-
 @cache
-def check_word(word: str, tag: str) -> Stemming:
+def check_word(word: str, tag: str) -> tuple[str, Pos, Case, bool, str, str, str, bool]:
     result = _check_word(word, tag)
     # lemma, pos, case, is_definite, prefix, verb ending, suffix, success
     if not result:
@@ -471,7 +469,7 @@ def check_word(word: str, tag: str) -> Stemming:
 
 def check_sentence(
     sentence: Sentence,
-) -> Generator[Stemming, None, None]:
+) -> Generator[tuple[str, Pos, Case, bool, str, str, str, bool], None, None]:
     """
     Analyzes Arabic tokens
 
