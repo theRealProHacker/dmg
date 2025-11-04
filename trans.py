@@ -1,3 +1,4 @@
+import os
 import re
 from contextlib import suppress
 
@@ -640,13 +641,26 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
 def transliterate_llm(text: str):
     from huggingface_hub import InferenceClient
 
+    input_words = text.split().__len__()
+
     # no special key
-    client = InferenceClient(api_key="...")
+    client = InferenceClient(
+        provider="nscale",
+        token=os.environ["HF_TOKEN"]
+    )
 
     messages = [
         {
             "role": "system",
-            "content": "You are a transliterator that transliterates according to the IJMES standard. Your task is to transliterate as quickly and succinctly as possible. Don't explain anything, keep your answers as short as possible. "
+            "content":  """
+                        
+                        You are a transliterator that transliterates vocalized or unvocalized Arabic text according to the IJMES standard. 
+                        Your task is to transliterate as succinctly as possible. 
+                        
+                        To correctly transliterate, you must first understand the meaning of the text, its grammatical structure, and the context in which words are used.
+
+                        Don't explain anything, keep your answers as short as possible. 
+                        """.strip()
         },
         {
             "role": "user",
@@ -654,12 +668,19 @@ def transliterate_llm(text: str):
         }
     ]
 
-    completion = client.chat.completions.create(
-        model="Qwen/Qwen2.5-72B-Instruct", 
+    completion = client.chat_completion(
+        model="Qwen/Qwen3-235B-A22B", 
         messages=messages, 
-        max_tokens=500,
-        temperature=0,
-
+        max_tokens=input_words*200 + 2000,
+        temperature=0.6,
+        top_p=0.95,
     )
 
-    return completion.choices[0].message.content
+    content = completion.choices[0].message.content
+
+    if content is None:
+        raise ValueError("No content returned from LLM.")
+
+    content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+
+    return content.strip()
