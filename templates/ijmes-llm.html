@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {% block title %}
-        IJMES Transliteration
+        IJMES LLM Transliteration
         {% endblock %}
     </title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -335,7 +335,8 @@
                         <textarea id="input-text" dir="rtl" placeholder="كليلة ودمنة" autofocus></textarea>
 
                         <button id="send-button" class="btn btn-outline-primary">
-                            Send
+                            <span class="btn-label">Send</span>
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                         </button>
                     </div>
                 </div>
@@ -508,7 +509,28 @@
                 output.value = ""
                 return false
             }
-            await transliterate()
+
+            const label = send_button.querySelector('.btn-label');
+            const spinner = send_button.querySelector('.spinner-border');
+
+            // show spinner and hide label
+            if (label) label.classList.add('d-none');
+            if (spinner) spinner.classList.remove('d-none');
+            send_button.disabled = true;
+            send_button.setAttribute('aria-busy', 'true');
+
+            try {
+                await transliterate();
+            } catch (err) {
+                console.error(err);
+                show_title_toast('An unexpected error occured while transliterating', 'Please try again');
+            } finally {
+                // restore button state
+                if (spinner) spinner.classList.add('d-none');
+                if (label) label.classList.remove('d-none');
+                send_button.disabled = false;
+                send_button.removeAttribute('aria-busy');
+            }
         });
 
         let last_copied_interval = null;
