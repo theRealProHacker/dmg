@@ -61,7 +61,7 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
     beginning_non_token = data.sub_after(text[: starts[0]])
 
     tokens = [
-        Token(token, after=text[end:start], is_pausa=profile_is_name or profile.pausa)
+        Token(token, after=text[end:start], is_pausa=profile_is_name or profile.pausa) # type: ignore
         for token, end, start in zip(tokens, ends, [*starts[1:], len(text)])
     ]
     # sentence splitting
@@ -371,7 +371,7 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
             cont = False
             for pattern, replace in rules:
                 word, n = pattern.subn(replace, word)
-                cont = cont or n
+                cont = cont or bool(n)
                 # if n:
                 #     print(word, pattern, replace)
         # sun letter assimilation
@@ -625,7 +625,7 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
             cont = False
             for pattern, replace in rules:
                 word, n = pattern.subn(replace, word)
-                cont = cont or n
+                cont = cont or bool(n)
                 # if n:
                 #     print(word, pattern, replace)
         prefix = token.latin_prefix
