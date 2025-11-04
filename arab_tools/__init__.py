@@ -332,7 +332,7 @@ def _check_word(word: str, tag: str) -> list[StemmedWord]:
         if not any(c in ("ة", *araby.TANWIN) for c in word) and (
             tagger.has_verb_tag(tag) or tagger.is_stopword_tag(tag)
         ):
-            result += verbstemmer.stemming_verb(word_nm)
+            result += verbstemmer.stemming_verb(word_nm) # type: ignore
         if tagger.has_noun_tag(tag) or tagger.is_stopword_tag(tag):
             result += stem_noun(word_nm)
 
@@ -354,9 +354,10 @@ def _check_word(word: str, tag: str) -> list[StemmedWord]:
 
     return [StemmedWord(w) for w in result]
 
+type Stemming = tuple[str, Pos, Case, bool, str, str, str, bool]
 
 @cache
-def check_word(word: str, tag: str) -> tuple[str, Pos, Case, bool, str, str, str]:
+def check_word(word: str, tag: str) -> Stemming:
     result = _check_word(word, tag)
     # lemma, pos, case, is_definite, prefix, verb ending, suffix, success
     if not result:
@@ -438,7 +439,7 @@ def check_word(word: str, tag: str) -> tuple[str, Pos, Case, bool, str, str, str
             "g": len(sm["majrour"]) + len(sm["tanwin_majrour"]),
             "j": len(sm["majzoum"]),
         }
-        sorted_cases = sorted(cases, key=cases.get, reverse=True)
+        sorted_cases = sorted(cases, key=cases.get, reverse=True) # type: ignore
         gram_case = (
             "" if cases[sorted_cases[0]] == cases[sorted_cases[1]] else sorted_cases[0]
         )
@@ -448,7 +449,7 @@ def check_word(word: str, tag: str) -> tuple[str, Pos, Case, bool, str, str, str
         ) >= len(sm["tanwin_marfou3"]) + len(sm["tanwin_mansoub"]) + len(
             sm["tanwin_majrour"]
         )
-        affix = node.get_affix().split("-")
+        affix = node.get_affix().split("-") # type: ignore
         # debug info
         # print(affix)
         # print((
@@ -465,12 +466,12 @@ def check_word(word: str, tag: str) -> tuple[str, Pos, Case, bool, str, str, str
             affix[0],
             *affix[2:4],
             True,
-        )
+        ) # type: ignore
 
 
 def check_sentence(
     sentence: Sentence,
-) -> Generator[tuple[str, Pos, Case, bool, str, str, str], None, None]:
+) -> Generator[Stemming, None, None]:
     """
     Analyzes Arabic tokens
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {% block title %}
-        IJMES Transliteration
+        IJMES LLM Transliteration
         {% endblock %}
     </title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,11 +29,6 @@
         }
 
         .btn-primary {
-            background-color: var(--purple-accent);
-            border-color: var(--purple-accent);
-        }
-
-        .btn-primary:disabled {
             background-color: var(--purple-accent);
             border-color: var(--purple-accent);
         }
@@ -111,13 +106,27 @@
             padding: 10px;
         }
 
-        #magic {
+        .btn-outline-primary {
+            --bs-btn-color: var(--purple-accent);
+            --bs-btn-border-color: var(--purple-accent);
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: var(--purple-accent);
+            --bs-btn-hover-border-color: var(--purple-accent);
+            --bs-btn-focus-shadow-rgb: 124, 38, 167;
+            --bs-btn-active-color: #fff;
+            --bs-btn-active-bg: var(--purple-accent);
+            --bs-btn-active-border-color: var(--purple-accent);
+            --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+            --bs-btn-disabled-color: var(--purple-accent);
+            --bs-btn-disabled-bg: transparent;
+            --bs-btn-disabled-border-color: var(--purple-accent);
+            --bs-gradient: none;
+        }
+
+        #send-button {
             position: absolute;
             bottom: 0.9rem;
             right: 0.75rem;
-            width: 2rem;
-            padding: 0;
-            height: 2rem;
         }
 
         #input-text {
@@ -255,20 +264,13 @@
                     <a class="navbar-brand" href="/ijmes">
                         IJMES Transliteration
                     </a>
-                    <a class="nav-link" href="/ijmes/llm">
+                    <a class="nav-link active" href="/ijmes/llm">
                         LLM
                         <span class="badge text-bg-secondary top-20", style="position: relative;bottom: 2px;">New</span>
                     </a>
                 </ul>
                 <ul class="navbar-nav">
                     {% block nav_actions %}
-                    <!-- <li class="nav-item">
-                        <a class="btn ps-0" href="/book" type="button" title="Handbuch">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-book" viewBox="0 0 16 16">
-                                <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783"/>
-                            </svg>
-                        </a>
-                    </li> -->
                     <li class="nav-item mx-2">
                         <button class="btn ps-0" type="button" data-bs-toggle="modal" data-bs-target="#feedback-modal" aria-controls="feedback-modal" title="Feedback" style="vertical-align: text-top;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentcolor" viewBox="0 -960 960 960"><path d="M480-360q17 0 28.5-11.5T520-400q0-17-11.5-28.5T480-440q-17 0-28.5 11.5T440-400q0 17 11.5 28.5T480-360Zm-40-160h80v-240h-80v240ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg>
@@ -310,9 +312,9 @@
         <main>
             {% block main %}
             <div class="col-12 mb-3">
-                Transliterate your fully-vocalized text. <br>
-                Press the magic wand in the input field below to automatically vocalize your text.
-                <div id="profile" class="col">
+                Transliterate any Arabic text using an AI-based method.
+                
+                <!-- <div id="profile" class="col">
                     <div class="form-check form-switch mt-3">
                         <label class="form-check-label" for="is-name-profile-input" data-bs-toggle="tooltip">
                             Are you trying to transliterate a name?
@@ -325,22 +327,21 @@
                         </label>
                         <input id="diphthongs-profile-input" class="form-check-input" type="checkbox" role="switch" name="diphthongs">
                     </div>
-                </div>
+                </div> -->
             </div>
             <div id="input-output" class="row mb-lg-5">
                 <div class="col-12 col-lg-6 mb-3">
-                    <div id="textarea-magic-wrapper" style="position:relative;">
-                        <textarea id="input-text" dir="rtl" placeholder="كَلِيلَة وَدِمنَة"  autofocus></textarea>
-                        <button id="magic" class="btn btn-primary" title="Vocalize" data-bs-toggle="tooltip">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-magic" viewBox="0 0 16 16">
-                                <path d="M9.5 2.672a.5.5 0 1 0 1 0V.843a.5.5 0 0 0-1 0zm4.5.035A.5.5 0 0 0 13.293 2L12 3.293a.5.5 0 1 0 .707.707zM7.293 4A.5.5 0 1 0 8 3.293L6.707 2A.5.5 0 0 0 6 2.707zm-.621 2.5a.5.5 0 1 0 0-1H4.843a.5.5 0 1 0 0 1zm8.485 0a.5.5 0 1 0 0-1h-1.829a.5.5 0 0 0 0 1zM13.293 10A.5.5 0 1 0 14 9.293L12.707 8a.5.5 0 1 0-.707.707zM9.5 11.157a.5.5 0 0 0 1 0V9.328a.5.5 0 0 0-1 0zm1.854-5.097a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L8.646 5.94a.5.5 0 0 0 0 .707l.708.708a.5.5 0 0 0 .707 0l1.293-1.293Zm-3 3a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L.646 13.94a.5.5 0 0 0 0 .707l.708.708a.5.5 0 0 0 .707 0z"/>
-                            </svg>
+                    <div id="textarea-wrapper" style="position:relative;">
+                        <textarea id="input-text" dir="rtl" placeholder="كليلة ودمنة" autofocus></textarea>
+
+                        <button id="send-button" class="btn btn-outline-primary">
+                            <span class="btn-label">Send</span>
                             <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                         </button>
                     </div>
                 </div>
                 <div class="col-12 col-lg-6">
-                    <textarea id="output-text" class="disabled" readonly placeholder="kalīla wa-dimna"></textarea>
+                    <textarea id="output-text" class="disabled" readonly placeholder="Kalīla wa Dimna"></textarea>
                     <div id="one-click-feedback">
                         <span>How do you find this transliteration?</span>
                         <button class="btn" data-bs-toggle="button" title="Positive Feedback" data-bs-toggle="tooltip">
@@ -371,7 +372,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.js"></script>
-    <script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@latest/lib/index.js" type="module"></script> -->
+    <script type="module">
         // Toasts
         const toast_container = document.querySelector('.toast-container')
         const title_toast_template = document.getElementById('title-toast-template')
@@ -438,93 +440,55 @@
             });
         });
 
+        // LLM (too slow currently, difficult to detect GPU, maybe less parameters?)
+        // https://github.com/mlc-ai/web-llm
+        // import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+
+        // const initProgressCallback = (initProgress) => {
+        //     console.log(initProgress);
+        // }
+
+        // const selectedModel = "Llama-3.1-8B-Instruct-q4f32_1-MLC";
+
+        // const engine = await webllm.CreateMLCEngine(
+        //     selectedModel,
+        //     { initProgressCallback: initProgressCallback }, 
+        // );
+
         // Rest
         const map = {{ input_map|tojson }};
 
         let timeoutId;
-        let processing = false;
-        const trans_url = '/transliterate/ijmes';
+        const trans_url = '/transliterate/ijmes/llm';
         const input = document.getElementById('input-text');
+        const send_button = document.getElementById('send-button');
         const output = document.getElementById('output-text');
         const profile_inputs = document.querySelectorAll('#profile input[name]');
         const one_click_feedback_btns = [...document.querySelectorAll("#one-click-feedback>button")];
 
-        // Vocalization
-        const magic_button = document.getElementById('magic');
-        magic_button.addEventListener('click', async (e) => {
-            input.focus();
-            // prevent double-clicks / concurrent vocalize requests
-            if (magic_button.disabled) return;
 
-            const svgIcon = magic_button.querySelector('svg');
-            const spinner = magic_button.querySelector('.spinner-border');
+        const transliterate = async () => {
+            const text = input.value
 
-            // show spinner and hide svg
-            if (svgIcon) svgIcon.classList.add('d-none');
-            if (spinner) spinner.classList.remove('d-none');
-            magic_button.disabled = true;
-            magic_button.setAttribute('aria-busy', 'true');
-
-            try {
-                const response = await fetch('/vocalize', { method: 'POST', body: input.value });
-                if (!response.ok) {
-                    console.error(response);
-                    show_title_toast('An unexpected error occured while vocalizing', 'Please try again');
-                    return;
-                }
-                const text = await response.text();
-                document.execCommand("selectAll", false, null);
-                document.execCommand("insertText", false, text);
-                send_request();
-            } catch (err) {
-                console.error(err);
-                show_title_toast('An unexpected error occured while vocalizing', 'Please try again');
-            } finally {
-                // hide spinner and restore svg
-                if (spinner) spinner.classList.add('d-none');
-                if (svgIcon) svgIcon.classList.remove('d-none');
-                magic_button.disabled = false;
-                magic_button.removeAttribute('aria-busy');
-            }
-        });
-
-        const profile = {};
-        const send_request = () => {
-            const text = input.value;
-            if (!text) {
-                output.value = ""
-                return false
-            };
-
-            profile_inputs.forEach(input => {
-                if (input.type === 'checkbox') {
-                    profile[input.name] = input.checked
-                }
-            });
-
-            fetch(trans_url, { method: 'POST', body: JSON.stringify({ text, profile }) })
+            // const messages = [
+            //     {role: 'system', content: 'Transliterating according to IJMES ...'},
+            //     {role: 'user', content: text}
+            // ]
+            
+            // const reply = await engine.chat.completions.create({
+            //     messages,
+            // });
+            // output.value = reply.choices[0].message.content
+            output.value = await fetch(trans_url, { method: 'POST', body: JSON.stringify({ text }) })
             .then(response => {
                 if (response.ok){
-                    // last_sent = text;
                     return response.text() 
                 }
                 else 
                     throw new Error(response)
             })
-            .then(data => {
-                output.value = data;
-                one_click_feedback_btns.forEach(btn => {
-                    btn.classList.remove('active');
-                    btn.classList.remove('disabled');
-                })
-            })
-            .catch(error => {
-                console.error(error.message)
-                show_title_toast('The server is currently not available', 'Please try again later')
-            });
-            console.debug(text, profile, output.value);
         }
-
+ 
         input.addEventListener('keydown', (e) => {
             // no modifier keys except for shift
             if (e.key in map && !e.ctrlKey && !e.altKey && !e.metaKey) {
@@ -534,17 +498,39 @@
         })
 
         input.addEventListener('input', (e) => {
-            clearTimeout(timeoutId); 
             if (!input.value) {
                 output.value = ""
                 return false
             }
-            timeoutId = setTimeout(send_request, e.inputType === 'insertFromPaste' ? 0 : 1000);
-        });
+        })
 
-        input.addEventListener('change', ()=>{
-            clearTimeout(timeoutId)
-            send_request()
+        send_button.addEventListener('click', async (e) => {
+            if (!input.value) {
+                output.value = ""
+                return false
+            }
+
+            const label = send_button.querySelector('.btn-label');
+            const spinner = send_button.querySelector('.spinner-border');
+
+            // show spinner and hide label
+            if (label) label.classList.add('d-none');
+            if (spinner) spinner.classList.remove('d-none');
+            send_button.disabled = true;
+            send_button.setAttribute('aria-busy', 'true');
+
+            try {
+                await transliterate();
+            } catch (err) {
+                console.error(err);
+                show_title_toast('An unexpected error occured while transliterating', 'Please try again');
+            } finally {
+                // restore button state
+                if (spinner) spinner.classList.add('d-none');
+                if (label) label.classList.remove('d-none');
+                send_button.disabled = false;
+                send_button.removeAttribute('aria-busy');
+            }
         });
 
         let last_copied_interval = null;
@@ -563,8 +549,6 @@
                 show_title_toast('Copied', output.value);
             }
         });
-
-        profile_inputs.forEach(input => input.addEventListener('change', send_request));
 
         // Feedback
         const feedback_form = document.getElementById('feedback-form');

@@ -1,4 +1,6 @@
 flask
+python-dotenv
+
 pyarabic
 naftawayh
 qalsadi
@@ -13,6 +15,7 @@ mistune
 # python-slugify[unidecode]
 
 # AI
+huggingface-hub
 # torch
 # transformers
 

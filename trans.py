@@ -1,3 +1,4 @@
+import os
 import re
 from contextlib import suppress
 
@@ -61,7 +62,7 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
     beginning_non_token = data.sub_after(text[: starts[0]])
 
     tokens = [
-        Token(token, after=text[end:start], is_pausa=profile_is_name or profile.pausa)
+        Token(token, after=text[end:start], is_pausa=profile_is_name or profile.pausa) # type: ignore
         for token, end, start in zip(tokens, ends, [*starts[1:], len(text)])
     ]
     # sentence splitting
@@ -371,7 +372,7 @@ def transliterate(text: str, profile: Profile | NameProfile = Profile()) -> str:
             cont = False
             for pattern, replace in rules:
                 word, n = pattern.subn(replace, word)
-                cont = cont or n
+                cont = cont or bool(n)
                 # if n:
                 #     print(word, pattern, replace)
         # sun letter assimilation
@@ -625,7 +626,7 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
             cont = False
             for pattern, replace in rules:
                 word, n = pattern.subn(replace, word)
-                cont = cont or n
+                cont = cont or bool(n)
                 # if n:
                 #     print(word, pattern, replace)
         prefix = token.latin_prefix
@@ -636,3 +637,50 @@ def transliterate_ijmes(text: str, profile: IJMESProfile = IJMESProfile()) -> st
         token.latin = word
 
     return beginning_non_token + "".join(token.result for token in tokens)
+
+def transliterate_llm(text: str):
+    from huggingface_hub import InferenceClient
+
+    input_words = text.split().__len__()
+
+    # no special key
+    client = InferenceClient(
+        provider="nscale",
+        token=os.environ["HF_TOKEN"]
+    )
+
+    messages = [
+        {
+            "role": "system",
+            "content":  """
+                        
+                        You are a transliterator that transliterates vocalized or unvocalized Arabic text according to the IJMES standard. 
+                        Your task is to transliterate as succinctly as possible. 
+                        
+                        To correctly transliterate, you must first understand the meaning of the text, its grammatical structure, and the context in which words are used.
+
+                        Don't explain anything, keep your answers as short as possible. 
+                        """.strip()
+        },
+        {
+            "role": "user",
+            "content": text
+        }
+    ]
+
+    completion = client.chat_completion(
+        model="Qwen/Qwen3-235B-A22B", 
+        messages=messages, 
+        max_tokens=input_words*200 + 2000,
+        temperature=0.6,
+        top_p=0.95,
+    )
+
+    content = completion.choices[0].message.content
+
+    if content is None:
+        raise ValueError("No content returned from LLM.")
+
+    content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+
+    return content.strip()
