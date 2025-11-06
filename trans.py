@@ -643,7 +643,11 @@ def transliterate_llm(text: str):
 
     input_words = text.split().__len__()
 
-    # no special key
+    if not "HF_TOKEN" in os.environ:
+        import dotenv
+
+        dotenv.load_dotenv()
+
     client = InferenceClient(
         provider="nscale",
         token=os.environ["HF_TOKEN"]
