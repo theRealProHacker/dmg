@@ -426,7 +426,8 @@ def check_word(word: str, tag: str) -> tuple[str, Pos, Case, bool, str, str, str
             if result[-1] and result[1] == "noun":
                 return prepend_prefix(result, letter + data.fatha)
         # debug
-        print(word, "not found")
+        with open("broken_words.txt", "a", encoding="utf-8") as f:
+            f.write(word + "\n")
         return default_return
     else:
         node = stemnode.StemNode(result, True)
